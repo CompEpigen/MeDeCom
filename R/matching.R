@@ -74,6 +74,8 @@ match.matrix<-function(TT, Tref, method="pearson"){
 corrmatch<-function(TT, Tref, method="pearson",return.vals=F){
 	
 	mmat<-match.matrix(TT,Tref,method)
+	## a very bad solution for the degenerate cases
+	mmat[is.na(mmat)]<-0 
 	if(return.vals){
 		return(apply(mmat, 1, max))
 	}else{

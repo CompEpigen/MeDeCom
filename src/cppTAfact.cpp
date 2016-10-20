@@ -743,9 +743,9 @@ List cppTAfact(const NumericMatrix& mDt, const NumericMatrix& mTtinit, const Num
     /* Dimensionality of a problem */
     const size_t r = mAinit.rows();
 
-    const RMatrixIn Dt     = as<RMatrixIn>(mDt);
-    const RMatrixIn Ttinit = as<RMatrixIn>(mTtinit);
-    const RMatrixIn Ainit  = as<RMatrixIn>(mAinit);
+    const RMatrixIn Dt     = as<const RMatrixIn>(mDt);
+    const RMatrixIn Ttinit = as<const RMatrixIn>(mTtinit);
+    const RMatrixIn Ainit  = as<const RMatrixIn>(mAinit);
 
     RMatrixOut mTtout, mAout;
     int nItout;

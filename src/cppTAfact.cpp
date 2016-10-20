@@ -13,6 +13,13 @@
 /* R-C++ interface with Eigen support */
 #include <Rcpp.h>
 #include <RcppEigen.h>
+/*
+ * Rcpp declarations
+ */
+// [[Rcpp::depends(RcppEigen)]]
+//
+// Enable C++11 via this plugin (Rcpp 0.10.3 or later)
+// [[Rcpp::plugins(cpp11)]]
 
 using namespace Rcpp;
 
@@ -37,14 +44,6 @@ bool gotSignal = false;
 void setGotSignal(int signum) {
     gotSignal = true;
 }
-
-/*
- * Rcpp declarations
- */
-// [[Rcpp::depends(RcppEigen)]]
-//
-// Enable C++11 via this plugin (Rcpp 0.10.3 or later)
-// [[Rcpp::plugins(cpp11)]]
 
 /* Binary operator to get projected gradient
  * while optimizing wrt T

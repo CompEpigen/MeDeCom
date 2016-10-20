@@ -757,6 +757,79 @@ onerun.alternate<-function(
 	return(result)
 }
 
+
+
+#######################################################################################################################
+# Implemenation of the alternating optimization scheme
+#######################################################################################################################
+#
+# a wrapper for cppTAfact
+#
+# cppTAfact - alternating optimization framework to solve the following
+# problem:
+#		find T, A such that 0.5 * (||D - TA||_F)^2 + lambda ,
+# where D is a mxn matrix with entries between 0 and 1,
+# T is a mxr matrix with entries between 0 and 1,
+# A is a rxn matrix with nonnegative values and columns summing up
+# to 1.
+#
+# author: Nikita Vedeneev
+#
+# R port by Pavlo Lutsik
+#
+
+onerun.cppTAfact<-function(
+		D, 
+		T0, 
+		A0,
+		Tfix=NULL,
+		Tpartial=NULL,
+		Tpartial.rows=NULL,
+		Apartial=NULL,
+		Apartial.cols=NULL,
+		t.method="quadPen", 
+		lambda = 0,
+		t.Poss = NULL, 
+		normD = NULL, 
+		itermax=100,
+		qp.rangeT=c(0,1),
+		#qp.Alower=rep(0,ncol(T0)),
+		#qp.Aupper=rep(1,ncol(T0)),
+		qp.Alower=NULL,
+		qp.Aupper=NULL,
+		emp.dim=500, 
+		emp.resample=TRUE,
+		emp.vsf=1,
+		emp.borders=c(0,1),
+		trace=FALSE,
+		eps=1e-8,
+		blocks=NULL,
+		na.values=FALSE,
+		verbose=TRUE){
+
+	
+	res<-cppTAfact(
+			t(D), #- a transposed D matrix,
+			t(T0), #-Ttinit - a transposed init for T matrix,
+			Ainit, # - an initial value for A matrix,
+			lambda,# - regularizer parameter (0.0 by default),
+			itermax, #itersMax, - a max number of alternations (1000 by default),
+			eps, #tol - tolerance for alternations (1e-8 by default),
+			10*eps, #tolA - tolerance for opt wrt A (1e-7 by default),
+			10*eps #tolT - tolerance for opt wrt T (1e-7 by default)
+	)
+	### TODO: modify cppTAfact to output the list is identical to the output of onerun.alternate
+	#
+	#cppTAfact returns a named list where:
+    #res$Tt - a transposed estimated of T matrix,
+    #res$A - an estimate of A matrix,
+    #res$niter - a total number of alternations
+    #res$objF - objective value at res$Tt and res$A
+	#
+	result<-list("T" = t(res$Tt), "A" = res$A, "Fval" = res$objF, "Conv" = res$niter, "rmse"= sqrt(mean((D-t(res$Tt)%*%res$A)^2)))
+	return(result)
+}
+
 #######################################################################################################################
 #'
 #' factorize.alternate
@@ -823,7 +896,8 @@ onerun.alternate<-function(
 #' @export
 #' 
 factorize.alternate<-function(D, 
-		k, 
+		k,
+		method="MeDeCom.quadPen",
 		t.method="quadPen",
 		Tfix=NULL,
 		Tpartial=NULL,
@@ -1008,8 +1082,15 @@ factorize.alternate<-function(D,
 				}
 			}
 		}
+		
 		# solve the topic model
-		onerun <- onerun.alternate(
+		if(method == "MeDeCom.cppTAfact"){
+			onerun.function<-onerun.cppTAfact
+		}else{
+			onerun.function<-onerun.alternate
+		}
+
+		onerun <- onerun.function(
 				D, T0, A0,
 				Tfix = Tfix,
 				Tpartial=NULL,

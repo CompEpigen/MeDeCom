@@ -15,6 +15,7 @@
 #include <RcppEigen.h>
 
 using namespace Rcpp;
+using namespace RcppEigen;
 
 /*
  * Rcpp declarations
@@ -724,7 +725,7 @@ void solve(int d, const RMatrixIn& mDt, const RMatrixIn& mTtinit, const RMatrixI
 }
 
 // [[Rcpp::export]]
-List cppTAfact(const RMatrixIn& mDt, const RMatrixIn& mTtinit, const RMatrixIn& mAinit,
+List cppTAfact(const NumericMatrix& mDt, const NumericMatrix& mTtinit, const NumericMatrix& mAinit,
         double lambda = 0.0, int itersMax = 1000,
         double tol = 1e-8, double tolA = 1e-7, double tolT = 1e-7) {
     /* Prepare Eigen for multithreading */
@@ -742,13 +743,17 @@ List cppTAfact(const RMatrixIn& mDt, const RMatrixIn& mTtinit, const RMatrixIn& 
     /* Dimensionality of a problem */
     const size_t r = mAinit.rows();
 
+    const RMatrixIn Dt     = as<RMatrixIn>(mDt);
+    const RMatrixIn Ttinit = as<RMatrixIn>(mTtinit);
+    const RMatrixIn Ainit  = as<RMatrixIn>(mAinit);
+
     RMatrixOut mTtout, mAout;
     int nItout;
     double objFout;
     solve<2, 3, 4, 5,
           6, 7, 8, 9,
           10, 11, 12,
-          13, 14, 15, 16>(r, mDt, mTtinit, mAinit, lambda, itersMax,
+          13, 14, 15, 16>(r, Dt, Ttinit, Ainit, lambda, itersMax,
                   tol, tolA, tolT,
                   mTtout, mAout, nItout, objFout);
 

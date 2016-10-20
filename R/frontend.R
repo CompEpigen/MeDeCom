@@ -13,6 +13,7 @@
 #' @param data	 	DNA methylation dataset as a \code{numeric} matrix (methylation sites vs samples) or an ojbect of class \code{RnBeadSet}
 #' @param Ks		values of parameter \deqn{k} to be tested, vector of type \code{integer}
 #' @param lambdas	values of parameter \deqn{\lambda} to be tested, vector of type \code{numeric}
+#' @param opt.method optimization method used. Currently supported values are \code{"MeDeCom.quadPen"} and \code{"MeDeCom.cppTAfact"}.
 #' @param cg_subsets a \code{list} of \code{integer} vectors specifying row indices to include into the analysis
 #' @param sample_subset samples to include into the analysis
 #' @param startT    a \code{list} of length equal to \code{length(Ks)} or a \code{matrix} with \code{max(Ks)} columns
@@ -43,7 +44,8 @@
 runMeDeCom<-function(
 		data, 
 		Ks, 
-		lambdas, 
+		lambdas,
+		opt.method="MeDeCom.quadpen",
 		cg_subsets=NULL,
 		sample_subset=NULL,
 		startT=NULL,
@@ -254,7 +256,8 @@ runMeDeCom<-function(
 								ITERMAX=ITERMAX,
 								NCORES=NCORES,
 								WD=WD, 
-								DD=DD)
+								DD=DD,
+								METHOD=opt.method)
 						if(run=="full" && cluster_run){
 							cv_results_idx<-result_index[
 									match(param_list$cg_subset_id, cg_subset_ids),
@@ -344,6 +347,7 @@ runMeDeCom<-function(
 											NCORES=NCORES,
 											WD=WD,
 											DD=DD,
+											METHOD=opt.method,
 											lnr_result=result_list[[res_idx]],
 											clnr_result=result_list[[comp_res_idx]]
 											)
@@ -608,7 +612,7 @@ singleRun<-function(
 		NINIT,
 		ITERMAX,
 		NCORES=1L,
-		METHOD="MeDeCom",
+		METHOD="MeDeCom.quadPen",
 		verbosity=1L
 ){
 	D<-meth_matrix
@@ -626,6 +630,7 @@ singleRun<-function(
 		fr<-factorize.alternate(	
 				D,
 				k=K,
+				method=METHOD,
 				t.method=MeDeCom:::T_METHODS[METHOD],
 				lambda=ALG_LAMBDA,
 				init=ALG_INT,

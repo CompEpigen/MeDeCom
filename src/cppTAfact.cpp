@@ -25,6 +25,7 @@ using namespace RcppEigen;
 // Enable C++11 via this plugin (Rcpp 0.10.3 or later)
 // [[Rcpp::plugins(cpp11)]]
 
+
 /* Signal handling */
 #include <signal.h>
 #include <unistd.h>
@@ -70,11 +71,10 @@ public:
     }
 };
 
-template <int DIM = 16, typename Scalar = Double>
+template <typename MatrixBig, int DIM = 16, typename Scalar = Double>
 class ProbSimplexProjector {
 public:
-    using Matrix      = Eigen::Matrix<Scalar, DIM, Dynamic>;
-    using MatrixBig   = Eigen::Matrix<Scalar, Dynamic, Dynamic>;
+    using Matrix = Eigen::Matrix<Scalar, DIM, Dynamic>;
 
 private:
     const Matrix mTtD;
@@ -547,7 +547,7 @@ private:
                 descent(fidxv(i)) = descentFree(i);
             }
 
-            Scalar currStep = applyDescent(t, grad, descent);
+            applyDescent(t, grad, descent);
             evalGrad(t, grad);
 
             /* Evaluate optimality condition */
@@ -595,33 +595,18 @@ private:
 };
 
 template <int DIM = -1>
-void applySolver(const RMatrixIn& mDt, const RMatrixIn& mTtinit, const RMatrixIn& mAinit,
+void applySolver(const RMatrixIn& Dt, const RMatrixIn& mTtinit, const RMatrixIn& mAinit,
         double lambda, int itersMax, double tol, double tolA, double tolT,
         RMatrixOut& mTtout, RMatrixOut& mAout, int& nItout, double& objFout) {
     using MatrixDD = Eigen::Matrix<Double, DIM, DIM>;
     using VectorDD = Eigen::Matrix<Double, DIM, 1>;
-
-    using EigenMD = Map<Eigen::Matrix<double, DIM, DIM>>;
-    using EigenVD = Map<Eigen::Matrix<double, DIM, 1>>;
-
-    using EigenMDX = Map<Eigen::Matrix<double, DIM, Dynamic>>;
     using MatrixDX = Eigen::Matrix<Double, DIM, Dynamic>;
 
-    using MatrixDd = Eigen::Matrix<double, DIM, DIM>;
-    using VectorDd = Eigen::Matrix<double, DIM, 1>;
-
-    using EigenMXX = Map<Eigen::MatrixXd>;
-    using MatrixXX = Eigen::MatrixXd;
-
     size_t r = mAinit.rows();
-    size_t n = mDt.rows();
-    size_t m = mDt.cols();
+    size_t n = Dt.rows();
+    size_t m = Dt.cols();
 
     /* Convert to Eigen's data types */
-    //MatrixXX Dt = EigenMXX(mDt.data(), n, m).template cast<Double>();
-    //MatrixDX Tt = EigenMDX(mTtinit.data() r, m).template cast<Double>();
-    //MatrixDX A  = EigenMDX(mAinit.data(), r, n).template cast<Double>();
-    MatrixXX Dt = mDt.template cast<Double>();
     MatrixDX Tt = mTtinit.template cast<Double>();
     MatrixDX A  = mAinit.template cast<Double>();
 
@@ -644,7 +629,7 @@ void applySolver(const RMatrixIn& mDt, const RMatrixIn& mTtinit, const RMatrixIn
         /*
         * Optimization wrt A {
         */
-        ProbSimplexProjector<DIM> probSmplxProjector(Dt, Tt, tolA, innerItersMax);
+        ProbSimplexProjector<RMatrixIn, DIM> probSmplxProjector(Dt, Tt, tolA, innerItersMax);
         probSmplxProjector.solve(A);
 
         /*
@@ -725,7 +710,7 @@ void solve(int d, const RMatrixIn& mDt, const RMatrixIn& mTtinit, const RMatrixI
 }
 
 // [[Rcpp::export]]
-List cppTAfact(const NumericMatrix& mDt, const NumericMatrix& mTtinit, const NumericMatrix& mAinit,
+RcppExport SEXP cppTAfact(SEXP mDtSEXP, SEXP mTtinitSEXP, SEXP mAinitSEXP,
         double lambda = 0.0, int itersMax = 1000,
         double tol = 1e-8, double tolA = 1e-7, double tolT = 1e-7) {
     /* Prepare Eigen for multithreading */
@@ -740,12 +725,12 @@ List cppTAfact(const NumericMatrix& mDt, const NumericMatrix& mTtinit, const Num
     signal(SIGTERM, setGotSignal);
     signal(SIGKILL, setGotSignal);
 
+    RMatrixIn mDt(as<RMatrixIn>(mDtSEXP));
+    RMatrixIn mTtinit(as<RMatrixIn>(mTtinitSEXP));
+    RMatrixIn mAinit(as<RMatrixIn>(mAinitSEXP));
+
     /* Dimensionality of a problem */
     const size_t r = mAinit.rows();
-
-    const RMatrixIn Dt     = as<RMatrixIn>(mDt);
-    const RMatrixIn Ttinit = as<RMatrixIn>(mTtinit);
-    const RMatrixIn Ainit  = as<RMatrixIn>(mAinit);
 
     RMatrixOut mTtout, mAout;
     int nItout;
@@ -753,12 +738,12 @@ List cppTAfact(const NumericMatrix& mDt, const NumericMatrix& mTtinit, const Num
     solve<2, 3, 4, 5,
           6, 7, 8, 9,
           10, 11, 12,
-          13, 14, 15, 16>(r, Dt, Ttinit, Ainit, lambda, itersMax,
+          14, 15, 16>(r, mDt, mTtinit, mAinit, lambda, itersMax,
                   tol, tolA, tolT,
                   mTtout, mAout, nItout, objFout);
 
-    return List::create(Named("Tt")    = mTtout,
-                        Named("A")     = mAout,
-                        Named("niter") = nItout,
-                        Named("objF")  = objFout);
+    return wrap(List::create(Named("Tt")    = mTtout,
+                             Named("A")     = mAout,
+                             Named("niter") = nItout,
+                             Named("objF")  = objFout));
 }

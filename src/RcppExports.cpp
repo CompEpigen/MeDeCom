@@ -5,6 +5,24 @@
 
 using namespace Rcpp;
 
+// cppTAfact
+List cppTAfact(const RMatrixIn& mDt, const RMatrixIn& mTtinit, const RMatrixIn& mAinit, double lambda, int itersMax, double tol, double tolA, double tolT);
+RcppExport SEXP MeDeCom_cppTAfact(SEXP mDtSEXP, SEXP mTtinitSEXP, SEXP mAinitSEXP, SEXP lambdaSEXP, SEXP itersMaxSEXP, SEXP tolSEXP, SEXP tolASEXP, SEXP tolTSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< const RMatrixIn& >::type mDt(mDtSEXP);
+    Rcpp::traits::input_parameter< const RMatrixIn& >::type mTtinit(mTtinitSEXP);
+    Rcpp::traits::input_parameter< const RMatrixIn& >::type mAinit(mAinitSEXP);
+    Rcpp::traits::input_parameter< double >::type lambda(lambdaSEXP);
+    Rcpp::traits::input_parameter< int >::type itersMax(itersMaxSEXP);
+    Rcpp::traits::input_parameter< double >::type tol(tolSEXP);
+    Rcpp::traits::input_parameter< double >::type tolA(tolASEXP);
+    Rcpp::traits::input_parameter< double >::type tolT(tolTSEXP);
+    __result = Rcpp::wrap(cppTAfact(mDt, mTtinit, mAinit, lambda, itersMax, tol, tolA, tolT));
+    return __result;
+END_RCPP
+}
 // RHLasso
 List RHLasso(NumericMatrix Ginp, NumericMatrix Winp, NumericMatrix Ainp, NumericVector l);
 RcppExport SEXP MeDeCom_RHLasso(SEXP GinpSEXP, SEXP WinpSEXP, SEXP AinpSEXP, SEXP lSEXP) {

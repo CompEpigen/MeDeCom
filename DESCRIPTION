@@ -14,7 +14,6 @@ Version: 0.11
 Depends:
     R (>= 3.2.0),
     Rcpp,
-    RcppEigen,
     pracma,
     gtools,
     gplots,
@@ -23,7 +22,12 @@ Suggests:
     BiocStyle,
     knitr,
     rmarkdown
+Imports: 
+    Rcpp (>= 0.12.6), 
+    RcppEigen (>= 0.3.2.9.0)
+LinkingTo: 
+    Rcpp, 
+    RcppEigen
 VignetteBuilder: knitr
 License: GPL-3
-LinkingTo: Rcpp
 RoxygenNote: 5.0.1

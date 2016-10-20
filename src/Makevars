@@ -14,5 +14,5 @@
 
 
 # standard setup
-PKG_LIBS = `$(R_HOME)/bin/Rscript -e "Rcpp:::LdFlags()"`
-PKG_CXXFLAGS=`$(R_HOME)/bin/Rscript -e "Rcpp:::CxxFlags()"` -I. -fopenmp -std=c++11
+PKG_LIBS = `$(R_HOME)/bin/Rscript -e "Rcpp:::LdFlags()"`  
+PKG_CXXFLAGS=`$(R_HOME)/bin/Rscript -e "Rcpp:::CxxFlags()"` `$(R_HOME)/bin/Rscript -e "RcppEigen:::CxxFlags()"` -I. -fopenmp -std=c++11

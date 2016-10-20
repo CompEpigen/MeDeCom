@@ -659,7 +659,6 @@ void applySolver(const RMatrixIn& Dt, const RMatrixIn& mTtinit, const RMatrixIn&
         double dA = (Aprev - A).norm() / std::sqrt(r * n);
         double dT = (Ttprev - Tt).norm() / std::sqrt(r * m);
         optCond = std::sqrt(dA * dA + dT * dT);
-        std::cout<<optCond<<std::endl;
     }
 
     /*

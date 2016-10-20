@@ -16,6 +16,14 @@
 
 using namespace Rcpp;
 
+/*
+ * Rcpp declarations
+ */
+// [[Rcpp::depends(RcppEigen)]]
+//
+// Enable C++11 via this plugin (Rcpp 0.10.3 or later)
+// [[Rcpp::plugins(cpp11)]]
+
 /* Signal handling */
 #include <signal.h>
 #include <unistd.h>
@@ -37,14 +45,6 @@ bool gotSignal = false;
 void setGotSignal(int signum) {
     gotSignal = true;
 }
-
-/*
- * Rcpp declarations
- */
-// [[Rcpp::depends(RcppEigen)]]
-//
-// Enable C++11 via this plugin (Rcpp 0.10.3 or later)
-// [[Rcpp::plugins(cpp11)]]
 
 /* Binary operator to get projected gradient
  * while optimizing wrt T

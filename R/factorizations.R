@@ -811,7 +811,7 @@ onerun.cppTAfact<-function(
 	res<-cppTAfact(
 			t(D), #- a transposed D matrix,
 			t(T0), #-Ttinit - a transposed init for T matrix,
-			Ainit, # - an initial value for A matrix,
+			A0, # - an initial value for A matrix,
 			lambda,# - regularizer parameter (0.0 by default),
 			itermax, #itersMax, - a max number of alternations (1000 by default),
 			eps, #tol - tolerance for alternations (1e-8 by default),
@@ -925,7 +925,7 @@ factorize.alternate<-function(D,
 		na.values=FALSE,
 		verbosity=0L){
 	
-	if(!t.method %in% c("integer", "empirical", "resample", "Hlasso", "optim", "quadPen")){
+	if(!t.method %in% c("integer", "empirical", "resample", "Hlasso", "optim", "quadPen", "cppTAfact")){
 		stop("supplied optimization method for T is not implemented")
 	}
 	

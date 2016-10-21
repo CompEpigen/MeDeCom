@@ -594,10 +594,16 @@ private:
     }
 };
 
+struct SolverSuppOutput {
+    int niters;
+    double objF;
+    double rmse;
+};
+
 template <int DIM = -1>
 void applySolver(const RMatrixIn& Dt, const RMatrixIn& mTtinit, const RMatrixIn& mAinit,
         double lambda, int itersMax, double tol, double tolA, double tolT,
-        RMatrixOut& mTtout, RMatrixOut& mAout, int& nItout, double& objFout) {
+        RMatrixOut& mTtout, RMatrixOut& mAout, SolverSuppOutput& supp) {
     using MatrixDD = Eigen::Matrix<Double, DIM, DIM>;
     using VectorDD = Eigen::Matrix<Double, DIM, 1>;
     using MatrixDX = Eigen::Matrix<Double, DIM, Dynamic>;
@@ -618,6 +624,7 @@ void applySolver(const RMatrixIn& Dt, const RMatrixIn& mTtinit, const RMatrixIn&
 
     int niter = 1;
     double optCond = 1e+10;
+    int method = QPBoxSolverSmallDims<DIM>::Method::newton;
 
     MatrixDX Ttprev;
     MatrixDX Aprev;
@@ -647,7 +654,15 @@ void applySolver(const RMatrixIn& Dt, const RMatrixIn& mTtinit, const RMatrixIn&
             VectorDD t = Tt.col(i);
             VectorDD b = B.col(i);
             QPBoxSolverSmallDims<DIM> solver(AAt, b, tolT, innerItersMax);
-            solver.solve(t);
+
+            if (2 == r) {
+                method = QPBoxSolverSmallDims<DIM>::Method::exact_rank_2;
+            }
+            else if (14 < r) {
+                method = QPBoxSolverSmallDims<DIM>::Method::coord_descent;
+            }
+
+            solver.solve(t, method);
 
             Tt.col(i) = t;
         }
@@ -666,9 +681,9 @@ void applySolver(const RMatrixIn& Dt, const RMatrixIn& mTtinit, const RMatrixIn&
      */
     mTtout  = Tt;
     mAout   = A;
-    nItout  = niter - 1;
-    objFout = 0.5 * (Dt - A.transpose() * Tt).squaredNorm()
-            + lambda * (Tt.sum() - Tt.squaredNorm());
+    supp.niters = niter - 1;
+    supp.rmse   = 0.5 * (Dt - A.transpose() * Tt).squaredNorm();
+    supp.objF   = supp.rmse + lambda * (Tt.sum() - Tt.squaredNorm());
 }
 
 /* Some Voodoo magic to eliminate
@@ -678,34 +693,34 @@ template <int ...> struct DimList {};
 /* border case */
 void solve(int d, const RMatrixIn& mDt, const RMatrixIn& mTtinit, const RMatrixIn& mAinit,
         double lambda, int itersMax, double tol, double tolA, double tolT,
-        RMatrixOut& mTtout, RMatrixOut& mAout, int& nItout, double& objFout,
+        RMatrixOut& mTtout, RMatrixOut& mAout, SolverSuppOutput& supp,
         DimList<>) {
 }
 
 template <int DIM, int ...DIMS>
 void solve(int d, const RMatrixIn& mDt, const RMatrixIn& mTtinit, const RMatrixIn& mAinit,
         double lambda, int itersMax, double tol, double tolA, double tolT,
-        RMatrixOut& mTtout, RMatrixOut& mAout, int& nItout, double& objFout,
+        RMatrixOut& mTtout, RMatrixOut& mAout, SolverSuppOutput& supp,
         DimList<DIM, DIMS...>) {
     if (DIM != d) {
         return solve(d, mDt, mTtinit, mAinit, lambda,
                 itersMax, tol, tolA, tolT,
-                mTtout, mAout, nItout, objFout,
+                mTtout, mAout, supp,
                 DimList<DIMS...>());
     }
 
     applySolver<DIM>(mDt, mTtinit, mAinit, lambda,
             itersMax, tol, tolA, tolT,
-            mTtout, mAout, nItout, objFout);
+            mTtout, mAout, supp);
 }
 
 template <int ...DIMS>
 void solve(int d, const RMatrixIn& mDt, const RMatrixIn& mTtinit, const RMatrixIn& mAinit,
         double lambda, int itersMax, double tol, double tolA, double tolT,
-        RMatrixOut& mTtout, RMatrixOut& mAout, int& nItout, double& objFout) {
+        RMatrixOut& mTtout, RMatrixOut& mAout, SolverSuppOutput& supp) {
         solve(d, mDt, mTtinit, mAinit, lambda,
                 itersMax, tol, tolA, tolT,
-                mTtout, mAout, nItout, objFout,
+                mTtout, mAout, supp,
                 DimList<DIMS...>());
 }
 
@@ -733,17 +748,17 @@ RcppExport SEXP cppTAfact(SEXP mDtSEXP, SEXP mTtinitSEXP, SEXP mAinitSEXP,
     const size_t r = mAinit.rows();
 
     RMatrixOut mTtout, mAout;
-    int nItout;
-    double objFout;
+    SolverSuppOutput supp;
     solve<2, 3, 4, 5,
           6, 7, 8, 9,
           10, 11, 12,
           14, 15, 16>(r, mDt, mTtinit, mAinit, lambda, itersMax,
                   tol, tolA, tolT,
-                  mTtout, mAout, nItout, objFout);
+                  mTtout, mAout, supp);
 
     return wrap(List::create(Named("Tt")    = mTtout,
                              Named("A")     = mAout,
-                             Named("niter") = nItout,
-                             Named("objF")  = objFout));
+                             Named("niter") = supp.niters,
+                             Named("objF")  = supp.objF,
+                             Named("rmse")  = supp.rmse));
 }

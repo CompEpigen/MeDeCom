@@ -45,7 +45,7 @@ runMeDeCom<-function(
 		data, 
 		Ks, 
 		lambdas,
-		opt.method="MeDeCom.quadpen",
+		opt.method="MeDeCom.quadPen",
 		cg_subsets=NULL,
 		sample_subset=NULL,
 		startT=NULL,
@@ -217,25 +217,44 @@ runMeDeCom<-function(
 					length(Ks)*
 					(NFOLDS+1)*
 					length(LAMBDA_GRID))
+	if(NCORES>1){
+		job_batches<-vector("list", 2)
+		job_batches[[1]]<-vector("list", 
+				length(cg_subsets)*
+						length(Ks)*
+						(NFOLDS))
+		job_batches[[1]]<-vector("list", 
+				length(cg_subsets)*
+						length(Ks))
+		job_index_counters<-as.list(rep(0,2))
+	}
+	## init counters
 	param_ctr<-0
 	res_ctr<-0
+	
 	#run_param_list<-list()
 	cg_subset_ids<-1:length(cg_subsets)
 	#for(run in c("initial", "cv"))
-	for(run in c("cv", "full"))
+
+	#for(K in Ks){
+	for(gr in cg_subset_ids)
 	{
-		#for(K in Ks){
-		for(gr in cg_subset_ids)
+		for(run in c("cv", "full"))
 		{
 			if(run=="cv"){
 				folds=1:NFOLDS
+				job_batch<-1L
 			}else{
 				folds=0
+				job_batch<-2L
 			}
 			for(fold in folds)
 			{	
 				for(K in Ks)
 				{
+					job_index_counters[[job_batch]]<-job_index_counters[[job_batch]]+1
+					job_batches[[job_batch]][[job_index_counters[[job_batch]]]]<-c(NA,NA)
+					job_batches[[job_batch]][[job_index_counters[[job_batch]]]][1]<-param_ctr+1
 					for(lnr in 1:length(LAMBDA_GRID))
 					{
 						param_ctr<-param_ctr+1
@@ -254,7 +273,8 @@ runMeDeCom<-function(
 								mode=run, 
 								direction="topbottom", 
 								ITERMAX=ITERMAX,
-								NCORES=NCORES,
+								#NCORES=NCORES,
+								NCORES=1,
 								WD=WD, 
 								DD=DD,
 								METHOD=opt.method)
@@ -344,7 +364,8 @@ runMeDeCom<-function(
 											direction=direction,
 											lambda_cnr=comp_lambda,
 											ITERMAX=ITERMAX,
-											NCORES=NCORES,
+											#NCORES=NCORES,
+											NCORES=1,
 											WD=WD,
 											DD=DD,
 											METHOD=opt.method,
@@ -369,6 +390,7 @@ runMeDeCom<-function(
 							}
 						}
 					}
+					job_batches[[job_batch]][[job_index_counters[[job_batch]]]][2]<-param_ctr
 				}
 			}
 		}
@@ -426,10 +448,12 @@ runMeDeCom<-function(
 		if(cleanup){
 			unlink(WD, recursive=TRUE)
 		}
+		
 	}else{
+		
 		final_results<-vector("list", length(run_param_list))
 		
-		for(idx in 1:length(run_param_list)){
+		one_fact_run<-function(idx){
 			
 			if(verbosity>0L && idx %% 100==0){
 				cat(sprintf("[%sMain:] %d runs complete\n",ts(), idx))
@@ -439,7 +463,7 @@ runMeDeCom<-function(
 			params$cg_subset<-cg_subsets[[params$cg_subset_id]]
 			params$sample_subset<-sample_subset
 			#params$meth_matrix<-D
-		
+			
 			if(params$mode %in% c("full", "initial", "initial_fine")){
 				incl_samples<-1:length(sample_subset)
 			}else{
@@ -469,7 +493,7 @@ runMeDeCom<-function(
 					match(params$K, Ks),
 					params$lambda_cnr]
 			params$lnr_result<-result_list[[res_idx]]
-					
+			
 			if(params$mode %in% c("initial_fine", "cv_fine")){
 				params$startT<-result_list[[comp_res_idx]]$T
 				params$startA<-result_list[[comp_res_idx]]$A
@@ -482,7 +506,7 @@ runMeDeCom<-function(
 						match(1:NFOLDS, c(0,1:NFOLDS)),
 						match(params$K, Ks),
 						params$lambda_cnr
-						]
+				]
 				inits<-summarizeCVinits(result_list[cv_results_idx])
 				params$startT<-inits$T
 				if(!is.null(inits$A)){
@@ -506,32 +530,81 @@ runMeDeCom<-function(
 			single_run_params<-intersect(names(as.list(args(singleRun))), names(params))
 			result<-do.call("singleRun", params[single_run_params])
 			####################### END FACTORIZATION RUN
-			
+			#print(params$mode)
+			#print(str(result))
+			#print(str(result_list[[comp_res_idx]]))
 			if(params$mode %in% c("full", "cv") || (result$Fval < result_list[[comp_res_idx]]$Fval)){
 				if(params$mode %in% c("full", "initial_fine")){
-						trueT_prep<-trueA_prep<-NULL
-						if(Tstar_present){
-							trueT_prep<-trueT_ff[params$cg_subset,-fixed_T_cols,drop=FALSE]
-						}
-						if(Astar_present){
-							trueA_prep<-trueA_ff[,incl_samples,drop=FALSE]
-						}
-						perf_result<-estimatePerformance(result, 
-								trueT_prep, 
-								trueA_prep)
-					}else{
-						perf_result<-estimateFoldError(
-								result$That, 
-								D_ff[params$cg_subset,params$sample_subset[fold_subset],drop=FALSE],
-								NFOLDS)			
+					trueT_prep<-trueA_prep<-NULL
+					if(Tstar_present){
+						trueT_prep<-trueT_ff[params$cg_subset,-fixed_T_cols,drop=FALSE]
 					}
+					if(Astar_present){
+						trueA_prep<-trueA_ff[,incl_samples,drop=FALSE]
+					}
+					perf_result<-estimatePerformance(result, 
+							trueT_prep, 
+							trueA_prep)
+				}else{
+					perf_result<-estimateFoldError(
+							result$That, 
+							D_ff[params$cg_subset,params$sample_subset[fold_subset],drop=FALSE],
+							NFOLDS)
+				}
 				for(elt in names(perf_result)){
 					result[[elt]]<-perf_result[[elt]]
 				}
 				
-				result_list[[res_idx]]<-result
 				if(params$mode %in% c("initial_fine", "cv_fine") && verbosity>1L){
 					cat("found a better solution\n")
+				}
+				attr(result, "res_idx")<-res_idx
+				return(result)
+			}else{
+				return(NULL)
+			}
+			
+		}
+
+		if(NCORES>1){#
+			
+			for(concurr_indices in job_batches){
+			
+				intermed_results<-mclapply(concurr_indices[sample(1:length(concurr_indices))], function(index_group){
+						#int_result_list<-vector("list", index_group[2]-index_group[1])
+						#res_indices<-vector("integer", index_group[2]-index_group[1]+1)
+						#res_idx_ctr<-1
+						res_indices<-c()
+						for (ii in index_group[1]:index_group[2]){
+							#int_result_list[[ii]]<-one_fact_run(ii)
+							int_result<-one_fact_run(ii)
+							#print(str(int_result))
+							if(!is.null(int_result)){
+								res_idx<-attr(int_result, "res_idx")
+								#res_indices[res_idx_ctr]<-res_idx
+								#res_idx_ctr<-res_idx_ctr+1
+								res_indices<-c(res_indices, res_idx)
+								result_list[[res_idx]]<<-int_result
+							}
+						}
+						res_indices<-sort(unique(res_indices))
+						result_list_copy<-result_list[res_indices]
+						attr(result_list_copy,"res_indices")<-res_indices
+						#print(str(result_list_copy))
+						return(result_list_copy)
+					}, mc.cores=NCORES)
+				for(result_chunck in intermed_results){
+	#				for(result in rl){
+	#					result_list[[attr(result, "res_idx")]]<-result
+	#				}
+					result_list[attr(result_chunck,"res_indices")]<-result_chunck
+				}
+			}
+		}else{
+			for(idx in 1:length(run_param_list)){
+				result<-one_fact_run(idx)
+				if(!is.null(result)){
+					result_list[[attr(result, "res_idx")]]<-result
 				}
 			}
 		}

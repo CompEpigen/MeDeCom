@@ -225,7 +225,7 @@ public:
                 solveExactAnyRank(tinit);
                 break;
             case exact_rank_2:
-                if (DIM == 2) {
+                if (r == 2) {
                     solveExactRank2(tinit);
                 }
                 else {
@@ -256,7 +256,7 @@ private:
         VectorIdx stateVec = VectorIdx::Zero();
         StateMatrix stateOrder = StateMatrix::Zero();
         /* predicting states given initial value */
-        for (int i = 0; i < DIM; ++i) {
+        for (int i = 0; i < r; ++i) {
             if (t(i) <= slackEps) {
                 stateOrder(i, 0) = zero;
                 stateOrder(i, 1) = box;
@@ -286,13 +286,13 @@ private:
 
     bool exhaustiveKKT(Vector& t, VectorIdx& stateVec,
             StateMatrix& stateOrder, int currVar) {
-        if (currVar == DIM) {
+        if (currVar == r) {
             /* Maps state to index */
             VectorIdx stateIdx[] = {VectorIdx::Zero(), VectorIdx::Zero(), VectorIdx::Zero()};
             int numState[] = {0, 0, 0};
 
             Vector colSumStateOne = Vector::Zero();
-            for (int i = 0; i < DIM; ++i) {
+            for (int i = 0; i < r; ++i) {
                 /* which variables are in state i? And how many of them? */
                 stateIdx[stateVec(i)](numState[stateVec(i)]++) = i;
                 if (one == stateVec(i)) {
@@ -684,6 +684,8 @@ void applySolver(const RMatrixIn& Dt, const RMatrixIn& mTtinit, const RMatrixIn&
     supp.niters = niter - 1;
     supp.rmse   = 0.5 * (Dt - A.transpose() * Tt).squaredNorm();
     supp.objF   = supp.rmse + lambda * (Tt.sum() - Tt.squaredNorm());
+    supp.rmse  /= m;
+    supp.rmse  /= n;
 }
 
 /* Some Voodoo magic to eliminate

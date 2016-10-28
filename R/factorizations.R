@@ -180,6 +180,7 @@ updateT_gini<-function(G, W, Tk, lambdaT, tol, f0, lower=0, upper=1){
 	return(list(Tk1, fk1, iter))
 }
 
+
 #######################################################################################################################
 
 updateT_empirical<-function(G, W, Poss, lambda){
@@ -239,7 +240,25 @@ updateT_empirical<-function(G, W, Poss, lambda){
 #	return(Tnew)
 #	
 #}
+#######################################################################################################################
 
+updateT_multicore<-function(method="gini", G, W, Tk, lambdaT, tol, f0, lower=0, upper=1, ncores=2){
+	
+	if(method=="gini"){
+		update.func<-updateT_gini
+	}
+	
+	row.partition<-lapply(0:(ncores-1), function(chunck) (1:(ncol(W)%/%ncores))+chunck*(ncol(W)%/%ncores))
+	
+	opt_res<-mclapply(row.partition, function(row.ind) update.func(G, W[,row.ind], Tk[,row.ind], lambdaT, tol, f0, lower=0, upper=1), mc.cores=ncores)	
+	#opt_res<-lapply(row.partition, function(row.ind) update.func(G, W[,row.ind], Tk[,row.ind], lambdaT, tol, f0, lower=0, upper=1))	
+	
+	Tk<-do.call("cbind", lapply(opt_res, el, 1))
+	fk<-sum(sapply(opt_res, el, 2))
+	avg_iter<-mean(sapply(opt_res, el, 3))
+	
+	return(list(Tk,fk,avg_iter))
+}
 
 #######################################################################################################################
 #	 Wrappers for the T update methods 	 
@@ -393,7 +412,8 @@ onerun.alternate<-function(
 		eps=1e-8,
 		blocks=NULL,
 		na.values=FALSE,
-		verbose=TRUE){
+		verbose=TRUE,
+		ncores=1){
 	
 	k<-ncol(T0)
 	if(!is.null(Tfix)){
@@ -586,7 +606,11 @@ onerun.alternate<-function(
 				G <- A %*% t(A); W <- A %*% Dt4T
 				##%%%mexHCLasso(G,W,T',lambda);
 				
-				res <- updateT_gini(G, W, Tstart, lambda, eps, f - norm_val, lower=qp.rangeT[1], upper=qp.rangeT[2]);
+				if(ncores>1){
+					res <- updateT_multicore("gini", G, W, Tstart, lambda, eps, f - norm_val, lower=qp.rangeT[1], upper=qp.rangeT[2], ncores=ncores);
+				}else{
+					res <- updateT_gini(G, W, Tstart, lambda, eps, f - norm_val, lower=qp.rangeT[1], upper=qp.rangeT[2]);
+		 		}
 				Trecov <- t(res[[1]]); ftemp<-res[[2]]
 				
 				if(!is.null(Tfix)){
@@ -750,7 +774,7 @@ onerun.alternate<-function(
 	}
 	
 	rmse<-sqrt(sum((D-TT%*%A)^2)/ncol(D)/nrow(D))
-	result<-list("T" = TT, "A" = A, "Fval" = Fval, "Conv" = Conv, "rmse"=rmse)
+	result<-list("T" = TT, "A" = A, "Fval" = Fval, "Conv" = Conv, "rmse" = rmse)
 	if(!is.null(Tfix)){
 		result$Afix<-Afix
 	}
@@ -805,9 +829,9 @@ onerun.cppTAfact<-function(
 		eps=1e-8,
 		blocks=NULL,
 		na.values=FALSE,
-		verbose=TRUE){
+		verbose=TRUE,
+		ncores=1){
 
-	
 	res<-cppTAfact(
 			t(D), #- a transposed D matrix,
 			t(T0), #-Ttinit - a transposed init for T matrix,
@@ -826,7 +850,7 @@ onerun.cppTAfact<-function(
     #res$niter - a total number of alternations
     #res$objF - objective value at res$Tt and res$A
 	#
-	result<-list("T" = t(res$Tt), "A" = res$A, "Fval" = res$objF, "Conv" = res$niter, "rmse"= sqrt(mean((D-t(res$Tt)%*%res$A)^2)))
+	result<-list("T" = t(res$Tt), "A" = res$A, "Fval" = res$objF, "Conv" = res$niter, "rmse"= res$rmse)
 	return(result)
 }
 
@@ -1018,7 +1042,6 @@ factorize.alternate<-function(D,
 		}
 	}
 	
-	
 	if(init=="random"){
 		numruns <- opt
 	}else if(init=="fixed"){
@@ -1113,7 +1136,8 @@ factorize.alternate<-function(D,
 				eps=eps,
 				blocks=blocks,
 				na.values=na.values,
-				verbose=verbosity>1L);
+				verbose=verbosity>1L,
+				ncores=ncores);
 		
 #			Ts[[run]]<<-onerun[[1]]
 #			As[[run]]<<-onerun[[2]]
@@ -1131,7 +1155,8 @@ factorize.alternate<-function(D,
 #		pcoordinates <- foreach(target = targets) %dopar%
 #				tryCatch(RnBeads::rnb.execute.dreduction(rnb.set, target = target), error = function(e) { e$message } )
 		
-		if(ncores>1){
+		#if(ncores>1){
+		if(FALSE){
 			#require(doMC)
 			#registerDoMC(N_CORES)
 			#cl<-makeCluster(N_CORES)
@@ -1165,7 +1190,8 @@ factorize.alternate<-function(D,
 		Conv <- Convs[[idx]]
 		
 		if(!na.values){
-			rmse<-sqrt(sum((D-TT%*%A)^2)/ncol(D)/nrow(D))
+			#rmse<-sqrt(sum((D-TT%*%A)^2)/ncol(D)/nrow(D))
+			rmse <- Fval - lambda*sum(TT-TT^2)
 		}else{
 			diff_mat<-D-TT%*%A
 			rmse<-sqrt(sum(diff_mat[!is.na(diff_mat)]^2)/ncol(D)/nrow(D))

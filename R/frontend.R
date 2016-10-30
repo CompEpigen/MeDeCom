@@ -252,9 +252,11 @@ runMeDeCom<-function(
 			{	
 				for(K in Ks)
 				{
-					job_index_counters[[job_batch]]<-job_index_counters[[job_batch]]+1
-					job_batches[[job_batch]][[job_index_counters[[job_batch]]]]<-c(NA,NA)
-					job_batches[[job_batch]][[job_index_counters[[job_batch]]]][1]<-param_ctr+1
+					if(NCORES>1){
+						job_index_counters[[job_batch]]<-job_index_counters[[job_batch]]+1
+						job_batches[[job_batch]][[job_index_counters[[job_batch]]]]<-c(NA,NA)
+						job_batches[[job_batch]][[job_index_counters[[job_batch]]]][1]<-param_ctr+1
+					}
 					for(lnr in 1:length(LAMBDA_GRID))
 					{
 						param_ctr<-param_ctr+1
@@ -390,7 +392,7 @@ runMeDeCom<-function(
 							}
 						}
 					}
-					job_batches[[job_batch]][[job_index_counters[[job_batch]]]][2]<-param_ctr
+					if(NCORES>1) job_batches[[job_batch]][[job_index_counters[[job_batch]]]][2]<-param_ctr
 				}
 			}
 		}
@@ -520,7 +522,6 @@ runMeDeCom<-function(
 				free_cols<-setdiff(1:ncol(trueT_ff), fixed_T_cols)
 				params$fixedT<-trueT_ff[,fixed_T_cols, drop=FALSE]
 				#trueT<-trueT_ff[,-fixed_T_cols, drop=FALSE]]
-				fixed_T_cols<-integer()
 			}else{
 				fixedT<-NULL
 				free_cols<-1:K
@@ -537,7 +538,7 @@ runMeDeCom<-function(
 				if(params$mode %in% c("full", "initial_fine")){
 					trueT_prep<-trueA_prep<-NULL
 					if(Tstar_present){
-						trueT_prep<-trueT_ff[params$cg_subset,-fixed_T_cols,drop=FALSE]
+						trueT_prep<-trueT_ff[params$cg_subset,free_cols,drop=FALSE]
 					}
 					if(Astar_present){
 						trueA_prep<-trueA_ff[,incl_samples,drop=FALSE]
@@ -570,7 +571,7 @@ runMeDeCom<-function(
 			
 			for(concurr_indices in job_batches){
 			
-				intermed_results<-mclapply(concurr_indices[sample(1:length(concurr_indices))], function(index_group){
+				intermed_results<-mclapply(rev(concurr_indices), function(index_group){
 						#int_result_list<-vector("list", index_group[2]-index_group[1])
 						#res_indices<-vector("integer", index_group[2]-index_group[1]+1)
 						#res_idx_ctr<-1
@@ -592,7 +593,7 @@ runMeDeCom<-function(
 						attr(result_list_copy,"res_indices")<-res_indices
 						#print(str(result_list_copy))
 						return(result_list_copy)
-					}, mc.cores=NCORES)
+					}, mc.cores=NCORES, mc.preschedule=FALSE)
 				for(result_chunck in intermed_results){
 	#				for(result in rl){
 	#					result_list[[attr(result, "res_idx")]]<-result

@@ -150,7 +150,7 @@ private:
         size_t r = mA.rows();
         Matrix mAcopy = mA;
 
-        #pragma omp parallel for
+        //#pragma omp parallel for
         for (size_t colN = 0; colN < n; ++colN) {
             auto s = mAcopy.col(colN);
             std::sort(s.data(), s.data() + s.size(),
@@ -649,7 +649,7 @@ void applySolver(const RMatrixIn& Dt, const RMatrixIn& mTtinit, const RMatrixIn&
         MatrixDD AAt = A * A.transpose();
         MatrixDX B = A * Dt - lambda * (onesrm - 2 * Ttprev);
 
-        #pragma omp parallel for schedule(runtime)
+        //#pragma omp parallel for schedule(runtime)
         for (int i = 0; i < m; ++i) {
             VectorDD t = Tt.col(i);
             VectorDD b = B.col(i);

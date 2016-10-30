@@ -87,8 +87,18 @@ for(params in params_list){
 		if(!is.null(inits$A)){
 			params$startA<-inits$A
 		}else{
-			params$startA<-factorize.regr(params$meth_matrix, params$startT)[["A"]]
+			params$startA<-MeDeCom:::factorize.regr(params$meth_matrix, params$startT)[["A"]]
 		}
+	}
+	
+	if(Tstar_present && !is.null(params$fixed_T_cols)){
+		free_cols<-setdiff(1:ncol(trueT_ff), fixed_T_cols)
+		params$fixedT<-trueT_ff[,fixed_T_cols, drop=FALSE]
+		#trueT<-trueT_ff[,-fixed_T_cols, drop=FALSE]]
+		fixed_T_cols<-integer()
+	}else{
+		fixedT<-NULL
+		free_cols<-1:params$K
 	}
 	
 	single_run_params<-intersect(names(as.list(args(MeDeCom:::singleRun))), names(params))
@@ -98,7 +108,7 @@ for(params in params_list){
 		if(params$mode %in% c("full", "initial", "initial_fine")){
 			trueT_prep<-trueA_prep<-NULL
 			if(Tstar_present){
-				trueT_prep<-trueT[params$cg_subset,-fixed_cols,drop=FALSE]
+				trueT_prep<-trueT[params$cg_subset,free_cols,drop=FALSE]
 			}
 			if(Astar_present){
 				trueA_prep<-trueA_ff[,incl_samples,drop=FALSE]

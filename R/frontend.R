@@ -64,7 +64,8 @@ runMeDeCom<-function(
 		temp.dir=NULL,
 		cleanup=TRUE,
 		verbosity=1L,
-		time.stamps=FALSE
+		time.stamps=FALSE,
+		random.seed=NULL
 ){
 	ts<-function(){
 		if(time.stamps){
@@ -279,6 +280,7 @@ runMeDeCom<-function(
 								NCORES=1,
 								WD=WD, 
 								DD=DD,
+								seed=random.seed,
 								METHOD=opt.method)
 						if(run=="full" && cluster_run){
 							cv_results_idx<-result_index[
@@ -370,6 +372,7 @@ runMeDeCom<-function(
 											NCORES=1,
 											WD=WD,
 											DD=DD,
+											seed=random.seed,
 											METHOD=opt.method,
 											lnr_result=result_list[[res_idx]],
 											clnr_result=result_list[[comp_res_idx]]

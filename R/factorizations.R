@@ -947,6 +947,7 @@ factorize.alternate<-function(D,
 		ncores=1,
 		pheno=NULL,
 		na.values=FALSE,
+		seed=NULL,
 		verbosity=0L){
 	
 	if(!t.method %in% c("integer", "empirical", "resample", "Hlasso", "optim", "quadPen", "cppTAfact")){
@@ -1044,6 +1045,9 @@ factorize.alternate<-function(D,
 	
 	if(init=="random"){
 		numruns <- opt
+		if(!is.null(seed)){
+			set.seed(seed)
+		}
 	}else if(init=="fixed"){
 		numruns <- 1
 	}else{

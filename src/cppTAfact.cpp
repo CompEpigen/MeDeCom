@@ -225,7 +225,7 @@ public:
                 solveExactAnyRank(tinit);
                 break;
             case exact_rank_2:
-                if (DIM == 2) {
+                if (r == 2) {
                     solveExactRank2(tinit);
                 }
                 else {
@@ -253,10 +253,10 @@ private:
     enum varState {box = 0, zero, one};
 
     void solveExactAnyRank(Vector& t) {
-        VectorIdx stateVec = VectorIdx::Zero();
-        StateMatrix stateOrder = StateMatrix::Zero();
+        VectorIdx stateVec = VectorIdx::Zero(r, 1);
+        StateMatrix stateOrder = StateMatrix::Zero(r, 3);
         /* predicting states given initial value */
-        for (int i = 0; i < DIM; ++i) {
+        for (int i = 0; i < r; ++i) {
             if (t(i) <= slackEps) {
                 stateOrder(i, 0) = zero;
                 stateOrder(i, 1) = box;
@@ -286,13 +286,13 @@ private:
 
     bool exhaustiveKKT(Vector& t, VectorIdx& stateVec,
             StateMatrix& stateOrder, int currVar) {
-        if (currVar == DIM) {
+        if (currVar == r) {
             /* Maps state to index */
-            VectorIdx stateIdx[] = {VectorIdx::Zero(), VectorIdx::Zero(), VectorIdx::Zero()};
+            VectorIdx stateIdx[] = {VectorIdx::Zero(r, 1), VectorIdx::Zero(r, 1), VectorIdx::Zero(r, 1)};
             int numState[] = {0, 0, 0};
 
-            Vector colSumStateOne = Vector::Zero();
-            for (int i = 0; i < DIM; ++i) {
+            Vector colSumStateOne = Vector::Zero(r, 1);
+            for (int i = 0; i < r; ++i) {
                 /* which variables are in state i? And how many of them? */
                 stateIdx[stateVec(i)](numState[stateVec(i)]++) = i;
                 if (one == stateVec(i)) {
@@ -302,10 +302,10 @@ private:
 
             /* now we prepare a system of linear equations to figure out
              * what would the values for box variables be like */
-            Vector tbox = Vector::Zero();
+            Vector tbox = Vector::Zero(r, 1);
             if (numState[box] > 0) {
-                Matrix AAtBox = Matrix::Zero();
-                Vector bBox   = Vector::Zero();
+                Matrix AAtBox = Matrix::Zero(r, r);
+                Vector bBox   = Vector::Zero(r, 1);
                 for (int j = 0; j < numState[box]; ++j) {
                     for (int i = 0; i < numState[box]; ++i) {
                         AAtBox(i, j) = AAt(stateIdx[box](i), stateIdx[box](j));
@@ -500,8 +500,9 @@ private:
     }
 
     void solveNewton(Vector& t) {
-        VectorIdx fidxv;
-        Vector grad, descent;
+        VectorIdx fidxv = VectorIdx::Zero(r, 1);
+        Vector grad = Vector::Zero(r, 1);
+        Vector descent = Vector::Zero(r, 1);
         evalGrad(t, grad);
 
         optCond = grad.binaryExpr(t, ProjGradT(slackEps)).norm();
@@ -529,14 +530,14 @@ private:
             if (!freeVarsNum) break;
 
             /* compute the corresponding submatrix of the Hessian */
-            Matrix AAtFree = Matrix::Zero();
+            Matrix AAtFree = Matrix::Zero(r, r);
             for (int j = 0; j < freeVarsNum; ++j) {
                 for (int i = 0; i < freeVarsNum; ++i) {
                     AAtFree(i, j) = AAt(fidxv(i), fidxv(j));
                 }
             }
 
-            Vector gradFree = Vector::Zero();
+            Vector gradFree = Vector::Zero(r, 1);
             for (int i = 0; i < freeVarsNum; ++i) {
                 gradFree(i) = grad(fidxv(i));
             }
@@ -684,6 +685,8 @@ void applySolver(const RMatrixIn& Dt, const RMatrixIn& mTtinit, const RMatrixIn&
     supp.niters = niter - 1;
     supp.rmse   = 0.5 * (Dt - A.transpose() * Tt).squaredNorm();
     supp.objF   = supp.rmse + lambda * (Tt.sum() - Tt.squaredNorm());
+    supp.rmse  /= m;
+    supp.rmse  /= n;
 }
 
 /* Some Voodoo magic to eliminate
@@ -745,14 +748,15 @@ RcppExport SEXP cppTAfact(SEXP mDtSEXP, SEXP mTtinitSEXP, SEXP mAinitSEXP,
     RMatrixIn mAinit(as<RMatrixIn>(mAinitSEXP));
 
     /* Dimensionality of a problem */
-    const size_t r = mAinit.rows();
+    const size_t d = mAinit.rows() > 16 ? Dynamic : mAinit.rows();
 
     RMatrixOut mTtout, mAout;
     SolverSuppOutput supp;
     solve<2, 3, 4, 5,
           6, 7, 8, 9,
           10, 11, 12,
-          14, 15, 16>(r, mDt, mTtinit, mAinit, lambda, itersMax,
+          14, 15, 16,
+          Dynamic>(d, mDt, mTtinit, mAinit, lambda, itersMax,
                   tol, tolA, tolT,
                   mTtout, mAout, supp);
 

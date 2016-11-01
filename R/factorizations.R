@@ -826,7 +826,7 @@ onerun.cppTAfact<-function(
     #res$niter - a total number of alternations
     #res$objF - objective value at res$Tt and res$A
 	#
-	result<-list("T" = t(res$Tt), "A" = res$A, "Fval" = res$objF, "Conv" = res$niter, "rmse"= sqrt(mean((D-t(res$Tt)%*%res$A)^2)))
+	result<-list("T" = t(res$Tt), "A" = res$A, "Fval" = res$objF, "Conv" = res$niter, "rmse"= res$rmse)
 	return(result)
 }
 

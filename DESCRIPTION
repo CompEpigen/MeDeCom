@@ -10,7 +10,7 @@ Authors@R: c(
    person ( "Matthias", "Hein", email="hein@cs.uni-saarland.de", role = c("aut")),
    person ( "Joern", "Walter", email="j.walter@mx.uni-saarland.de", role = c("aut"))
  )
-Date: 2016-06-30
+Date: 2016-11-02
 Version: 0.2
 Depends:
     R (>= 3.2.0),

@@ -13,13 +13,6 @@
 /* R-C++ interface with Eigen support */
 #include <Rcpp.h>
 #include <RcppEigen.h>
-/*
- * Rcpp declarations
- */
-// [[Rcpp::depends(RcppEigen)]]
-//
-// Enable C++11 via this plugin (Rcpp 0.10.3 or later)
-// [[Rcpp::plugins(cpp11)]]
 
 using namespace Rcpp;
 using namespace RcppEigen;
@@ -762,8 +755,8 @@ RcppExport SEXP cppTAfact(SEXP mDtSEXP, SEXP mTtinitSEXP, SEXP mAinitSEXP,
     solve<2, 3, 4, 5,
           6, 7, 8, 9,
           10, 11, 12,
-          14, 15, 16,
-          Dynamic>(d, mDt, mTtinit, mAinit, lambda, itersMax,
+          13, 14, 15,
+          16, Dynamic>(d, mDt, mTtinit, mAinit, lambda, itersMax,
                   tol, tolA, tolT,
                   mTtout, mAout, supp);
 

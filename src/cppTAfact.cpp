@@ -626,6 +626,12 @@ void applySolver(const RMatrixIn& Dt, const RMatrixIn& mTtinit, const RMatrixIn&
     int niter = 1;
     double optCond = 1e+10;
     int method = QPBoxSolverSmallDims<DIM>::Method::newton;
+    if (2 == r) {
+        method = QPBoxSolverSmallDims<DIM>::Method::exact_rank_2;
+    }
+    else if (14 < r) {
+        method = QPBoxSolverSmallDims<DIM>::Method::coord_descent;
+    }
 
     MatrixDX Ttprev;
     MatrixDX Aprev;
@@ -655,16 +661,7 @@ void applySolver(const RMatrixIn& Dt, const RMatrixIn& mTtinit, const RMatrixIn&
             VectorDD t = Tt.col(i);
             VectorDD b = B.col(i);
             QPBoxSolverSmallDims<DIM> solver(AAt, b, tolT, innerItersMax);
-
-            if (2 == r) {
-                method = QPBoxSolverSmallDims<DIM>::Method::exact_rank_2;
-            }
-            else if (14 < r) {
-                method = QPBoxSolverSmallDims<DIM>::Method::coord_descent;
-            }
-
             solver.solve(t, method);
-
             Tt.col(i) = t;
         }
         /*

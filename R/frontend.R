@@ -141,11 +141,12 @@ runMeDeCom<-function(
 	Astar_present<-!is.null(trueA)
 	if(Astar_present){
 		trueA_ff<-trueA[,sample_subset]
-	}else if(Tstar_present){
-		regr.est<-MeDeCom:::factorize.regr(D[,sample_subset], trueT)
-		trueA_ff<-regr.est$A
-		rm(regr.est)
 	}
+#	else if(Tstar_present){
+#		regr.est<-MeDeCom:::factorize.regr(D[,sample_subset], trueT)
+#		trueA_ff<-regr.est$A
+#		rm(regr.est)
+#	}
 	
 	### cross-validation preparation
 	cv.partitions<-do.call("rbind", lapply(0:(NFOLDS-1), function(fld) (1:(length(sample_subset)%/%NFOLDS))+fld*(length(sample_subset)%/%NFOLDS)))
@@ -481,7 +482,11 @@ runMeDeCom<-function(
 			if(Tstar_present){
 				params$trueT<-trueT_ff[params$cg_subset,]
 				colnames(params$trueT)<-rownames(params$trueT)<-NULL
-				params$trueA<-trueA_ff[,params$sample_subset]
+				if(Astar_present){
+					params$trueA<-trueA_ff[,params$sample_subset]
+				}else{
+					params$trueA<-NULL
+				}
 				colnames(params$trueA)<-rownames(params$trueA)<-NULL
 			}
 			
@@ -527,7 +532,7 @@ runMeDeCom<-function(
 				#trueT<-trueT_ff[,-fixed_T_cols, drop=FALSE]]
 			}else{
 				fixedT<-NULL
-				free_cols<-1:K
+				free_cols<-1:ncol(trueT_ff)
 			}
 			
 			####################### START FACTORIZATION RUN
@@ -764,7 +769,6 @@ estimatePerformance<-function(fr, trueT=NULL, trueA=NULL){
 				#### Performance estimation part
 				if(!is.null(trueT)){
 					perm<-MeDeCom:::matchLMCs(fr$T, trueT, check=FALSE)
-					print(perm)
 					rmseT<-MeDeCom:::RMSE_T(fr$T, trueT, perm)
 					
 					if(length(unique(perm))>0){

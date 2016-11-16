@@ -91,14 +91,16 @@ for(params in params_list){
 		}
 	}
 	
-	if(Tstar_present && !is.null(params$fixed_T_cols)){
-		free_cols<-setdiff(1:ncol(trueT_ff), fixed_T_cols)
-		params$fixedT<-trueT_ff[,fixed_T_cols, drop=FALSE]
-		#trueT<-trueT_ff[,-fixed_T_cols, drop=FALSE]]
-		fixed_T_cols<-integer()
-	}else{
-		fixedT<-NULL
-		free_cols<-1:params$K
+	
+	if(Tstar_present){
+		if(!is.null(fixed_T_cols)){
+			free_cols<-setdiff(1:ncol(trueT_ff), fixed_T_cols)
+			params$fixedT<-trueT_ff[,fixed_T_cols, drop=FALSE]
+			#trueT<-trueT_ff[,-fixed_T_cols, drop=FALSE]]
+		}else{
+			fixedT<-NULL
+			free_cols<-1:ncol(trueT_ff)
+		}
 	}
 	
 	single_run_params<-intersect(names(as.list(args(MeDeCom:::singleRun))), names(params))

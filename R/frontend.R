@@ -461,10 +461,6 @@ runMeDeCom<-function(
 		
 		one_fact_run<-function(idx){
 			
-			if(verbosity>0L && idx %% 100==0){
-				cat(sprintf("[%sMain:] %d runs complete\n",ts(), idx))
-			}
-			
 			params<-run_param_list[[idx]]
 			params$cg_subset<-cg_subsets[[params$cg_subset_id]]
 			params$sample_subset<-sample_subset
@@ -526,13 +522,15 @@ runMeDeCom<-function(
 				}
 			}
 			
-			if(Tstar_present && !is.null(fixed_T_cols)){
-				free_cols<-setdiff(1:ncol(trueT_ff), fixed_T_cols)
-				params$fixedT<-trueT_ff[,fixed_T_cols, drop=FALSE]
-				#trueT<-trueT_ff[,-fixed_T_cols, drop=FALSE]]
-			}else{
-				fixedT<-NULL
-				free_cols<-1:ncol(trueT_ff)
+			if(Tstar_present){
+				if(!is.null(fixed_T_cols)){
+					free_cols<-setdiff(1:ncol(trueT_ff), fixed_T_cols)
+					params$fixedT<-trueT_ff[,fixed_T_cols, drop=FALSE]
+					#trueT<-trueT_ff[,-fixed_T_cols, drop=FALSE]]
+				}else{
+					fixedT<-NULL
+					free_cols<-1:ncol(trueT_ff)
+				}
 			}
 			
 			####################### START FACTORIZATION RUN
@@ -574,7 +572,23 @@ runMeDeCom<-function(
 			}
 			
 		}
+		
+		
+		report_progress<-function(type, completed_runs){
 
+			if(type=="serial"){
+				if(completed_runs %% 100==0){
+					cat(sprintf("[%sMain:] %d runs complete\n", ts(), completed_runs))
+				}
+			}else{
+				if(completed_runs[1] == completed_runs[2]){
+					cat(sprintf("[%sMain:] %d runs complete\n", ts(), completed_runs[1]))
+				}else{
+					cat(sprintf("[%sMain:] runs %d to %d complete\n", ts(), completed_runs[1], completed_runs[2]))
+				}
+			}
+			
+		}
 		if(NCORES>1){#
 			
 			for(concurr_indices in job_batches){
@@ -600,6 +614,7 @@ runMeDeCom<-function(
 						result_list_copy<-result_list[res_indices]
 						attr(result_list_copy,"res_indices")<-res_indices
 						#print(str(result_list_copy))
+						report_progress("parallel",index_group)
 						return(result_list_copy)
 					}, mc.cores=NCORES, mc.preschedule=FALSE)
 				for(result_chunck in intermed_results){
@@ -607,11 +622,13 @@ runMeDeCom<-function(
 	#					result_list[[attr(result, "res_idx")]]<-result
 	#				}
 					result_list[attr(result_chunck,"res_indices")]<-result_chunck
+					
 				}
 			}
 		}else{
 			for(idx in 1:length(run_param_list)){
 				result<-one_fact_run(idx)
+				report_progress("serial", idx)
 				if(!is.null(result)){
 					result_list[[attr(result, "res_idx")]]<-result
 				}

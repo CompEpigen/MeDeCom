@@ -81,8 +81,15 @@ runMeDeCom<-function(
 		D<-meth(data)
 		pheno<-pheno(data)
 	}else if(inherits(data, "list")){
-		D<-data[[1]]
-		pheno<-data[[2]]
+		if(inherits(data[[1]], "matrix") && inherits(data[[2]], "matrix")){
+			M<-data[[1]]
+			U<-data[[2]]
+			sample_var<-apply(M+U, 1, var)
+			D<-M/(M+U)
+		}else{
+			D<-data[[1]]
+			pheno<-data[[2]]
+		}
 	}else if(inherits(data, "matrix")){
 		D<-data
 	}else{

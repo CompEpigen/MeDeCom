@@ -84,7 +84,7 @@ runMeDeCom<-function(
 		if(inherits(data[[1]], "matrix") && inherits(data[[2]], "matrix")){
 			M<-data[[1]]
 			U<-data[[2]]
-			sample_var<-apply(M+U, 1, var)
+			sample_var<-apply(M+U, 1, var) ##TODO: Nik, you should correct this
 			D<-M/(M+U)
 		}else{
 			D<-data[[1]]

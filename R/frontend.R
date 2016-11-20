@@ -77,6 +77,7 @@ runMeDeCom<-function(
 	if(verbosity>0){
 		cat(sprintf("[%sMain:] checking inputs\n",ts()))
 	}
+	sample_var<-NULL
 	if(inherits(data, "RnBSet")){
 		D<-meth(data)
 		pheno<-pheno(data)
@@ -84,7 +85,6 @@ runMeDeCom<-function(
 		if(inherits(data[[1]], "matrix") && inherits(data[[2]], "matrix")){
 			M<-data[[1]]
 			U<-data[[2]]
-			sample_var<-apply(M+U, 1, var) ##TODO: Nik, you should correct this
 			D<-M/(M+U)
 		}else{
 			D<-data[[1]]
@@ -245,9 +245,16 @@ runMeDeCom<-function(
 	cg_subset_ids<-1:length(cg_subsets)
 	#for(run in c("initial", "cv"))
 
+	if(use_sample_var){
+		sample_vars_list<-vector("list", length(cg_subset_ids))
+	}
+
 	#for(K in Ks){
 	for(gr in cg_subset_ids)
 	{
+		if(use_sample_var){
+			sample_vars_list[[gr]]<-vector("list", NFOLDS)
+		}
 		for(run in c("cv", "full"))
 		{
 			if(run=="cv"){
@@ -259,6 +266,14 @@ runMeDeCom<-function(
 			}
 			for(fold in folds)
 			{	
+				if(use_sample_var){
+					if(fold!=0){
+						ssubs<-cv.partitions[fold,]
+					}else{
+						ssubs<-1:ncol(D)
+					}
+					sample_vars_list[[gr]][[fold]]<-sapply(M[,ssubs]+U[,ssubs],1,var)
+				}
 				for(K in Ks)
 				{
 					if(NCORES>1){
@@ -481,6 +496,9 @@ runMeDeCom<-function(
 			}
 			
 			params$meth_matrix<-D_ff[params$cg_subset,incl_samples,drop=FALSE]
+			if(opt.method=="opt.cppTAfact" && use_sample_var){
+				params$sample_var<-sample_vars_list[[params$cg_subset]][[params$FOLD]]
+			}
 			#params$trueT<-trueT
 			if(Tstar_present){
 				params$trueT<-trueT_ff[params$cg_subset,]
@@ -714,6 +732,7 @@ singleRun<-function(
 		fixedT=NULL,
 		Alower=NULL,
 		Aupper=NULL,
+		sample_var=NULL,
 		fixed_T_cols=integer(),
 		NINIT,
 		ITERMAX,
@@ -744,6 +763,7 @@ singleRun<-function(
 				itermax=ITERMAX,
 				qp.Alower=Alower,
 				qp.Aupper=Aupper,
+				sample_var=sample_var,
 				Tfix=fixedT,
 				ncores=NCORES
 				);

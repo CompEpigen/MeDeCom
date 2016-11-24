@@ -22,7 +22,7 @@ for(params in params_list){
 	}
 	if(file.exists(file.path(params$DD, "trueA.RData"))){
 		load(file.path(params$DD, "trueA.RData"))
-		params$trueA<-trueA
+		params$trueA<-trueA[,params$sample_subset]
 		Astar_present<-TRUE
 	}else{
 		Astar_present<-FALSE
@@ -93,9 +93,9 @@ for(params in params_list){
 	
 	
 	if(Tstar_present){
-		if(!is.null(fixed_T_cols)){
-			free_cols<-setdiff(1:ncol(trueT_ff), fixed_T_cols)
-			params$fixedT<-trueT_ff[,fixed_T_cols, drop=FALSE]
+		if(!is.null(params$fixed_T_cols)){
+			free_cols<-setdiff(1:ncol(trueT_ff), params$fixed_T_cols)
+			params$fixedT<-trueT_ff[,params$fixed_T_cols, drop=FALSE]
 			#trueT<-trueT_ff[,-fixed_T_cols, drop=FALSE]]
 		}else{
 			fixedT<-NULL
@@ -115,7 +115,8 @@ for(params in params_list){
 			if(Astar_present){
 				trueA_prep<-trueA_ff[,incl_samples,drop=FALSE]
 			}
-			perf_result<-MeDeCom:::estimatePerformance(result, 
+			perf_result<-MeDeCom:::estimatePerformance(result,
+					params$meth_matrix,
 					trueT_prep, 
 					trueA_prep)
 		}else{

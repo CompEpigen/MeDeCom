@@ -960,9 +960,9 @@ component.heatmap<-function(
 	}
 	
 	if(centered){
-		th<-sweep(TT, 1, rowMeans(th), "-")
+		th<-sweep(TT, 1, rowMeans(TT), "-")
 		if(!is.null(Tref)){
-			tr<-sweep(Tref, 1, rowMeans(tr), "-")
+			tr<-sweep(Tref, 1, rowMeans(Tref), "-")
 		}else{
 			tr<-th
 		}

@@ -140,7 +140,7 @@ runMeDeCom<-function(
 	
 	Astar_present<-!is.null(trueA)
 	if(Astar_present){
-		trueA_ff<-trueA[,sample_subset]
+		trueA_ff<-trueA#[,sample_subset]
 	}
 #	else if(Tstar_present){
 #		regr.est<-MeDeCom:::factorize.regr(D[,sample_subset], trueT)
@@ -279,6 +279,7 @@ runMeDeCom<-function(
 								ITERMAX=ITERMAX,
 								#NCORES=NCORES,
 								NCORES=1,
+								fixed_T_cols=fixed_T_cols,
 								WD=WD, 
 								DD=DD,
 								seed=random.seed,
@@ -375,6 +376,7 @@ runMeDeCom<-function(
 											DD=DD,
 											seed=random.seed,
 											METHOD=opt.method,
+											fixed_T_cols=fixed_T_cols,
 											lnr_result=result_list[[res_idx]],
 											clnr_result=result_list[[comp_res_idx]]
 											)
@@ -418,7 +420,7 @@ runMeDeCom<-function(
 		
 		save(trueT, file=file.path(DD,"trueT.RData"))
 		if(!is.null(trueA)){
-			save(trueA, file.path(DD, "trueA.RData"))
+			save(trueA, file=file.path(DD, "trueA.RData"))
 		}
 		
 		if(!is.null(startT) && !is.null(startA)){
@@ -550,6 +552,7 @@ runMeDeCom<-function(
 						trueA_prep<-trueA_ff[,incl_samples,drop=FALSE]
 					}
 					perf_result<-estimatePerformance(result, 
+							params$meth_matrix,
 							trueT_prep, 
 							trueA_prep)
 				}else{
@@ -780,7 +783,7 @@ summarizeCVinits<-function(result_list){
 # Estimate performance of a factorization run
 #
 #######################################################################################################################
-estimatePerformance<-function(fr, trueT=NULL, trueA=NULL){
+estimatePerformance<-function(fr, D, trueT=NULL, trueA=NULL){
 	
 				#if(mode %in% c("initial", "initial_fine") ){
 				#### Performance estimation part

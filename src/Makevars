@@ -1,6 +1,6 @@
  set by configure
 GSL_CFLAGS = @GSL_CFLAGS@
-GSL_LIBS   = @GSL_LIBS@
+GSL_LIBS = @GSL_LIBS@
 
 # standard setup
 PKG_LIBS = $(GSL_LIBS) `$(R_HOME)/bin/Rscript -e "Rcpp:::LdFlags()"`  

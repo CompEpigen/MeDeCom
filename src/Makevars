@@ -1,18 +1,10 @@
-#PKG_LIBS = `$(R_HOME)/bin/Rscript -e "Rcpp:::LdFlags()"` -L/opt/intel/mkl/lib/intel64 -lmkl_gf_lp64 -lmkl_sequential -lmkl_core
-#PKG_LIBS = `$(R_HOME)/bin/Rscript -e "Rcpp:::LdFlags()"` -L/opt/intel/mkl/lib/intel64 -lmkl_gf_lp64 -lmkl_gnu_thread -lmkl_core -lgomp
-
-#PKG_LIBS = `$(R_HOME)/bin/Rscript -e "Rcpp:::LdFlags()"` -L/opt/intel/composer_xe_2013_sp1.4.211/mkl/lib/intel64 -lmkl_gf_lp64 -lmkl_sequential -lmkl_core
-#PKG_LIBS = `$(R_HOME)/bin/Rscript -e "Rcpp:::LdFlags()"` -L/opt/intel/composer_xe_2013_sp1.4.211/mkl/lib/intel64 -lmkl_gf_lp64 -lmkl_gnu_thread -lmkl_core
-
-#PKG_CXXFLAGS=`$(R_HOME)/bin/Rscript -e "Rcpp:::CxxFlags()"` -I. -fopenmp
-#PKG_LIBS = `$(R_HOME)/bin/Rscript -e "Rcpp:::LdFlags()"` -L/opt/intel/composer_xe_2013.5.192/mkl/lib/intel64 -lmkl_gf_lp64 -lmkl_gnu_thread -lmkl_core
-
-#PKG_LIBS = `$(R_HOME)/bin/Rscript -e "Rcpp:::LdFlags()"` -L/opt/matlabR2012a/bin/glnxa64/ -lmwblas -lmwlapack
-#PKG_CXXFLAGS=`$(R_HOME)/bin/Rscript -e "Rcpp:::CxxFlags()"` -I. -fopenmp
+ set by configure
+GSL_CFLAGS = @GSL_CFLAGS@
+GSL_LIBS   = @GSL_LIBS@
 
 # standard setup
-PKG_LIBS = `$(R_HOME)/bin/Rscript -e "Rcpp:::LdFlags()"`  
-PKG_CXXFLAGS=`$(R_HOME)/bin/Rscript -e "Rcpp:::CxxFlags()"` `$(R_HOME)/bin/Rscript -e "RcppEigen:::CxxFlags()"` -I. -fopenmp -std=c++11
+PKG_LIBS = $(GSL_LIBS) `$(R_HOME)/bin/Rscript -e "Rcpp:::LdFlags()"`  
+PKG_CXXFLAGS = $(GSL_CFLAGS) `$(R_HOME)/bin/Rscript -e "Rcpp:::CxxFlags()"` `$(R_HOME)/bin/Rscript -e "RcppEigen:::CxxFlags()"` -I. -fopenmp -std=c++11
 
 # OMP setup
 OMP_NUM_THREADS=1	

@@ -1,9 +1,9 @@
- set by configure
+#set by configure
 GSL_CFLAGS = @GSL_CFLAGS@
 GSL_LIBS = @GSL_LIBS@
 
 # standard setup
-PKG_LIBS = $(GSL_LIBS) `$(R_HOME)/bin/Rscript -e "Rcpp:::LdFlags()"`  
+PKG_LIBS = $(GSL_LIBS) `$(R_HOME)/bin/Rscript -e "Rcpp:::LdFlags()"`
 PKG_CXXFLAGS = $(GSL_CFLAGS) `$(R_HOME)/bin/Rscript -e "Rcpp:::CxxFlags()"` `$(R_HOME)/bin/Rscript -e "RcppEigen:::CxxFlags()"` -I. -fopenmp -std=c++11
 
 # OMP setup

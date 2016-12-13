@@ -38,28 +38,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// mean_p
-double mean_p(Rcpp::NumericVector x);
-RcppExport SEXP MeDeCom_mean_p(SEXP xSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type x(xSEXP);
-    rcpp_result_gen = Rcpp::wrap(mean_p(x));
-    return rcpp_result_gen;
-END_RCPP
-}
-// mean_s
-double mean_s(Rcpp::NumericVector x);
-RcppExport SEXP MeDeCom_mean_s(SEXP xSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type x(xSEXP);
-    rcpp_result_gen = Rcpp::wrap(mean_s(x));
-    return rcpp_result_gen;
-END_RCPP
-}
 // RQuadHC
 List RQuadHC(NumericMatrix Ginp, NumericMatrix Winp, NumericMatrix Ainp, NumericVector otol, NumericVector lconstr, NumericVector uconstr);
 RcppExport SEXP MeDeCom_RQuadHC(SEXP GinpSEXP, SEXP WinpSEXP, SEXP AinpSEXP, SEXP otolSEXP, SEXP lconstrSEXP, SEXP uconstrSEXP) {

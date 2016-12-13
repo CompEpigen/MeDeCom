@@ -9,14 +9,6 @@ RHLasso <- function(Ginp, Winp, Ainp, l) {
     .Call('MeDeCom_RHLasso', PACKAGE = 'MeDeCom', Ginp, Winp, Ainp, l)
 }
 
-mean_p <- function(x) {
-    .Call('MeDeCom_mean_p', PACKAGE = 'MeDeCom', x)
-}
-
-mean_s <- function(x) {
-    .Call('MeDeCom_mean_s', PACKAGE = 'MeDeCom', x)
-}
-
 RQuadHC <- function(Ginp, Winp, Ainp, otol, lconstr, uconstr) {
     .Call('MeDeCom_RQuadHC', PACKAGE = 'MeDeCom', Ginp, Winp, Ainp, otol, lconstr, uconstr)
 }

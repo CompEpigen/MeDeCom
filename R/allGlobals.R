@@ -8,6 +8,7 @@ ALGORITHMS<-c(
 		"regression",
 		"houseman2012",
 		"houseman2016",
+		"MeDeCom",
 		"MeDeCom.quadPen",
 		"MeDeCom.cppTAfact", 
 		"HLasso", 
@@ -21,6 +22,7 @@ T_METHODS<-c(
 		NA,
 		NA,
 		NA,
+		"quadPen",
 		"quadPen",
 		"cppTAfact",
 		"Hlasso", 
@@ -36,6 +38,7 @@ ALGORITHM.COLS=c(
 		"regression"="blue",
 		"houseman2012"="deepskyblue",
 		"houseman2016"="skyblue",
+		"MeDeCom"="red",
 		"MeDeCom.quadPen"="red",
 		"MeDeCom.cppTAfact"="tomato", 
 		"HLasso"="orange", 
@@ -44,7 +47,7 @@ ALGORITHM.COLS=c(
 		"Resample"="magenta",
 		"VertexSearch"="brown")
 
-ALGORITHM.PCH=c(15,0,0,0,2,2,3,4,5,6,1)
+ALGORITHM.PCH=c(15,0,0,0,2,2,2,3,4,5,6,1)
 
 names(ALGORITHM.PCH)<-ALGORITHMS
 

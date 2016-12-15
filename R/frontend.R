@@ -45,7 +45,7 @@ runMeDeCom<-function(
 		data, 
 		Ks, 
 		lambdas,
-		opt.method="MeDeCom.quadPen",
+		opt.method="MeDeCom.cppTAfact",
 		cg_subsets=NULL,
 		sample_subset=NULL,
 		startT=NULL,
@@ -58,14 +58,15 @@ runMeDeCom<-function(
 		NFOLDS=10,
 		N_COMP_LAMBDA=4,
 		NCORES=1,
+		random.seed=NULL,
+		num.tol=1e-8,
 		analysis.name=NULL,
 		use.ff=FALSE,
 		cluster.settings=NULL,
 		temp.dir=NULL,
 		cleanup=TRUE,
 		verbosity=1L,
-		time.stamps=FALSE,
-		random.seed=NULL
+		time.stamps=FALSE
 ){
 	ts<-function(){
 		if(time.stamps){
@@ -283,6 +284,7 @@ runMeDeCom<-function(
 								WD=WD, 
 								DD=DD,
 								seed=random.seed,
+								num.top=num.tol,
 								METHOD=opt.method)
 						if(run=="full" && cluster_run){
 							cv_results_idx<-result_index[
@@ -375,6 +377,7 @@ runMeDeCom<-function(
 											WD=WD,
 											DD=DD,
 											seed=random.seed,
+											num.top=num.tol,
 											METHOD=opt.method,
 											fixed_T_cols=fixed_T_cols,
 											lnr_result=result_list[[res_idx]],
@@ -711,6 +714,7 @@ singleRun<-function(
 		Alower=NULL,
 		Aupper=NULL,
 		fixed_T_cols=integer(),
+		num.tol=1e-8,
 		NINIT,
 		ITERMAX,
 		NCORES=1L,
@@ -741,7 +745,8 @@ singleRun<-function(
 				qp.Alower=Alower,
 				qp.Aupper=Aupper,
 				Tfix=fixedT,
-				ncores=NCORES
+				ncores=NCORES,
+				eps=num.tol
 				);
 		
 	fr$cve<-NA

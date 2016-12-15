@@ -48,10 +48,13 @@ devtools:::install_github("lutsik/MeDeCom")
 ```
 
 Currently only *nix-like platforms with a C++11-compatible compiler are supported.
+MeDeCom uses stack model for memory to accelerate factorization for smaller ranks. 
+This requires certain preparation during compilation, therefore, please, note the extended
+compilation time (15 to 20 minutes).
 
 # Data preparation
 
-*MeDeCom* accepts methylation data in several forms. Preferably the user may load and preprocess the data
+*MeDeCom* accepts DNA methylation data in several forms. Preferably the user may load and preprocess the data
 using a general-purpose DNA methylation analysis package [RnBeads](http://rnbeads.mpi-inf.mpg.de). A resulting RnBSet object
 can be directly supplied to *MeDeCom*. Alternatively, *MeDeCom* runs on any matrix of type `numeric` with valid methylation values.
 

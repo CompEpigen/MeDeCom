@@ -4,6 +4,7 @@ author: "Pavlo Lutsik, Martin Slawski, Gilles Gasparoni, Matthias Hein and Joern
 date: "`r Sys.Date()`"
 output:
   rmarkdown::html_document:
+    mathjax: default
     toc: true
     number_sections: false
     fig_width: 5

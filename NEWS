@@ -1,7 +1,7 @@
 MeDeCom 0.2
 =============
 
- * Added improve optimization routines (cppTAfact by Nik Vedeneev) which are now used by default
+ * Added improved optimization routines (cppTAfact by Nik Vedeneev) which are now used by default
  * Improved R-side parallelization in the single machine mode
  * Multiple minor fixes and improvements
 

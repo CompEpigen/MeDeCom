@@ -9,6 +9,11 @@ output:
     number_sections: false
     fig_width: 5
     fig_height: 5
+markdown: kramdown
+kramdown:
+  input: GFM
+  hard_wrap: false
+  
 vignette: >
   %\VignetteIndexEntry{MeDeCom}
   %\VignetteEngine{knitr::rmarkdown}
@@ -19,11 +24,11 @@ vignette: >
 
 *MeDeCom* is an R-package for reference-free decomposition of heterogeneous DNA methylation profiles. 
 It uses matrix factorization enhanced by constraints and a specially tailored regularization. 
-*MeDeCom* represents an input $m\times n$ data matrix ($m$ CpGs measured in $n$ samples) as a product of two other matrices. 
-The first matrix has $m$ rows, just as the input data, but the number of columns is equal to $k$. 
-The columns of this matrix can be interpreted as methylomes of the $k$ unknown 
+*MeDeCom* represents an input $$m\times n$$ data matrix ($$m$$ CpGs measured in $$n$$ samples) as a product of two other matrices. 
+The first matrix has $$m$$ rows, just as the input data, but the number of columns is equal to $$k$$. 
+The columns of this matrix can be interpreted as methylomes of the $$k$$ unknown 
 cell populations underlying the samples and will be referred to as **latent methylation components** or **LMCs**. 
-The second matrix has $k$ rows and $n$ columns, and can be interpreted as a matrix of relative contributions (mixing proportions) 
+The second matrix has $$k$$ rows and $$n$$ columns, and can be interpreted as a matrix of relative contributions (mixing proportions) 
 of each LMC to each sample.
 
 *MeDeCom* starts with a set of related DNA methylation profiles, e.g. a series of Infinium microarray measurements
@@ -33,10 +38,10 @@ and contains values between 0 and 1. *MeDeCom* implements an alternating scheme 
 updates randomly initialized factor matrices until convergence or until the maximum number of iterations 
 has been reached. This is repeated for multiple random initializations and the best solution is returned.
 
-MeDeCom features two tunable parameters. The first one is the number of LMCs $k$, an approximate choice for which 
+MeDeCom features two tunable parameters. The first one is the number of LMCs $$k$$, an approximate choice for which 
 should be known from prior information. To enforce the distribution properties of a methylation profile 
-upon LMCs *MeDeCom* uses a special for of regularization controlled by the parameter $\lambda$. 
-A typical *MeDeCom* experiment includes testing a grid of values for $k$ and $\lambda$. For each combination 
+upon LMCs *MeDeCom* uses a special for of regularization controlled by the parameter $$\lambda$$. 
+A typical *MeDeCom* experiment includes testing a grid of values for $$k$$ and $$\lambda$$. For each combination 
 of parameter values *MeDeCom* estimates a cross-validation error. The latter helps select the optimal number 
 of LMCs and the strength of regularization.
 

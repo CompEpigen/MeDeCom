@@ -22,7 +22,7 @@ for(params in params_list){
 	}
 	if(file.exists(file.path(params$DD, "trueA.RData"))){
 		load(file.path(params$DD, "trueA.RData"))
-		params$trueA<-trueA
+		params$trueA<-trueA[,params$sample_subset]
 		Astar_present<-TRUE
 	}else{
 		Astar_present<-FALSE
@@ -87,7 +87,19 @@ for(params in params_list){
 		if(!is.null(inits$A)){
 			params$startA<-inits$A
 		}else{
-			params$startA<-factorize.regr(params$meth_matrix, params$startT)[["A"]]
+			params$startA<-MeDeCom:::factorize.regr(params$meth_matrix, params$startT)[["A"]]
+		}
+	}
+	
+	
+	if(Tstar_present){
+		if(!is.null(params$fixed_T_cols)){
+			free_cols<-setdiff(1:ncol(trueT_ff), params$fixed_T_cols)
+			params$fixedT<-trueT_ff[,params$fixed_T_cols, drop=FALSE]
+			#trueT<-trueT_ff[,-fixed_T_cols, drop=FALSE]]
+		}else{
+			fixedT<-NULL
+			free_cols<-1:ncol(trueT_ff)
 		}
 	}
 	
@@ -98,12 +110,13 @@ for(params in params_list){
 		if(params$mode %in% c("full", "initial", "initial_fine")){
 			trueT_prep<-trueA_prep<-NULL
 			if(Tstar_present){
-				trueT_prep<-trueT[params$cg_subset,-fixed_cols,drop=FALSE]
+				trueT_prep<-trueT[params$cg_subset,free_cols,drop=FALSE]
 			}
 			if(Astar_present){
 				trueA_prep<-trueA_ff[,incl_samples,drop=FALSE]
 			}
-			perf_result<-MeDeCom:::estimatePerformance(result, 
+			perf_result<-MeDeCom:::estimatePerformance(result,
+					params$meth_matrix,
 					trueT_prep, 
 					trueA_prep)
 		}else{

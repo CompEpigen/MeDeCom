@@ -4,6 +4,7 @@ author: "Pavlo Lutsik, Martin Slawski, Gilles Gasparoni, Matthias Hein and Joern
 date: "`r Sys.Date()`"
 output:
   rmarkdown::html_document:
+    mathjax: default
     toc: true
     number_sections: false
     fig_width: 5
@@ -47,9 +48,14 @@ of LMCs and the strength of regularization.
 devtools:::install_github("lutsik/MeDeCom")
 ```
 
+Currently only *nix-like platforms with a C++11-compatible compiler are supported.
+MeDeCom uses stack model for memory to accelerate factorization for smaller ranks. 
+This requires certain preparation during compilation, therefore, please, note the extended
+compilation time (15 to 20 minutes).
+
 # Data preparation
 
-*MeDeCom* accepts methylation data in several forms. Preferably the user may load and preprocess the data
+*MeDeCom* accepts DNA methylation data in several forms. Preferably the user may load and preprocess the data
 using a general-purpose DNA methylation analysis package [RnBeads](http://rnbeads.mpi-inf.mpg.de). A resulting RnBSet object
 can be directly supplied to *MeDeCom*. Alternatively, *MeDeCom* runs on any matrix of type `numeric` with valid methylation values.
 
@@ -97,7 +103,7 @@ One can speed up the run by decreasing the number of cross-validation folds and 
 increasing the number of computational cores.
 
 ```{r, eval=FALSE}
-medecom.result<-runMeDeCom(D, 2:10, c(0,10^(-5:-1)), NINIT=10, NFOLDS=10, ITERMAX=300, NCORES=8)
+medecom.result<-runMeDeCom(D, 2:10, c(0,10^(-5:-1)), NINIT=10, NFOLDS=10, ITERMAX=300, NCORES=9)
 ```
 
 ```{r, echo=FALSE}
@@ -105,12 +111,12 @@ cat("
 [Main:] checking inputs
 [Main:] preparing data
 [Main:] preparing jobs
-[Main:] 592 factorization runs in total
-[Main:] 100 runs complete
-[Main:] 200 runs complete
-[Main:] 300 runs complete
-[Main:] 400 runs complete
-[Main:] 500 runs complete
+[Main:] 3114 factorization runs in total
+[Main:] runs 2755 to 2788 complete
+[Main:] runs 2789 to 2822 complete
+[Main:] runs 2823 to 2856 complete
+[Main:] runs 2857 to 2890 complete
+......
 [Main:] finished all jobs. Creating the object
 ")
 data(example.MeDeComSet)
@@ -254,7 +260,7 @@ rownames(Aref)<-colnames(Tref)
 ```
 
 ```{r}
-plotProportions(medecom.result,  K=5, lambda=0.01, type="lineplot", lmc=5, Aref=Aref, ref.profile=2)
+plotProportions(medecom.result,  K=5, lambda=0.01, type="lineplot", lmc=2, Aref=Aref, ref.profile=2)
 ```
 
 # Advanced usage
@@ -297,8 +303,8 @@ cat("
 [Main:] checking inputs
 [Main:] preparing data
 [Main:] preparing jobs
-[Main:] 522 factorization runs in total
-[Main:] 522 jobs remaining
+[Main:] 3114 factorization runs in total
+[Main:] 3114 jobs remaining
 ....
 [Main:] finished all jobs. Creating the object
 ")

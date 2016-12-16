@@ -1,13 +1,19 @@
 ---
 title: "MeDeCom: Methylome Decomposition via Constrained Matrix Factorization"
 author: "Pavlo Lutsik, Martin Slawski, Gilles Gasparoni, Matthias Hein and Joern Walter"
-date: "2016-07-31"
+date: "2016-12-15"
 output:
   rmarkdown::html_document:
+    mathjax: default
     toc: true
     number_sections: false
     fig_width: 5
     fig_height: 5
+markdown: kramdown
+kramdown:
+  input: GFM
+  hard_wrap: false
+  
 vignette: >
   %\VignetteIndexEntry{MeDeCom}
   %\VignetteEngine{knitr::rmarkdown}
@@ -18,11 +24,11 @@ vignette: >
 
 *MeDeCom* is an R-package for reference-free decomposition of heterogeneous DNA methylation profiles. 
 It uses matrix factorization enhanced by constraints and a specially tailored regularization. 
-*MeDeCom* represents an input $m\times n$ data matrix ($m$ CpGs measured in $n$ samples) as a product of two other matrices. 
-The first matrix has $m$ rows, just as the input data, but the number of columns is equal to $k$. 
-The columns of this matrix can be interpreted as methylomes of the $k$ unknown 
+*MeDeCom* represents an input $$m\times n$$ data matrix ($$m$$ CpGs measured in $$n$$ samples) as a product of two other matrices. 
+The first matrix has $$m$$ rows, just as the input data, but the number of columns is equal to $$k$$. 
+The columns of this matrix can be interpreted as methylomes of the $$k$$ unknown 
 cell populations underlying the samples and will be referred to as **latent methylation components** or **LMCs**. 
-The second matrix has $k$ rows and $n$ columns, and can be interpreted as a matrix of relative contributions (mixing proportions) 
+The second matrix has $$k$$ rows and $$n$$ columns, and can be interpreted as a matrix of relative contributions (mixing proportions) 
 of each LMC to each sample.
 
 *MeDeCom* starts with a set of related DNA methylation profiles, e.g. a series of Infinium microarray measurements
@@ -32,10 +38,10 @@ and contains values between 0 and 1. *MeDeCom* implements an alternating scheme 
 updates randomly initialized factor matrices until convergence or until the maximum number of iterations 
 has been reached. This is repeated for multiple random initializations and the best solution is returned.
 
-MeDeCom features two tunable parameters. The first one is the number of LMCs $k$, an approximate choice for which 
+MeDeCom features two tunable parameters. The first one is the number of LMCs $$k$$, an approximate choice for which 
 should be known from prior information. To enforce the distribution properties of a methylation profile 
-upon LMCs *MeDeCom* uses a special for of regularization controlled by the parameter $\lambda$. 
-A typical *MeDeCom* experiment includes testing a grid of values for $k$ and $\lambda$. For each combination 
+upon LMCs *MeDeCom* uses a special for of regularization controlled by the parameter $$\lambda$$. 
+A typical *MeDeCom* experiment includes testing a grid of values for $$k$$ and $$\lambda$$. For each combination 
 of parameter values *MeDeCom* estimates a cross-validation error. The latter helps select the optimal number 
 of LMCs and the strength of regularization.
 
@@ -48,9 +54,14 @@ of LMCs and the strength of regularization.
 devtools:::install_github("lutsik/MeDeCom")
 ```
 
+Currently only *nix-like platforms with a C++11-compatible compiler are supported.
+MeDeCom uses stack model for memory to accelerate factorization for smaller ranks. 
+This requires certain preparation during compilation, therefore, please, note the extended
+compilation time (15 to 20 minutes).
+
 # Data preparation
 
-*MeDeCom* accepts methylation data in several forms. Preferably the user may load and preprocess the data
+*MeDeCom* accepts DNA methylation data in several forms. Preferably the user may load and preprocess the data
 using a general-purpose DNA methylation analysis package [RnBeads](http://rnbeads.mpi-inf.mpg.de). A resulting RnBSet object
 can be directly supplied to *MeDeCom*. Alternatively, *MeDeCom* runs on any matrix of type `numeric` with valid methylation values.
 
@@ -128,7 +139,7 @@ increasing the number of computational cores.
 
 
 ```r
-medecom.result<-runMeDeCom(D, 2:10, c(0,10^(-5:-1)), NINIT=10, NFOLDS=10, ITERMAX=300, NCORES=8)
+medecom.result<-runMeDeCom(D, 2:10, c(0,10^(-5:-1)), NINIT=10, NFOLDS=10, ITERMAX=300, NCORES=9)
 ```
 
 
@@ -137,12 +148,12 @@ medecom.result<-runMeDeCom(D, 2:10, c(0,10^(-5:-1)), NINIT=10, NFOLDS=10, ITERMA
 ## [Main:] checking inputs
 ## [Main:] preparing data
 ## [Main:] preparing jobs
-## [Main:] 592 factorization runs in total
-## [Main:] 100 runs complete
-## [Main:] 200 runs complete
-## [Main:] 300 runs complete
-## [Main:] 400 runs complete
-## [Main:] 500 runs complete
+## [Main:] 3114 factorization runs in total
+## [Main:] runs 2755 to 2788 complete
+## [Main:] runs 2789 to 2822 complete
+## [Main:] runs 2823 to 2856 complete
+## [Main:] runs 2857 to 2890 complete
+## ......
 ## [Main:] finished all jobs. Creating the object
 ```
 
@@ -204,7 +215,7 @@ str(lmcs)
 ```
 
 ```
-##  num [1:10000, 1:5] 0.0288 0.0408 0.3025 0.8067 0.0206 ...
+##  num [1:10000, 1:5] 0 0.0184 0.2898 0.7856 0 ...
 ```
 
 LMCs can be seen as measured methylation profiles of purified cell populations. 
@@ -291,7 +302,7 @@ str(prop)
 ```
 
 ```
-##  num [1:5, 1:100] 0.03232 0.35062 0.08136 0.53172 0.00398 ...
+##  num [1:5, 1:100] 0.3411 0 0.065 0.0213 0.5726 ...
 ##  - attr(*, "dimnames")=List of 2
 ##   ..$ : chr [1:5] "LMC1" "LMC2" "LMC3" "LMC4" ...
 ##   ..$ : NULL
@@ -341,7 +352,7 @@ plotProportions(medecom.result, K=5, lambda=0.01, type="heatmap", sample.charact
 
 
 ```r
-plotProportions(medecom.result,  K=5, lambda=0.01, type="lineplot", lmc=5, Aref=Aref, ref.profile=2)
+plotProportions(medecom.result,  K=5, lambda=0.01, type="lineplot", lmc=2, Aref=Aref, ref.profile=2)
 ```
 
 <img src="MeDeCom_files/figure-html/unnamed-chunk-22-1.png" width="480" />
@@ -389,8 +400,8 @@ cluster.settings=sge.setup)
 ## [Main:] checking inputs
 ## [Main:] preparing data
 ## [Main:] preparing jobs
-## [Main:] 522 factorization runs in total
-## [Main:] 522 jobs remaining
+## [Main:] 3114 factorization runs in total
+## [Main:] 3114 jobs remaining
 ## ....
 ## [Main:] finished all jobs. Creating the object
 ```
@@ -416,16 +427,18 @@ Here is the output of `sessionInfo()` on the system on which this document was c
 ## [8] base     
 ## 
 ## other attached packages:
-## [1] MeDeCom_0.11    gplots_3.0.1    gtools_3.5.0    pracma_1.9.3   
-## [5] Rcpp_0.12.6     rmarkdown_1.0   devtools_1.12.0
+## [1] MeDeCom_0.2  gplots_3.0.1 gtools_3.5.0 pracma_1.9.5 Rcpp_0.12.8 
 ## 
 ## loaded via a namespace (and not attached):
-##  [1] quadprog_1.5-5     digest_0.6.9       withr_1.0.2       
-##  [4] bitops_1.0-6       formatR_1.4        magrittr_1.5      
-##  [7] evaluate_0.9       KernSmooth_2.23-15 stringi_1.1.1     
-## [10] gdata_2.17.0       tools_3.3.0        stringr_1.0.0     
-## [13] yaml_2.1.13        caTools_1.17.1     memoise_1.0.0     
-## [16] htmltools_0.3.5    knitr_1.13
+##  [1] knitr_1.14          magrittr_1.5        devtools_1.12.0    
+##  [4] lattice_0.20-34     quadprog_1.5-5      stringr_1.1.0      
+##  [7] caTools_1.17.1      tools_3.3.0         grid_3.3.0         
+## [10] KernSmooth_2.23-15  git2r_0.15.0.9000   withr_1.0.2        
+## [13] htmltools_0.3.5     yaml_2.1.13         assertthat_0.1     
+## [16] digest_0.6.10       tibble_1.2          RcppEigen_0.3.2.9.0
+## [19] Matrix_1.2-7.1      formatR_1.4         bitops_1.0-6       
+## [22] memoise_1.0.0       evaluate_0.10       rmarkdown_1.1      
+## [25] gdata_2.17.0        stringi_1.1.2
 ```
 
  

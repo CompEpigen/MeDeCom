@@ -180,6 +180,7 @@ updateT_gini<-function(G, W, Tk, lambdaT, tol, f0, lower=0, upper=1){
 	return(list(Tk1, fk1, iter))
 }
 
+
 #######################################################################################################################
 
 updateT_empirical<-function(G, W, Poss, lambda){
@@ -239,7 +240,25 @@ updateT_empirical<-function(G, W, Poss, lambda){
 #	return(Tnew)
 #	
 #}
+#######################################################################################################################
 
+updateT_multicore<-function(method="gini", G, W, Tk, lambdaT, tol, f0, lower=0, upper=1, ncores=2){
+	
+	if(method=="gini"){
+		update.func<-updateT_gini
+	}
+	
+	row.partition<-lapply(0:(ncores-1), function(chunck) (1:(ncol(W)%/%ncores))+chunck*(ncol(W)%/%ncores))
+	
+	opt_res<-mclapply(row.partition, function(row.ind) update.func(G, W[,row.ind], Tk[,row.ind], lambdaT, tol, f0, lower=0, upper=1), mc.cores=ncores)	
+	#opt_res<-lapply(row.partition, function(row.ind) update.func(G, W[,row.ind], Tk[,row.ind], lambdaT, tol, f0, lower=0, upper=1))	
+	
+	Tk<-do.call("cbind", lapply(opt_res, el, 1))
+	fk<-sum(sapply(opt_res, el, 2))
+	avg_iter<-mean(sapply(opt_res, el, 3))
+	
+	return(list(Tk,fk,avg_iter))
+}
 
 #######################################################################################################################
 #	 Wrappers for the T update methods 	 
@@ -393,7 +412,8 @@ onerun.alternate<-function(
 		eps=1e-8,
 		blocks=NULL,
 		na.values=FALSE,
-		verbose=TRUE){
+		verbose=TRUE,
+		ncores=1){
 	
 	k<-ncol(T0)
 	if(!is.null(Tfix)){
@@ -586,7 +606,11 @@ onerun.alternate<-function(
 				G <- A %*% t(A); W <- A %*% Dt4T
 				##%%%mexHCLasso(G,W,T',lambda);
 				
-				res <- updateT_gini(G, W, Tstart, lambda, eps, f - norm_val, lower=qp.rangeT[1], upper=qp.rangeT[2]);
+				if(ncores>1){
+					res <- updateT_multicore("gini", G, W, Tstart, lambda, eps, f - norm_val, lower=qp.rangeT[1], upper=qp.rangeT[2], ncores=ncores);
+				}else{
+					res <- updateT_gini(G, W, Tstart, lambda, eps, f - norm_val, lower=qp.rangeT[1], upper=qp.rangeT[2]);
+		 		}
 				Trecov <- t(res[[1]]); ftemp<-res[[2]]
 				
 				if(!is.null(Tfix)){
@@ -750,10 +774,83 @@ onerun.alternate<-function(
 	}
 	
 	rmse<-sqrt(sum((D-TT%*%A)^2)/ncol(D)/nrow(D))
-	result<-list("T" = TT, "A" = A, "Fval" = Fval, "Conv" = Conv, "rmse"=rmse)
+	result<-list("T" = TT, "A" = A, "Fval" = Fval, "Conv" = Conv, "rmse" = rmse)
 	if(!is.null(Tfix)){
 		result$Afix<-Afix
 	}
+	return(result)
+}
+
+
+
+#######################################################################################################################
+# Implemenation of the alternating optimization scheme
+#######################################################################################################################
+#
+# a wrapper for cppTAfact
+#
+# cppTAfact - alternating optimization framework to solve the following
+# problem:
+#		find T, A such that 0.5 * (||D - TA||_F)^2 + lambda ,
+# where D is a mxn matrix with entries between 0 and 1,
+# T is a mxr matrix with entries between 0 and 1,
+# A is a rxn matrix with nonnegative values and columns summing up
+# to 1.
+#
+# author: Nikita Vedeneev
+#
+# R port by Pavlo Lutsik
+#
+
+onerun.cppTAfact<-function(
+		D, 
+		T0, 
+		A0,
+		Tfix=NULL,
+		Tpartial=NULL,
+		Tpartial.rows=NULL,
+		Apartial=NULL,
+		Apartial.cols=NULL,
+		t.method="quadPen", 
+		lambda = 0,
+		t.Poss = NULL, 
+		normD = NULL, 
+		itermax=100,
+		qp.rangeT=c(0,1),
+		#qp.Alower=rep(0,ncol(T0)),
+		#qp.Aupper=rep(1,ncol(T0)),
+		qp.Alower=NULL,
+		qp.Aupper=NULL,
+		emp.dim=500, 
+		emp.resample=TRUE,
+		emp.vsf=1,
+		emp.borders=c(0,1),
+		trace=FALSE,
+		eps=1e-8,
+		blocks=NULL,
+		na.values=FALSE,
+		verbose=TRUE,
+		ncores=1){
+
+	res<-cppTAfact(
+			t(D), #- a transposed D matrix,
+			t(T0), #-Ttinit - a transposed init for T matrix,
+			A0, # - an initial value for A matrix,
+			lambda,# - regularizer parameter (0.0 by default),
+			itermax, #itersMax, - a max number of alternations (1000 by default),
+			eps, #tol - tolerance for alternations (1e-8 by default),
+			10*eps, #tolA - tolerance for opt wrt A (1e-7 by default),
+			10*eps #tolT - tolerance for opt wrt T (1e-7 by default)
+	)
+	### TODO: modify cppTAfact to output the list is identical to the output of onerun.alternate
+	#
+	#cppTAfact returns a named list where:
+    #res$Tt - a transposed estimated of T matrix,
+    #res$A - an estimate of A matrix,
+    #res$niter - a total number of alternations
+    #res$objF - objective value at res$Tt and res$A
+	#
+	result<-list("T" = t(res$Tt), "A" = res$A, "Fval" = res$objF, "Conv" = res$niter, "rmse"= res$rmse)
 	return(result)
 }
 
@@ -823,7 +920,8 @@ onerun.alternate<-function(
 #' @export
 #' 
 factorize.alternate<-function(D, 
-		k, 
+		k,
+		method="MeDeCom.quadPen",
 		t.method="quadPen",
 		Tfix=NULL,
 		Tpartial=NULL,
@@ -849,9 +947,10 @@ factorize.alternate<-function(D,
 		ncores=1,
 		pheno=NULL,
 		na.values=FALSE,
+		seed=NULL,
 		verbosity=0L){
 	
-	if(!t.method %in% c("integer", "empirical", "resample", "Hlasso", "optim", "quadPen")){
+	if(!t.method %in% c("integer", "empirical", "resample", "Hlasso", "optim", "quadPen", "cppTAfact")){
 		stop("supplied optimization method for T is not implemented")
 	}
 	
@@ -944,9 +1043,11 @@ factorize.alternate<-function(D,
 		}
 	}
 	
-	
 	if(init=="random"){
 		numruns <- opt
+		if(!is.null(seed)){
+			set.seed(seed)
+		}
 	}else if(init=="fixed"){
 		numruns <- 1
 	}else{
@@ -1008,8 +1109,15 @@ factorize.alternate<-function(D,
 				}
 			}
 		}
+		
 		# solve the topic model
-		onerun <- onerun.alternate(
+		if(method == "MeDeCom.cppTAfact"){
+			onerun.function<-onerun.cppTAfact
+		}else{
+			onerun.function<-onerun.alternate
+		}
+
+		onerun <- onerun.function(
 				D, T0, A0,
 				Tfix = Tfix,
 				Tpartial=NULL,
@@ -1032,7 +1140,8 @@ factorize.alternate<-function(D,
 				eps=eps,
 				blocks=blocks,
 				na.values=na.values,
-				verbose=verbosity>1L);
+				verbose=verbosity>1L,
+				ncores=ncores);
 		
 #			Ts[[run]]<<-onerun[[1]]
 #			As[[run]]<<-onerun[[2]]
@@ -1050,7 +1159,8 @@ factorize.alternate<-function(D,
 #		pcoordinates <- foreach(target = targets) %dopar%
 #				tryCatch(RnBeads::rnb.execute.dreduction(rnb.set, target = target), error = function(e) { e$message } )
 		
-		if(ncores>1){
+		#if(ncores>1){
+		if(FALSE){
 			#require(doMC)
 			#registerDoMC(N_CORES)
 			#cl<-makeCluster(N_CORES)
@@ -1084,7 +1194,8 @@ factorize.alternate<-function(D,
 		Conv <- Convs[[idx]]
 		
 		if(!na.values){
-			rmse<-sqrt(sum((D-TT%*%A)^2)/ncol(D)/nrow(D))
+			#rmse<-sqrt(sum((D-TT%*%A)^2)/ncol(D)/nrow(D))
+			rmse <- Fval - lambda*sum(TT-TT^2)
 		}else{
 			diff_mat<-D-TT%*%A
 			rmse<-sqrt(sum(diff_mat[!is.na(diff_mat)]^2)/ncol(D)/nrow(D))

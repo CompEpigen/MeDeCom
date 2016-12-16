@@ -547,15 +547,17 @@ void spawn_threads(double* G, double* W, double* A, ptrdiff_t k, int d, double* 
     
 }
 
-
-
 //[[Rcpp::export]]
 List RQuadHC(NumericMatrix  Ginp, NumericMatrix  Winp, NumericMatrix  Ainp, NumericVector otol, NumericVector lconstr, NumericVector uconstr)
 {
 
-	Rcpp::NumericMatrix Gi(clone(Ginp));
-	Rcpp::NumericMatrix Wi(clone(Winp));
-	Rcpp::NumericMatrix Ai(clone(Ainp));
+//	Rcpp::NumericMatrix Gi(clone(Ginp));
+//	Rcpp::NumericMatrix Wi(clone(Winp));
+//	Rcpp::NumericMatrix Ai(clone(Ainp));
+
+	Rcpp::NumericMatrix Gi(Ginp);
+	Rcpp::NumericMatrix Wi(Winp);
+	Rcpp::NumericMatrix Ai(Ainp);
 
 	double* Gptr =  Gi.begin();
 	double* Wptr =  Wi.begin();

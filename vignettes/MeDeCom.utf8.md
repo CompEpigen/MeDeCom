@@ -1,6 +1,6 @@
 ---
 title: "MeDeCom: Methylome Decomposition via Constrained Matrix Factorization"
-author: "Pavlo Lutsik, Martin Slawski, Gilles Gasparoni, Matthias Hein and Joern Walter"
+author: "Pavlo Lutsik, Martin Slawski, Gilles Gasparoni, Nikita Vedeneev, Matthias Hein and Joern Walter"
 date: "2016-12-15"
 output:
   rmarkdown::html_document:

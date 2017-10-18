@@ -382,7 +382,7 @@ These settings should be stored in a `list` object:
 sge.setup<-list(
 R_bin_dir="/usr/bin",
 host_pattern="*",
-ram_limit="5G"
+mem_limit="5G"
 )
 ```
 This object should be supplied to *MeDeCom* as the argument `cluster.settings`. It is also important to specify a valid temporary 

@@ -314,7 +314,7 @@ plotProportions(medecom.result, K=5, lambda=0.01, type=&quot;heatmap&quot;, samp
 <pre class="r"><code>sge.setup&lt;-list(
 R_bin_dir=&quot;/usr/bin&quot;,
 host_pattern=&quot;*&quot;,
-ram_limit=&quot;5G&quot;
+mem_limit=&quot;5G&quot;
 )</code></pre>
 <p>This object should be supplied to <em>MeDeCom</em> as the argument <code>cluster.settings</code>. It is also important to specify a valid temporary directory, which is available to all execution nodes.</p>
 <pre class="r"><code>medecom.result&lt;-runMeDeCom(D, Ks=2:10, lambdas=c(0,10^(-5:-1)), N_COMP_LAMBDA=1, NFOLDS=5, NINIT=10, 

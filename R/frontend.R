@@ -6,7 +6,7 @@
 # 
 #######################################################################################################################
 #'
-#' runMeDecom
+#' runMeDeCom
 #'
 #' Perform a MeDeCom experiment
 #'
@@ -26,21 +26,20 @@
 #' @param NFOLDS    number of cross-validation folds
 #' @param N_COMP_LAMBDA   the number of solutions to compare in the "smoothing" step
 #' @param NCORES    number of cores to be used in the parallelized steps (at best a divisor of NINIT)
+#' @param random.seed  seed for random number generation
+#' @param num.tol  some small parameter
 #' @param analysis.name a deliberate name of the analysis as a \code{character} singleton
 #' @param use.ff    use \code{ff} package functionality for memory optimization
 #' @param cluster.settings  a list with parameters for an HPC cluster
 #' @param temp.dir  a temporary directory for the cluster-based analysis available on all nodes
 #' @param cleanup	if \code{TRUE} the temporary directory will be removed on completion
-#' @param verbosity verbosity level, \code{0} for the quiet execution 
+#' @param verbosity verbosity level, \code{0} for quiet execution 
 #' @param time.stamps add timestamps to the diagnostic output
-#' 
-#' @details 
 #' 
 #' @return MeDeComSet object
 #'
 #' @author Pavlo Lutsik
 #' @export
-#' 
 runMeDeCom<-function(
 		data, 
 		Ks, 

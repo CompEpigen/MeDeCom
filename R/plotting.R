@@ -792,6 +792,8 @@ plot.lambda.selection<-function(
 #' @param statistic		if multiple k values are supplied, the statistic which is plotted (defaults to cross-validation error)
 #' @param minLambda		minimal lambda value
 #' @param maxLambda		maximal lambda value
+#' @param lambdaScale character indicating if native scale or logarithmic scale should be employed for plotting lambda
+#' @param ...  further paramters passed to \code{plot.lambda.selection} or \code{plot.K.selection}
 #' 
 #' @export
 plotParameters<-function(
@@ -1697,11 +1699,8 @@ proportion.feature.corr<-function(Ahat, lmc, data.ch){
 #' @param lambda	     value of parameter lambda to use
 #' @param cg_subset	     which CpG subset to use
 #' @param lmc		     which LMC to use for visualization
-#' @param Tref		     a matrix with reference methylomes
-#' @param distance	     distance measure to use
-#' @param center  		 if \code{TRUE} the LMC and reference methylome matrices will be row-centered
-#' @param n.most.var	 is not \code{NA} a respective number of CpGs with the highest standard deviation will be plotted
-#' 
+#' @param Aref		     a matrix with reference methylomes
+#'  
 #' @details
 #' Available plot types include:
 #' \describe{

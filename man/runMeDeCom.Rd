@@ -2,14 +2,15 @@
 % Please edit documentation in R/frontend.R
 \name{runMeDeCom}
 \alias{runMeDeCom}
-\title{runMeDecom}
+\title{runMeDeCom}
 \usage{
-runMeDeCom(data, Ks, lambdas, cg_subsets = NULL, sample_subset = NULL,
-  startT = NULL, startA = NULL, trueT = NULL, trueA = NULL,
-  fixed_T_cols = NULL, NINIT = 100, ITERMAX = 1000, NFOLDS = 10,
-  N_COMP_LAMBDA = 4, NCORES = 1, analysis.name = NULL, use.ff = FALSE,
-  cluster.settings = NULL, temp.dir = NULL, cleanup = TRUE,
-  verbosity = 1L, time.stamps = FALSE)
+runMeDeCom(data, Ks, lambdas, opt.method = "MeDeCom.cppTAfact",
+  cg_subsets = NULL, sample_subset = NULL, startT = NULL, startA = NULL,
+  trueT = NULL, trueA = NULL, fixed_T_cols = NULL, NINIT = 100,
+  ITERMAX = 1000, NFOLDS = 10, N_COMP_LAMBDA = 4, NCORES = 1,
+  random.seed = NULL, num.tol = 1e-08, analysis.name = NULL,
+  use.ff = FALSE, cluster.settings = NULL, temp.dir = NULL,
+  cleanup = TRUE, verbosity = 1L, time.stamps = FALSE)
 }
 \arguments{
 \item{data}{DNA methylation dataset as a \code{numeric} matrix (methylation sites vs samples) or an ojbect of class \code{RnBeadSet}}
@@ -17,6 +18,8 @@ runMeDeCom(data, Ks, lambdas, cg_subsets = NULL, sample_subset = NULL,
 \item{Ks}{values of parameter \deqn{k} to be tested, vector of type \code{integer}}
 
 \item{lambdas}{values of parameter \deqn{\lambda} to be tested, vector of type \code{numeric}}
+
+\item{opt.method}{optimization method used. Currently supported values are \code{"MeDeCom.quadPen"} and \code{"MeDeCom.cppTAfact"}.}
 
 \item{cg_subsets}{a \code{list} of \code{integer} vectors specifying row indices to include into the analysis}
 
@@ -42,6 +45,10 @@ runMeDeCom(data, Ks, lambdas, cg_subsets = NULL, sample_subset = NULL,
 
 \item{NCORES}{number of cores to be used in the parallelized steps (at best a divisor of NINIT)}
 
+\item{random.seed}{seed for random number generation}
+
+\item{num.tol}{some small parameter}
+
 \item{analysis.name}{a deliberate name of the analysis as a \code{character} singleton}
 
 \item{use.ff}{use \code{ff} package functionality for memory optimization}
@@ -52,7 +59,7 @@ runMeDeCom(data, Ks, lambdas, cg_subsets = NULL, sample_subset = NULL,
 
 \item{cleanup}{if \code{TRUE} the temporary directory will be removed on completion}
 
-\item{verbosity}{verbosity level, \code{0} for the quiet execution}
+\item{verbosity}{verbosity level, \code{0} for quiet execution}
 
 \item{time.stamps}{add timestamps to the diagnostic output}
 }
@@ -62,10 +69,6 @@ MeDeComSet object
 \description{
 Perform a MeDeCom experiment
 }
-\details{
-
-}
 \author{
 Pavlo Lutsik
 }
-

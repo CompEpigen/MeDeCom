@@ -35,6 +35,7 @@
 #' 
 #' @export
 run.trait.association <- function(medecom.set,rnb.set,test.fun=t.test,plot.path=getwd(),figure.format="pdf"){
+  cg_subsets <- medecom.set@parameters$cg_subsets
   Ks <- medecom.set@parameters$Ks
   lambdas <- medecom.set@parameters$lambdas
   if(!file.exists(plot.path)){
@@ -43,16 +44,26 @@ run.trait.association <- function(medecom.set,rnb.set,test.fun=t.test,plot.path=
   if(!figure.format %in% c("pdf","png")){
     stop(paste("Invalid value for figure.format, needs to be 'pdf' of 'png'"))
   }
-  plot.path <- file.path(plot.path,figure.format)
-  if(!file.exists(plot.path)){
-    dir.create(plot.path)
+  base.path <- file.path(plot.path,figure.format)
+  if(!file.exists(base.path)){
+    dir.create(base.path)
   }
-  for(K in Ks){
-    for(lambda in lambdas){
-      p.vals <- link.to.traits(medecom.set=medecom.set,K=K,lambda=lambda,rnb.set=rnb.set,test.fun=test.fun)
-      plot <- plot.p.val.heatmap(p.vals)
-      fname <- paste0("trait_association_heatmap_K",K,"_lambda",lambda,figure.format)
-      ggsave(filename=file.path(plot.path,fname),plot=plot,device = figure.format)
+  for(s in cg_subsets){
+    s.path <- file.path(base.path,paste0("Subset",s))
+    if(!file.exists(s.path)){
+      dir.create(s.path)
+    }
+    for(K in Ks){
+      k.path <- file.path(s.path,paste0("K",K))
+      if(!file.exists(k.path)){
+        dir.create(k.path)
+      }
+      for(lambda in lambdas){
+        p.vals <- link.to.traits(medecom.set=medecom.set,cg_subset=s,K=K,lambda=lambda,rnb.set=rnb.set,test.fun=test.fun)
+        plot <- plot.p.val.heatmap(p.vals)
+        fname <- paste0("trait_association_heatmap_lambda",lambda,figure.format)
+        ggsave(filename=file.path(k.path,fname),plot=plot,device = figure.format)
+      }
     }
   }
 }
@@ -64,8 +75,9 @@ run.trait.association <- function(medecom.set,rnb.set,test.fun=t.test,plot.path=
 #' 
 #' @param medecom.set An object of type \code{\link{MeDeComSet}} as the result of \code{\link{runMeDeCom}} containing LMCs and their
 #'                     proportions in the samples. The Set can contain multiple runs for different values of K and lambda.
+#' @param cg_subset The subset of sites used for computing LMCs in \code{medecom.set}.
 #' @param K The K parameter, determining the number of LMCs to extract from \code{medecom.set}.
-#' @param K The lambda parameter, determining the regularization used for the LMCs in \code{medecom.set}.
+#' @param lambda The lambda parameter, determining the regularization used for the LMCs in \code{medecom.set}.
 #' @param rnb.set An object of type \code{\link{RnBSet}} containing methylation data and metadata for the same samples for which 
 #'                 \code{medecom.set} was computed.
 #' @param test.fun Test statistic used to compute p-values of differences between LMC contributions in pairwise sample comparisons.
@@ -82,10 +94,10 @@ run.trait.association <- function(medecom.set,rnb.set,test.fun=t.test,plot.path=
 #' 
 #' @noRd
 
-link.to.traits <- function(medecom.set,K,lambda,rnb.set,test.fun=t.test){
+link.to.traits <- function(medecom.set,cg_subset,K,lambda,rnb.set,test.fun=t.test){
   require("RnBeads")
   sample.grps <- rnb.sample.groups(rnb.set)
-  props <- getProportions(medecom.set,K=K,lambda=lambda)
+  props <- getProportions(medecom.set,cg_subset=cg_subset,K=K,lambda=lambda)
   res <- list()
   names.grps <- names(sample.grps)
   for(i in 1:length(sample.grps)){

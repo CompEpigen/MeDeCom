@@ -715,7 +715,7 @@ plot.lambda.selection<-function(
 	
 	for(elt in 1:length(elts)){
 		
-		vals<-getStatistics(MeDeComSet, K, lmbd, cg_subset, statistic=elts[elt])
+		vals <- as.numeric(getStatistics(MeDeComSet, K, lmbd, cg_subset, statistic=elts[elt]))
 		offs<-(max(vals[!is.na(vals)])-min(vals[!is.na(vals)]))/5
 		
 		if(!all(is.na(vals))){

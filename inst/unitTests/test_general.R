@@ -11,9 +11,10 @@ test.reinius.reference <- function(){
 test.general <- function(){
   data("example.dataset")
   input.data <- D[sample(1:nrow(D),1000),sample(1:ncol(D),5)]
+  cg_subsets <- list("var"=sample(1:nrow(D),250),"random"=sample(1:nrow(D),500))
   Ks <- 2
   lambdas <- c(0.01)
-  res <- runMeDeCom(data = D,Ks = Ks,lambdas = lambdas)
+  res <- runMeDeCom(data = D,Ks = Ks,lambdas = lambdas,cg_subsets = cg_subsets)
   passes <- inherits(res,"MeDeComSet")
   checkTrue(passes)
 }

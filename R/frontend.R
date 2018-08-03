@@ -236,6 +236,9 @@ runMeDeCom<-function(
 	
 	#run_param_list<-list()
 	cg_subset_ids<-1:length(cg_subsets)
+	if(!is.null(names(cg_subsets))){
+	  names(cg_subset_ids) <- names(cg_subsets)
+	}
 	#for(run in c("initial", "cv"))
 
 	#for(K in Ks){
@@ -984,6 +987,9 @@ collectResults<-function(result_list, cg_subsets, Ks, lambdas, NFOLDS, result_in
 	help<- NULL
 	for ( i in cg_subsets){
 		help <- append(help, cg_subsets[[i]])
+	}
+	if(!is.null(names(cg_subsets))){
+	  names(help) <- names(cg_subsets)
 	}
 	all_results$parameters$cg_subsets<-help
 	all_results$parameters$Ks<-Ks

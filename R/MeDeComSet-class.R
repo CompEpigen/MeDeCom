@@ -108,7 +108,9 @@ setMethod("getStatistics", signature(object="MeDeComSet"),
 		elt<-c(
 				"objective"="Fval",	"Fval"="Fval", 
 				"rmse"="rmse", "RMSE"="rmse",
-				"CVE"="cve", "cve"="cve"
+				"CVE"="cve", "cve"="cve",
+				"MAEA"="maeA", "maeA"="maeA",
+				"RMSET"="rmseT","rmseT"="rmseT"
 		)[statistic]
 		return(object@outputs[[cg_subset]][[elt]][match(Ks, object@parameters$Ks), match(lambdas, object@parameters$lambdas)])
 })

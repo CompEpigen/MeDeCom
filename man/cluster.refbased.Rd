@@ -4,7 +4,8 @@
 \alias{cluster.refbased}
 \title{cluster.refbased}
 \usage{
-cluster.refbased(ref.run, K, lambda, plot.type = "dendrogram")
+cluster.refbased(ref.run, K, lambda, cg_subset = 1,
+  plot.type = "dendrogram")
 }
 \arguments{
 \item{ref.run}{A result of \code{\link{run.refbased}} with the results of \code{\link{runMeDeCom}} and the reference data matrix}
@@ -12,6 +13,8 @@ cluster.refbased(ref.run, K, lambda, plot.type = "dendrogram")
 \item{K}{Selected number of components}
 
 \item{lambda}{Selected regularization parameter}
+
+\item{cg_subset}{Numeric vector representing the CpG sites selected for analysis from the orignial MeDeComSet}
 
 \item{plot.type}{Type of plot to be created, is passed to \code{\link{plotLMCs}}}
 }

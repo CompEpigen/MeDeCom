@@ -18,7 +18,7 @@
 #' 
 #' @param medecom.set An object of type \code{\link{MeDeComSet}} as the result of \code{\link{runMeDeCom}} containing LMCs and their
 #'                     proportions in the samples. The Set can contain multiple runs for different values of K and lambda.
-#' @param rnb.set An object of type \code{\link[RnBeads]{RnBSet}} containing methylation data and metadata for the same samples for which 
+#' @param rnb.set An object of type \code{\link[RnBeads]{RnBSet-class}} containing methylation data and metadata for the same samples for which 
 #'                 \code{medecom.set} was computed.
 #' @param test.fun Test statistic used to compute p-values of differences between LMC contributions in pairwise sample comparisons.
 #'                  Defaults to \code{t.test}.

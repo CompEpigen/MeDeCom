@@ -20,6 +20,7 @@ AVAIL.REFS <- c("reinius","local")
 #'                 the deconvolution is to be performed
 #' @param Ks Numeric vector containing the number of components to be computed by \pkg{MeDeCom}
 #' @param lambdas Numeric vector specifying the regularzation parameters to be explored
+#' @param cg_subsets List of numeric vectors specifying the rows that are to be used in the analysis.
 #' @param opt.method Optimization method to be employed. For further information see \code{\link{runMeDeCom}}
 #' @param temp.dir Optional temporary directory to store intermediate results
 #' @param ref.base Reference profile data base to be used. Supported are 
@@ -37,7 +38,7 @@ AVAIL.REFS <- c("reinius","local")
 #'                 \code{ref.base="local"}.
 #' @param id.col The name of the column in the sample annotation sheet of \code{ref.set} containing the reference cell type. Is only
 #'                 compatible with \code{ref.base="local"}.
-#' @param save.restricted.set Flag indicating if \code{rnb.set} restricted to the \code{most.var} sites is to be saved in \code{temp.dir}
+#' @param save.restricted.sites Flag indicating if \code{rnb.set} restricted to the \code{most.var} sites is to be saved in \code{temp.dir}
 #'                             for potential downstream analysis.                 
 #' 
 #' @return A list object containing two elements \itemize{
@@ -62,7 +63,7 @@ run.refbased <- function(rnb.set,
                          opt.method="MeDeCom.cppTAfact",
                          temp.dir=NULL,
                          ref.base="reinius",
-                         most.var=50000,
+                         most.var=NULL,
                          NCORES=1,
                          cluster.settings=NULL,
                          ref.set=NULL,
@@ -92,23 +93,36 @@ run.refbased <- function(rnb.set,
   anno.ref <- GRanges(Rle(anno.ref$Chromosome),IRanges(start=anno.ref$Start,end=anno.ref$End))
   op <- findOverlaps(anno.set,anno.ref)
   #anno.set <- anno.set[queryHits(op)]
-  meth.data <- meth(rnb.set)[queryHits(op),]
-  vars <- apply(meth.data,1,function(x)var(x,na.rm=T))
-  ordered <- order(vars,decreasing=T)
-  rem.sites <- rep(TRUE,nsites(rnb.set))
-  if(most.var>nsites(rnb.set)){
-    warning("most.var bigger than number of sites, reduced to maximum")
-    most.var <- nsites(rnb.set)
-  }
-  rem.sites[queryHits(op)][ordered[1:most.var]] <- FALSE
-  #rem.sites[sample(1:nsites(rnb.set),most.var)] <- FALSE
+  rem.sites <- !(1:nsites(rnb.set) %in% queryHits(op))
   rnb.set <- remove.sites(rnb.set,rem.sites)
-  if(save.restricted.sites){
-    save.rnb.set(rnb.set,file.path(temp.dir,"restrictedRnBSet"))
+  meth.data <- meth(rnb.set)
+  if(!is.null(cg_subsets)){
+    new.anno <- anno.set[!rem.sites]
+    op2 <- findOverlaps(new.anno,anno.set)
+    cg_subsets <- lapply(cg_subsets,function(x){
+      matchi <- match(x,subjectHits(op2))
+      queryHits(op2)[matchi[!is.na(matchi)]]
+    })
   }
-  anno.set <- anno.set[!rem.sites]
-  op <- findOverlaps(anno.set,anno.ref)
+  if(!is.null(most.var)){
+    vars <- apply(meth.data,1,function(x)var(x,na.rm=T))
+    ordered <- order(vars,decreasing=T)
+    rem.sites <- rep(TRUE,nsites(rnb.set))
+    if(most.var>nsites(rnb.set)){
+      warning("most.var bigger than number of sites, reduced to maximum")
+      most.var <- nsites(rnb.set)
+    }
+    rem.sites[queryHits(op)][ordered[1:most.var]] <- FALSE
+    #rem.sites[sample(1:nsites(rnb.set),most.var)] <- FALSE
+    rnb.set <- remove.sites(rnb.set,rem.sites)
+    if(save.restricted.sites){
+      save.rnb.set(rnb.set,file.path(temp.dir,"restrictedRnBSet"))
+    }
+    anno.set <- anno.set[!rem.sites]
+    op <- findOverlaps(anno.set,anno.ref)
+  }
   meth.ref <- meth(ref.set)[subjectHits(op),]
+  meth.ref <- rnb.execute.imputation(meth.ref)
   colnames(meth.ref) <- pheno(ref.set)[,id.col]
   medecom.result <- runMeDeCom(rnb.set,
                                Ks=Ks,
@@ -118,6 +132,9 @@ run.refbased <- function(rnb.set,
                                temp.dir=temp.dir,
                                NCORES=NCORES,
                                cluster.settings=cluster.settings)
+  if(!is.null(cg_subsets)){
+    medecom.result@parameters$GROUP_LISTS <- cg_subsets
+  }
   return(list("MeDeComSet"=medecom.result,"RefMeth"=meth.ref))
 }
 
@@ -129,6 +146,7 @@ run.refbased <- function(rnb.set,
 #' @param ref.run A result of \code{\link{run.refbased}} with the results of \code{\link{runMeDeCom}} and the reference data matrix
 #' @param K Selected number of components
 #' @param lambda Selected regularization parameter
+#' @param cg_subset Numeric vector representing the CpG sites selected for analysis from the orignial MeDeComSet
 #' @param plot.type Type of plot to be created, is passed to \code{\link{plotLMCs}}
 #' 
 #' @return A plot object displaying the clustering
@@ -139,13 +157,18 @@ run.refbased <- function(rnb.set,
 cluster.refbased <- function(ref.run,
                              K,
                              lambda,
+                             cg_subset=1,
                              plot.type="dendrogram"){
   if(!is.list(ref.run) || length(ref.run)<2){
     stop("Argument needs to be the results obtained from 'run.refbased'")
   }
   medecom.result <- ref.run$MeDeComSet
   meth.ref <- ref.run$RefMeth
-  plot <- plotLMCs(medecom.result,K=K,lambda=lambda,type=plot.type,Tref=meth.ref)
+  if(!is.null(medecom.result@parameters$GROUP_LISTS)){
+    sset <- medecom.result@parameters$GROUP_LISTS[[cg_subset]]
+    meth.ref <- meth.ref[sset,]
+  }
+  plot <- plotLMCs(medecom.result,K=K,lambda=lambda,cg_subset=cg_subset,type=plot.type,Tref=meth.ref)
   return(plot)
 }
 
@@ -166,6 +189,7 @@ cluster.refbased <- function(ref.run,
 #' @noRd
 
 load.ref.set <- function(ref.base,temp.dir=NULL){
+  require("RnBeads")
   if(!ref.base %in% AVAIL.REFS){
     stop(paste("Unsupported reference data base, must be one of",AVAIL.REFS))
   }

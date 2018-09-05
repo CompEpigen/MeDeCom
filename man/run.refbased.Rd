@@ -5,10 +5,10 @@
 \title{FUNCTIONS
 run.refbased}
 \usage{
-run.refbased(rnb.set, Ks, lambdas, opt.method = "MeDeCom.cppTAfact",
-  temp.dir = NULL, ref.base = "reinius", most.var = 50000, NCORES = 1,
-  cluster.settings = NULL, ref.set = NULL, id.col = NULL,
-  save.restricted.sites = FALSE)
+run.refbased(rnb.set, Ks, lambdas, cg_subsets = NULL,
+  opt.method = "MeDeCom.cppTAfact", temp.dir = NULL, ref.base = "reinius",
+  most.var = NULL, NCORES = 1, cluster.settings = NULL, ref.set = NULL,
+  id.col = NULL, save.restricted.sites = FALSE)
 }
 \arguments{
 \item{rnb.set}{An Object of type \code{RnBSet} from the \pkg{RnBeads} package containing methylation information on which
@@ -17,6 +17,8 @@ the deconvolution is to be performed}
 \item{Ks}{Numeric vector containing the number of components to be computed by \pkg{MeDeCom}}
 
 \item{lambdas}{Numeric vector specifying the regularzation parameters to be explored}
+
+\item{cg_subsets}{List of numeric vectors specifying the rows that are to be used in the analysis.}
 
 \item{opt.method}{Optimization method to be employed. For further information see \code{\link{runMeDeCom}}}
 
@@ -43,7 +45,7 @@ the deconvolution is to be performed}
 \item{id.col}{The name of the column in the sample annotation sheet of \code{ref.set} containing the reference cell type. Is only
 compatible with \code{ref.base="local"}.}
 
-\item{save.restricted.set}{Flag indicating if \code{rnb.set} restricted to the \code{most.var} sites is to be saved in \code{temp.dir}
+\item{save.restricted.sites}{Flag indicating if \code{rnb.set} restricted to the \code{most.var} sites is to be saved in \code{temp.dir}
 for potential downstream analysis.}
 }
 \value{

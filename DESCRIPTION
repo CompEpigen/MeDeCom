@@ -1,6 +1,6 @@
 Package: MeDeCom
 Title: Decomposition of heterogeneous methylomes
-Description: Decomposition of heterogeneous methylomes
+Description: Decomposition of heterogeneous methylomes with non-negative matrix factorization.
 Maintainer: Pavlo Lutsik <p.lutsik@mx.uni-saarland.de>
 Authors@R: c(
    person ( "Pavlo", "Lutsik", email="p.lutsik@mx.uni-saarland.de", role = c("cre")),

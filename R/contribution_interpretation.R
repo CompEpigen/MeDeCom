@@ -63,6 +63,10 @@ run.trait.association <- function(medecom.set,rnb.set,test.fun=t.test,plot.path=
         plot <- plot.p.val.heatmap(p.vals)
         fname <- paste0("trait_association_heatmap_lambda",lambda,figure.format)
         ggsave(filename=file.path(k.path,fname),plot=plot,device = figure.format)
+        cors <- quantitative.trait.association(medecom.set=medecom.set,cg_subset=s,K=K,lambda=lambda,rnb.set=rnb.set)
+        plot <- plot.correlation.heatmap(cors)
+        fname <- paste0("quantitative_trait_association_lambda",lambda,figure.format)
+        ggsave(filename=file.path(k.path,fname),plot=plot,device = figure.format)
       }
     }
   }
@@ -85,7 +89,7 @@ run.trait.association <- function(medecom.set,rnb.set,test.fun=t.test,plot.path=
 #'                  
 #' @return A list with an element for each sample grouping defined by \code{\link{rnb.sample.groups}}.
 #' 
-#' @details Each element in the returned list is of left \code{K}, displaying the p-value of the statistical assocation of the
+#' @details Each element in the returned list is of length \code{K}, displaying the p-value of the statistical assocation of the
 #'           contributions of the corresponding LMC to the sample grouping. The p-values are produced by comparing the LMC 
 #'           contributions in all sample comparisons defined by \code{\link{rnb.sample.groups}} on \code{rnb.set}. The employed test
 #'           statistic for pariwise comparison can be specified by \code{test.fun}, for groups defining more than one group
@@ -99,30 +103,77 @@ link.to.traits <- function(medecom.set,cg_subset,K,lambda,rnb.set,test.fun=t.tes
   sample.grps <- rnb.sample.groups(rnb.set)
   props <- getProportions(medecom.set,cg_subset=cg_subset,K=K,lambda=lambda)
   res <- list()
-  names.grps <- names(sample.grps)
-  for(i in 1:length(sample.grps)){
-    grp <- sample.grps[[i]]
-    names.traits <- names(grp)
-    if(length(grp)==2){
-      p.vals <- apply(props,1,function(x){
-        test.fun(x[grp[[1]]],x[grp[[2]]])$p.val
-      })
-    }else if(length(grp)>2){
-      vec <- rep(NA,length(samples(rnb.set)))
-      for(name in names.traits){
-        vec[grp[[name]]] <- name
+  if(!(is.null(dim(props)))){
+    names.grps <- names(sample.grps)
+    for(i in 1:length(sample.grps)){
+      grp <- sample.grps[[i]]
+      names.traits <- names(grp)
+      if(length(grp)==2){
+        p.vals <- apply(props,1,function(x){
+          test.fun(x[grp[[1]]],x[grp[[2]]])$p.val
+        })
+      }else if(length(grp)>2){
+        vec <- rep(NA,length(samples(rnb.set)))
+        for(name in names.traits){
+          vec[grp[[name]]] <- name
+        }
+        vec <- as.factor(vec)
+        p.vals <- apply(props,1,function(x){
+          kruskal.test(x,vec)$p.val
+        })
+      }else{
+        p.vals <- NA
       }
-      vec <- as.factor(vec)
-      p.vals <- apply(props,1,function(x){
-        kruskal.test(x,vec)$p.val
-      })
-    }else{
-      p.vals <- NA
+      res[[names.grps[i]]] <- p.vals
     }
-    res[[names.grps[i]]] <- p.vals
   }
   return(res)
 }
+
+#' quantitative.trait.assocation
+#' 
+#' This routine performs a correlation test to determine if there is a correlation between any quantitative trait and LMC contributions.
+#' 
+#' @param medecom.set An object of type \code{\link{MeDeComSet}} as the result of \code{\link{runMeDeCom}} containing LMCs and their
+#'                     proportions in the samples. The Set can contain multiple runs for different values of K and lambda.
+#' @param cg_subset The subset of sites used for computing LMCs in \code{medecom.set}.
+#' @param K The K parameter, determining the number of LMCs to extract from \code{medecom.set}.
+#' @param lambda The lambda parameter, determining the regularization used for the LMCs in \code{medecom.set}.
+#' @param rnb.set An object of type \code{\link{RnBSet}} containing methylation data and metadata for the same samples for which 
+#'                 \code{medecom.set} was computed.
+#'                  
+#' @return A list with an element for each quantitative trait present in \code{rnb.set}'s phenotypic information.
+#' 
+#' @details Each element in the returned list is of length \code{K}, displaying the result of a correlation test of the
+#'           quantitative trait and the LMC proportions for each LMC. 
+#' @author Michael Scherer
+#' 
+#' @noRd
+
+quantitative.trait.association <- function(medecom.set,cg_subset,K,lambda,rnb.set){
+  require("RnBeads")
+  sample.grps <- names(rnb.sample.groups(rnb.set))
+  ph <- pheno(rnb.set)
+  quant.traits <- colnames(ph)
+  quant.traits <- quant.traits[!(quant.traits%in%sample.grps)]
+  props <- getProportions(medecom.set,cg_subset=cg_subset,K=K,lambda=lambda)
+  res <- list()
+  if(!is.null(dim(props))){
+    for(trait in quant.traits){
+      trait.value <- ph[,trait]
+      if(is.numeric(trait.value)){
+        cors <- apply(props,1,function(x){
+          cor.test(x,trait.value)
+        })
+      }else{
+        cors <- NA
+      }
+      res[[trait]] <- cors
+    }
+  }
+  return(res)
+}
+
 
 #' plot.p.val.heatmap
 #' 
@@ -137,14 +188,62 @@ link.to.traits <- function(medecom.set,cg_subset,K,lambda,rnb.set,test.fun=t.tes
 #' @noRd
 
 plot.p.val.heatmap <- function(trait.res){
-  require("ggplot2")
-  require("reshape2")
-  to.plot <- as.data.frame(trait.res)
-  to.plot$LMC <- row.names(to.plot)
-  to.plot <- melt(to.plot)
-  colnames(to.plot)[2:3] <- c("Trait","PValue")
-  to.plot$LogPValue <- log(to.plot$PValue)
-  plot <- ggplot(to.plot,aes(x=LMC,y=Trait,fill=LogPValue))+geom_tile()+theme_bw()+scale_fill_gradient(low="red",high = "white")+
-    geom_text(aes(label=ifelse(round(PValue,2)< 0.01,format(PValue,digits = 2),"")))
+  if(length(trait.res)!=0){
+    require("ggplot2")
+    require("reshape2")
+    to.plot <- as.data.frame(trait.res)
+    to.plot$LMC <- row.names(to.plot)
+    to.plot <- melt(to.plot)
+    colnames(to.plot)[2:3] <- c("Trait","PValue")
+    to.plot$LogPValue <- log(to.plot$PValue)
+    plot <- ggplot(to.plot,aes(x=LMC,y=Trait,fill=LogPValue))+geom_tile()+theme_bw()+scale_fill_gradient(low="red",high = "white")+
+      geom_text(aes(label=ifelse(round(PValue,2)< 0.01,format(PValue,digits = 2),"")))
+  }else{
+    plot <- ggplot(data.frame(x=c(0,1),y=c(0.1)))+geom_text(x=0.5,y=0.5,label="No assocation found")+theme_bw()
+  }
   return(plot)
 }
+
+#' plot.correlation.heatmap
+#' 
+#' Produces a correlation heatmap produced by \code{\link{quantitative.trait.assocation}}.
+#' 
+#' @param trait.res A list as the result of \code{\link{quantitative.trait.association}}.
+#' 
+#' @return A plot object displaying a heatmap of correlations and corresponding p-values. Correlations are color-coded and a color is added
+#'          to the text according to the correlation test p-value (one for <0.01 and another for >0.01).
+#'          
+#' @author Michael Scherer
+#' @noRd
+
+plot.correlation.heatmap <- function(trait.res){
+  if(length(trait.res)!=0){
+    require("ggplot2")
+    require("reshape2")
+    to.plot <- c()
+    for(trait in names(trait.res)){
+      lmc.association <- trait.res[[trait]]
+      temp.fr <- c()
+      for(lmc in names(lmc.association)){
+        cor.t <- lmc.association[[lmc]]
+        p.val <- cor.t$p.value
+        cori <- cor.t$estimate
+        temp.fr <- rbind(temp.fr,c(lmc,p.val,cori))
+      }
+      temp.fr <- as.data.frame(temp.fr)
+      temp.fr$Trait <- rep(trait,nrow(temp.fr))
+      to.plot <- rbind(to.plot,temp.fr)
+    }
+    to.plot <- as.data.frame(to.plot)
+    colnames(to.plot) <- c("LMC","PValue","Correlation","Trait")
+    to.plot$PValue <- as.numeric(as.character(to.plot$PValue))
+    to.plot$Correlation <- as.numeric(as.character(to.plot$Correlation))
+    to.plot$Significant <- ifelse(round(to.plot$PValue,2)< 0.01,"<0.01",">0.01")
+    plot <- ggplot(to.plot,aes(x=LMC,y=Trait,fill=Correlation,color=Significant))+geom_tile()+theme_bw()+
+      scale_fill_gradient(low="white",high = "blue")+scale_color_manual(values=c("red","white"))+geom_text(aes(label=round(Correlation,2)))
+  }else{
+    plot <- ggplot(data.frame(x=c(0,1),y=c(0.1)))+geom_text(x=0.5,y=0.5,label="No assocation found")+theme_bw()
+  }
+  return(plot)
+}
+

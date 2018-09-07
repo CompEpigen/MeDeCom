@@ -191,7 +191,7 @@ data.lineplot<-function(data, quant.trait=NULL,
 	
 	if(!legend) lp<-lp + theme(legend.position = "none")
 	
-	if(!is.null(title)) lp<-lp + ggtitle(title = title)
+	if(!is.null(title)) lp<-lp + ggtitle(title)
 	
 	if(plot)
 		print(lp) else lp

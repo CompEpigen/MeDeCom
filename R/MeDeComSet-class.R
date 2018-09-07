@@ -171,9 +171,11 @@ setMethod("getProportions", signature(object="MeDeComSet"),
 		function(object, K=object@parameters$Ks[1], lambda=object@parameters$lambdas[1], cg_subset=1, statistic="cve"){
 	check_inputs(object, cg_subset, K, lambda)
 	Ahat<-object@outputs[[cg_subset]]$A[[match(K, object@parameters$Ks), match(lambda, object@parameters$lambdas)]]
-	rownames(Ahat)<-sprintf("LMC%d", 1:nrow(Ahat))
-	if(!is.null(object@dataset_info$sample_names)){
-		colnames(Ahat)<-object@dataset_info$sample_names
+	if(!is.null(dim(Ahat))){
+	  rownames(Ahat)<-sprintf("LMC%d", 1:nrow(Ahat))
+  	if(!is.null(object@dataset_info$sample_names)){
+	  	colnames(Ahat)<-object@dataset_info$sample_names
+  	}
 	}
 	return(Ahat)
 })

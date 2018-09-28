@@ -4,10 +4,10 @@
 \alias{lmc.lola.enrichment}
 \title{lmc.lola.enrichment}
 \usage{
-lmc.lola.enrichment(medecom.result, annotation.filter = NULL, rnb.set, K,
-  lambda, cg_subset = NULL, diff.threshold = 0.5,
+lmc.lola.enrichment(medecom.result, annotation.filter = NULL, rnb.set,
+  K = NULL, lambda = NULL, cg_subset = NULL, diff.threshold = 0.5,
   region.type = "ensembleRegBuildBPall", temp.dir = tempdir(),
-  type = "hypo")
+  type = "hypo", assembly = "hg19", lola.db = NULL)
 }
 \arguments{
 \item{medecom.result}{An object of type \code{\link{MeDeComSet-class}} or the location of an .RData file, where
@@ -17,7 +17,8 @@ such an object is stored.}
 preprocessing step (e.g. coverage filtering) or a path to an .RData file.}
 
 \item{rnb.set}{The original \code{\link[RnBeads]{RnBSet-class}} object containing methylation, sample meta and annotation
-information or a path to a directory stored by \code{\link[RnBeads]{save.rnb.set}}.}
+information, a path to a directory stored by \code{\link[RnBeads]{save.rnb.set}} or a data.frame containing
+CpG annotations (ann_C)}
 
 \item{K}{The number of LMCs specified for the MeDeCom run.}
 
@@ -35,6 +36,12 @@ for a list of available region types.}
 \item{temp.dir}{Path to a directory used to store temporary files.}
 
 \item{type}{Which direction is to be tested for enrichment. Can be one of "hypo", "hyper", or "differential"}
+
+\item{assembly}{The assembly used. Needs to be one of "hg19", "hg38" or "mm10". Does not need to be specified, if rnb.set is a
+\code{\link{RnBSet-class}}}
+
+\item{lola.db}{A loaded LOLA database as loaded with \code{\link{loadRegionDB}}. If this value is NULL, the database is loaded
+automatically and stored in the temporary directory.}
 }
 \value{
 A list with K elements. One element is the enrichment result of the corresponding LMC-specific hypomethylated CpG sites.
@@ -48,6 +55,9 @@ This function employs LOLA on the CpG sites that are LMC-specifically hypomethyl
                  the median methylation value of the other LMCs and then selecting those sites that are more than 
                  \code{diff.threshold} away from the median in the LMC of interest. This is done for all LMCs from
                  1 to K.
+}
+\seealso{
+lmc.lola.plot.tables
 }
 \author{
 Michael Scherer

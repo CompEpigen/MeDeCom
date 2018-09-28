@@ -115,10 +115,10 @@ run.trait.association.single <- function(medecom.set,rnb.set,cg_subset=NULL,K=NU
     stop("Specified value for lambda not in medecom.set")
   }
   ret.list <- list()
-  p.vals <- link.to.traits(medecom.set=medecom.set,cg_subset=s,K=K,lambda=lambda,rnb.set=rnb.set,test.fun=test.fun)
+  p.vals <- link.to.traits(medecom.set=medecom.set,cg_subset=cg_subset,K=K,lambda=lambda,rnb.set=rnb.set,test.fun=test.fun)
   plot <- plot.p.val.heatmap(p.vals)
   ret.list[["quantitative"]] <- plot
-  cors <- quantitative.trait.association(medecom.set=medecom.set,cg_subset=s,K=K,lambda=lambda,rnb.set=rnb.set)
+  cors <- quantitative.trait.association(medecom.set=medecom.set,cg_subset=cg_subset,K=K,lambda=lambda,rnb.set=rnb.set)
   plot <- plot.correlation.heatmap(cors)
   ret.list[["qualitative"]] <- plot
   return(ret.list)

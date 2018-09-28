@@ -148,6 +148,7 @@ run.refbased <- function(rnb.set,
 #' @param lambda Selected regularization parameter
 #' @param cg_subset Numeric vector representing the CpG sites selected for analysis from the orignial MeDeComSet
 #' @param plot.type Type of plot to be created, is passed to \code{\link{plotLMCs}}
+#' @param ... Further arguments passed to plotLMCs
 #' 
 #' @return A plot object displaying the clustering
 #' 
@@ -158,7 +159,8 @@ cluster.refbased <- function(ref.run,
                              K,
                              lambda,
                              cg_subset=1,
-                             plot.type="dendrogram"){
+                             plot.type="dendrogram",
+                             ...){
   if(!is.list(ref.run) || length(ref.run)<2){
     stop("Argument needs to be the results obtained from 'run.refbased'")
   }
@@ -168,7 +170,7 @@ cluster.refbased <- function(ref.run,
     sset <- medecom.result@parameters$GROUP_LISTS[[cg_subset]]
     meth.ref <- meth.ref[sset,]
   }
-  plot <- plotLMCs(medecom.result,K=K,lambda=lambda,cg_subset=cg_subset,type=plot.type,Tref=meth.ref)
+  plot <- plotLMCs(medecom.result,K=K,lambda=lambda,cg_subset=cg_subset,type=plot.type,Tref=meth.ref,...)
   return(plot)
 }
 

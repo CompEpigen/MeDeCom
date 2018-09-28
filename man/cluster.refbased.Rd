@@ -5,7 +5,7 @@
 \title{cluster.refbased}
 \usage{
 cluster.refbased(ref.run, K, lambda, cg_subset = 1,
-  plot.type = "dendrogram")
+  plot.type = "dendrogram", ...)
 }
 \arguments{
 \item{ref.run}{A result of \code{\link{run.refbased}} with the results of \code{\link{runMeDeCom}} and the reference data matrix}
@@ -17,6 +17,8 @@ cluster.refbased(ref.run, K, lambda, cg_subset = 1,
 \item{cg_subset}{Numeric vector representing the CpG sites selected for analysis from the orignial MeDeComSet}
 
 \item{plot.type}{Type of plot to be created, is passed to \code{\link{plotLMCs}}}
+
+\item{...}{Further arguments passed to plotLMCs}
 }
 \value{
 A plot object displaying the clustering

@@ -87,7 +87,8 @@ run.trait.association <- function(medecom.set,rnb.set,test.fun=t.test,plot.path=
 #' @param test.fun Test statistic used to compute p-values of differences between LMC contributions in pairwise sample comparisons.
 #'                  Defaults to \code{t.test}.
 #' 
-#' @details Returns a heatmap as a ggplot object for the given \code{medecom.set}, \code{cg_subset} \code{K} and \code{lambda}. 
+#' @details Returns a list with two elements, each a heatmap as a ggplot object for the given \code{medecom.set}, \code{cg_subset} \code{K} and \code{lambda}. 
+#'           The elements correpond to p-values of correlation ("quantivative") and t-tests ("qualitative") traits.
 #'           The p-values are produced by comparing the LMC contributions in all sample comparisons defined by \code{\link[RnBeads]{rnb.sample.groups}} 
 #'           on \code{rnb.set}. The employed test statistic for pariwise comparison can be specified by \code{test.fun}, for groups defining more than one group \code{\link{kruskal.test}}
 #'           is employed. P-values lower than 0.01 are added to the heatmap.
@@ -114,10 +115,10 @@ run.trait.association.single <- function(medecom.set,rnb.set,cg_subset=NULL,K=NU
   ret.list <- list()
   p.vals <- link.to.traits(medecom.set=medecom.set,cg_subset=cg_subset,K=K,lambda=lambda,rnb.set=rnb.set,test.fun=test.fun)
   plot <- plot.p.val.heatmap(p.vals)
-  ret.list[["quantitative"]] <- plot
+  ret.list[["qualitative"]] <- plot
   cors <- quantitative.trait.association(medecom.set=medecom.set,cg_subset=cg_subset,K=K,lambda=lambda,rnb.set=rnb.set)
   plot <- plot.correlation.heatmap(cors)
-  ret.list[["qualitative"]] <- plot
+  ret.list[["quantitative"]] <- plot
   return(ret.list)
 }
 
@@ -151,6 +152,16 @@ link.to.traits <- function(medecom.set,cg_subset,K,lambda,rnb.set,test.fun=t.tes
   if(!inherits(rnb.set,"RnBSet") && !is.data.frame(rnb.set)){
     stop("Invalid value for rnb.set; needs to be RnBSet or data.frame")
   }
+  if(inherits(rnb.set,"RnBSet")){
+    if(!(length(samples(rnb.set))==medecom.set@dataset_info$n)){
+      stop("Annotation does not match the number of samples in the MeDeComSet")
+    }
+  }
+  if(is.data.frame(rnb.set)){
+    if(!(nrow(rnb.set)==medecom.set@dataset_info$n)){
+      stop("Annotation does not match the number of samples in the MeDeComSet")
+    }
+  }
   require("RnBeads")
   sample.grps <- rnb.sample.groups(rnb.set)
   props <- getProportions(medecom.set,cg_subset=cg_subset,K=K,lambda=lambda)
@@ -168,7 +179,7 @@ link.to.traits <- function(medecom.set,cg_subset,K,lambda,rnb.set,test.fun=t.tes
         if(inherits(rnb.set,"RnBSet")){
           vec <- rep(NA,length(samples(rnb.set)))
         }else{
-          vec <- rep(NA,ncol(rnb.set))
+          vec <- rep(NA,nrow(rnb.set))
         }
         for(name in names.traits){
           vec[grp[[name]]] <- name

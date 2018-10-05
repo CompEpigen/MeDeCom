@@ -22,20 +22,16 @@ proportions in the samples. The Set can contain multiple runs for different valu
 
 \item{test.fun}{Test statistic used to compute p-values of differences between LMC contributions in pairwise sample comparisons.
 Defaults to \code{t.test}.}
-
-\item{plot.path}{Path to store the p-value heatmaps.}
-
-\item{figure.format}{Character describing the format in which plots should be stored on disk. Either \code{"pdf"} or \code{"png"}.}
 }
 \description{
 Computes test statistics for all possible group assignments of samples defined in \code{medecom.set} and \code{rnb.set} and stores
 heatmaps of p-values on the given location only for a given CG Subset, K and lambda.
 }
 \details{
-This function creates a new folder names \code{pdfs} at the location given by \code{plot.path} and stores a heatmap for
-          all possible Ks and lambdas defined in \code{medecom.set}. The p-values are produced by comparing the LMC contributions
-          in all sample comparisons defined by \code{\link[RnBeads]{rnb.sample.groups}} on \code{rnb.set}. The employed test statistic for
-          pariwise comparison can be specified by \code{test.fun}, for groups defining more than one group \code{\link{kruskal.test}}
+Returns a list with two elements, each a heatmap as a ggplot object for the given \code{medecom.set}, \code{cg_subset} \code{K} and \code{lambda}. 
+          The elements correpond to p-values of correlation ("quantivative") and t-tests ("qualitative") traits.
+          The p-values are produced by comparing the LMC contributions in all sample comparisons defined by \code{\link[RnBeads]{rnb.sample.groups}} 
+          on \code{rnb.set}. The employed test statistic for pariwise comparison can be specified by \code{test.fun}, for groups defining more than one group \code{\link{kruskal.test}}
           is employed. P-values lower than 0.01 are added to the heatmap.
 }
 \author{

@@ -86,13 +86,10 @@ run.trait.association <- function(medecom.set,rnb.set,test.fun=t.test,plot.path=
 #' @param lambda The selected value of the regularizer (lambda)
 #' @param test.fun Test statistic used to compute p-values of differences between LMC contributions in pairwise sample comparisons.
 #'                  Defaults to \code{t.test}.
-#' @param plot.path Path to store the p-value heatmaps.
-#' @param figure.format Character describing the format in which plots should be stored on disk. Either \code{"pdf"} or \code{"png"}.
 #' 
-#' @details This function creates a new folder names \code{pdfs} at the location given by \code{plot.path} and stores a heatmap for
-#'           all possible Ks and lambdas defined in \code{medecom.set}. The p-values are produced by comparing the LMC contributions
-#'           in all sample comparisons defined by \code{\link[RnBeads]{rnb.sample.groups}} on \code{rnb.set}. The employed test statistic for
-#'           pariwise comparison can be specified by \code{test.fun}, for groups defining more than one group \code{\link{kruskal.test}}
+#' @details Returns a heatmap as a ggplot object for the given \code{medecom.set}, \code{cg_subset} \code{K} and \code{lambda}. 
+#'           The p-values are produced by comparing the LMC contributions in all sample comparisons defined by \code{\link[RnBeads]{rnb.sample.groups}} 
+#'           on \code{rnb.set}. The employed test statistic for pariwise comparison can be specified by \code{test.fun}, for groups defining more than one group \code{\link{kruskal.test}}
 #'           is employed. P-values lower than 0.01 are added to the heatmap.
 #'           
 #' @author Michael Scherer

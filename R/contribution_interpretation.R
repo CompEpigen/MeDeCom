@@ -271,7 +271,8 @@ plot.p.val.heatmap <- function(trait.res){
     colnames(to.plot)[2:3] <- c("Trait","PValue")
     to.plot$LogPValue <- log(to.plot$PValue)
     plot <- ggplot(to.plot,aes(x=LMC,y=Trait,fill=LogPValue))+geom_tile()+theme_bw()+scale_fill_gradient(low="red",high = "white")+
-      geom_text(aes(label=ifelse(round(PValue,2)< 0.01,format(PValue,digits = 2),"")))
+      geom_text(aes(label=ifelse(round(PValue,2)< 0.01,format(PValue,digits = 2),"")),size=5/(length(unique(to.plot$LMC))/5))+
+      theme(axis.text.x = element_text(angle=90,hjust=1))
   }else{
     plot <- ggplot(data.frame(x=c(0,1),y=c(0.1)))+geom_text(x=0.5,y=0.5,label="No assocation found")+theme_bw()
   }
@@ -314,7 +315,8 @@ plot.correlation.heatmap <- function(trait.res){
     to.plot$Correlation <- as.numeric(as.character(to.plot$Correlation))
     to.plot$Significant <- ifelse(round(to.plot$PValue,2)< 0.01,"<0.01",">0.01")
     plot <- ggplot(to.plot,aes(x=LMC,y=Trait,fill=Correlation,color=Significant))+geom_tile()+theme_bw()+
-      scale_fill_gradient(low="white",high = "blue")+scale_color_manual(values=c("red","white"))+geom_text(aes(label=round(Correlation,2)))
+      scale_fill_gradient(low="white",high = "blue")+scale_color_manual(values=c("red","white"))+geom_text(aes(label=round(Correlation,2)),size=5/(length(unique(to.plot$LMC))/10))+
+      theme(axis.text.x = element_text(angle=90,hjust=1))
   }else{
     plot <- ggplot(data.frame(x=c(0,1),y=c(0.1)))+geom_text(x=0.5,y=0.5,label="No assocation found")+theme_bw()
   }

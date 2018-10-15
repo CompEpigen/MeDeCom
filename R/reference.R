@@ -174,6 +174,66 @@ cluster.refbased <- function(ref.run,
   return(plot)
 }
 
+#' plotLMC.reference
+#' 
+#' This routine uses a reference methylome, together with an annotation, and calls plotLMCs for the matching postions
+#' 
+#' @param medecom.set An object of type MeDeComSet
+#' @param ref.meth Reference methylome in the form of a matrix of a RnBSet
+#' @param ann.md Genomic annotation for the CpG sites present in medecom.set
+#' @param ann.ref Genomic annotation for the CpG sites in the referenc methylome. Can be omitted, if ref.meth is an RnBSet object
+#' @param cg_subset The cg_subset of interest
+#' @param K K value
+#' @param lambda lambda value
+#' @param type Plot type, see \code{\link{plotLMC}}
+#' @param chrom.col The chromosome column name in ann.md and ann.ref
+#' @param start.col The start column name in ann.md and ann.ref
+#' @param end.col The end column name in ann.md and ann.ref
+#' @param ct.color.column A column name in the phenotypic information of ref.meth to be shown in the clustering
+#' @return NULL
+#' @author Michael Scherer
+#' @export
+
+plotLMC.reference <- function(medecom.set,
+                              ref.meth,
+                              ann.md,
+                              cg_subset=medecom.set@parameters$cg_subsets[1],
+                              K=medecom.set@parameters$Ks[1],
+                              lambda=medecom.set@parameters$lambdas[1],
+                              ann.ref=NULL,
+                              type="dendrogram",
+                              chrom.col="Chromosome",
+                              start.col="Start",
+                              end.col="End",
+                              ct.color.column="cell_type"){
+  require("RnBeads")
+  if(!inherits(medecom.set,"MeDeComSet")){
+    stop("Invalid value for medecom.set")
+  }
+  if(!inherits(ref.meth,"RnBSet") && !is.matrix(ref.meth)){
+    stop("Invalid value for ref.meth; needs to be RnBSet or matrix")
+  }
+  if(is.matrix(ref.meth) && is.null(ann.ref)){
+    stop("Genomic annotation needs to be provided for the reference methylome")
+  }
+  if(inherits(ref.meth,"RnBSet")){
+    ann.ref <- annotation(ref.meth)
+    meth.ref <- meth(ref.meth)
+    colnames(meth.ref) <- pheno(ref.meth)[,ct.color.column]
+    ref.meth <- meth.ref
+    rm(meth.ref)
+  }
+  ann.md <- GRanges(Rle(ann.md[,chrom.col]),IRanges(start=ann.md[,start.col],end=ann.md[,end.col]))
+  ann.ref <- GRanges(Rle(ann.ref[,chrom.col]),IRanges(start=ann.ref[,start.col],end=ann.ref[,end.col]))
+  op <- findOverlaps(ann.md,ann.ref)
+  if(any(!(1:length(ann.md) %in% queryHits(op)))){
+    stop("Insuffiecient information present in reference methylome")
+  }
+  ref.meth <- ref.meth[subjectHits(op),]
+  ref.meth <- ref.meth[medecom.set@parameters$GROUP_LISTS[[cg_subset]],]
+  ref.meth <- rnb.execute.imputation(ref.meth,method="knn")
+  plotLMCs(medecom.set,Tref=ref.meth,K=K,lambda=lambda,cg_subset=cg_subset,type = type)
+}
 #' load.ref.set
 #' 
 #' This functions loads a reference data base and return the corresponding \code{RnBSet}.

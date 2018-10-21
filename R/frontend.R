@@ -653,7 +653,9 @@ runMeDeCom<-function(
 	
 	dataset_info<-list(m=nrow(D), n=ncol(D))
 	
-	params_to_save<-c("NFOLDS","N_COMP_LAMBDA","NINIT","ITERMAX")
+	cg_subset_lists<-cg_subsets
+	
+	params_to_save<-c("NFOLDS","N_COMP_LAMBDA","NINIT","ITERMAX", "cg_subset_lists", "sample_subset")
 	for(param in params_to_save){
 		result_object$parameters[[param]]<-get(param)
 	}

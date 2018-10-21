@@ -26,6 +26,7 @@ Suggests:
 Imports: 
     Rcpp (>= 0.12), 
     RcppEigen (>= 0.3)
+    dplyr
 LinkingTo: 
     Rcpp, 
     RcppEigen

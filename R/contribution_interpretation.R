@@ -292,7 +292,7 @@ plot.p.val.heatmap <- function(trait.res){
 #' @noRd
 
 plot.correlation.heatmap <- function(trait.res){
-  if(length(trait.res)!=0){
+  if(length(trait.res)!=0 && !all(is.na(trait.res))){
     require("ggplot2")
     require("reshape2")
     to.plot <- c()

@@ -22,7 +22,7 @@ test.general <- function(){
 test.contribution.interpretation <- function(){
   data("example.MeDeComSet")
   anno.frame <- data.frame(Sex=sample(c("M","F"),100,replace=T),Age=sample(1:100,100,replace=T),Ethnicity=sample(c("A","B","C"),100,replace = T))
-  res <- run.trait.association.single(medecom.result,rnb.set=anno.frame)
+  res <- run.trait.association.single(medecom.result,pheno.data=anno.frame)
   passes <- all(names(res) %in% c("qualitative","quantitative"))
   checkTrue(passes)
 }
@@ -31,9 +31,9 @@ test.enrichment <- function(){
   require("RnBeads")
   data("example.MeDeComSet")
   anno.frame <- rnb.annotation2data.frame(rnb.get.annotation("probes450"))[sample(1:460000,10000),]
-  res <- lmc.lola.plots.tables(medecom.result,rnb.set=anno.frame)
+  res <- lmc.lola.plots.tables(medecom.result,anno.data=anno.frame)
   passes <- all(names(res) %in% c("Plots","Tables"))
-  res <- lmc.go.enrichment(medecom.result,rnb.set=anno.frame)
+  res <- lmc.go.enrichment(medecom.result,anno.data=anno.frame)
   passes <- passes && (class(res) == "list")
   checkTrue(passes)
 }

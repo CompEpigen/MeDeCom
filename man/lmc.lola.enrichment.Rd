@@ -4,7 +4,7 @@
 \alias{lmc.lola.enrichment}
 \title{lmc.lola.enrichment}
 \usage{
-lmc.lola.enrichment(medecom.result, annotation.filter = NULL, rnb.set,
+lmc.lola.enrichment(medecom.result, annotation.filter = NULL, anno.data,
   K = NULL, lambda = NULL, cg_subset = NULL, diff.threshold = 0.5,
   region.type = "ensembleRegBuildBPall", temp.dir = tempdir(),
   type = "hypo", assembly = "hg19", lola.db = NULL)
@@ -16,7 +16,7 @@ such an object is stored.}
 \item{annotation.filter}{A numeric vector specifying the sites that have been removed from \code{rnb.set} in a
 preprocessing step (e.g. coverage filtering) or a path to an .RData file.}
 
-\item{rnb.set}{The original \code{\link[RnBeads]{RnBSet-class}} object containing methylation, sample meta and annotation
+\item{anno.data}{The original \code{\link[RnBeads]{RnBSet-class}} object containing methylation, sample meta and annotation
 information, a path to a directory stored by \code{\link[RnBeads]{save.rnb.set}} or a data.frame containing
 CpG annotations (ann_C)}
 
@@ -40,7 +40,7 @@ for a list of available region types.}
 \item{assembly}{The assembly used. Needs to be one of "hg19", "hg38" or "mm10". Does not need to be specified, if rnb.set is a
 \code{\link{RnBSet-class}}}
 
-\item{lola.db}{A loaded LOLA database as loaded with \code{\link{loadRegionDB}}. If this value is NULL, the database is loaded
+\item{lola.db}{A loaded LOLA database as loaded with LOLA::loadRegionDB. If this value is NULL, the database is loaded
 automatically and stored in the temporary directory.}
 }
 \value{

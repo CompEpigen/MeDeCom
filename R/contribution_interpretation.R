@@ -18,7 +18,7 @@
 #' 
 #' @param medecom.set An object of type \code{\link{MeDeComSet}} as the result of \code{\link{runMeDeCom}} containing LMCs and their
 #'                     proportions in the samples. The Set can contain multiple runs for different values of K and lambda.
-#' @param rnb.set An object of type \code{\link[RnBeads]{RnBSet-class}} containing methylation data and metadata for the same samples for which 
+#' @param pheno.data An object of type \code{\link[RnBeads]{RnBSet-class}} containing methylation data and metadata for the same samples for which 
 #'                 \code{medecom.set} was computed or a data.frame of sample annotations (ann_S)
 #' @param test.fun Test statistic used to compute p-values of differences between LMC contributions in pairwise sample comparisons.
 #'                  Defaults to \code{t.test}.
@@ -34,7 +34,7 @@
 #' @author Michael Scherer
 #' 
 #' @export
-run.trait.association <- function(medecom.set,rnb.set,test.fun=t.test,plot.path=getwd(),figure.format="pdf"){
+run.trait.association <- function(medecom.set,pheno.data,test.fun=t.test,plot.path=getwd(),figure.format="pdf"){
   cg_subsets <- medecom.set@parameters$cg_subsets
   Ks <- medecom.set@parameters$Ks
   lambdas <- medecom.set@parameters$lambdas
@@ -59,11 +59,11 @@ run.trait.association <- function(medecom.set,rnb.set,test.fun=t.test,plot.path=
         dir.create(k.path)
       }
       for(lambda in lambdas){
-        p.vals <- link.to.traits(medecom.set=medecom.set,cg_subset=s,K=K,lambda=lambda,rnb.set=rnb.set,test.fun=test.fun)
+        p.vals <- link.to.traits(medecom.set=medecom.set,cg_subset=s,K=K,lambda=lambda,pheno.data=pheno.data,test.fun=test.fun)
         plot <- plot.p.val.heatmap(p.vals)
         fname <- paste0("trait_association_heatmap_lambda",lambda,figure.format)
         ggsave(filename=file.path(k.path,fname),plot=plot,device = figure.format)
-        cors <- quantitative.trait.association(medecom.set=medecom.set,cg_subset=s,K=K,lambda=lambda,rnb.set=rnb.set)
+        cors <- quantitative.trait.association(medecom.set=medecom.set,cg_subset=s,K=K,lambda=lambda,pheno.data=pheno.data)
         plot <- plot.correlation.heatmap(cors)
         fname <- paste0("quantitative_trait_association_lambda",lambda,figure.format)
         ggsave(filename=file.path(k.path,fname),plot=plot,device = figure.format)
@@ -79,7 +79,7 @@ run.trait.association <- function(medecom.set,rnb.set,test.fun=t.test,plot.path=
 #' 
 #' @param medecom.set An object of type \code{\link{MeDeComSet}} as the result of \code{\link{runMeDeCom}} containing LMCs and their
 #'                     proportions in the samples. The Set can contain multiple runs for different values of K and lambda.
-#' @param rnb.set An object of type \code{\link[RnBeads]{RnBSet-class}} containing methylation data and metadata for the same samples for which 
+#' @param pheno.data An object of type \code{\link[RnBeads]{RnBSet-class}} containing methylation data and metadata for the same samples for which 
 #'                 \code{medecom.set} was computed or a data.frame of sample annotations (ann_S)
 #' @param cg_subset The cg_subset of interest
 #' @param K The selected value for number of LMCs (K)
@@ -96,7 +96,7 @@ run.trait.association <- function(medecom.set,rnb.set,test.fun=t.test,plot.path=
 #' @author Michael Scherer
 #' 
 #' @export
-run.trait.association.single <- function(medecom.set,rnb.set,cg_subset=NULL,K=NULL,lambda=NULL,test.fun=t.test){
+run.trait.association.single <- function(medecom.set,pheno.data,cg_subset=NULL,K=NULL,lambda=NULL,test.fun=t.test){
   if(is.null(cg_subset)){
     cg_subset <- medecom.set@parameters$cg_subsets[1]
   }else if (!(cg_subset %in%  medecom.set@parameters$cg_subsets)){
@@ -113,10 +113,10 @@ run.trait.association.single <- function(medecom.set,rnb.set,cg_subset=NULL,K=NU
     stop("Specified value for lambda not in medecom.set")
   }
   ret.list <- list()
-  p.vals <- link.to.traits(medecom.set=medecom.set,cg_subset=cg_subset,K=K,lambda=lambda,rnb.set=rnb.set,test.fun=test.fun)
+  p.vals <- link.to.traits(medecom.set=medecom.set,cg_subset=cg_subset,K=K,lambda=lambda,pheno.data=pheno.data,test.fun=test.fun)
   plot <- plot.p.val.heatmap(p.vals)
   ret.list[["qualitative"]] <- plot
-  cors <- quantitative.trait.association(medecom.set=medecom.set,cg_subset=cg_subset,K=K,lambda=lambda,rnb.set=rnb.set)
+  cors <- quantitative.trait.association(medecom.set=medecom.set,cg_subset=cg_subset,K=K,lambda=lambda,pheno.data=pheno.data)
   plot <- plot.correlation.heatmap(cors)
   ret.list[["quantitative"]] <- plot
   return(ret.list)
@@ -132,7 +132,7 @@ run.trait.association.single <- function(medecom.set,rnb.set,cg_subset=NULL,K=NU
 #' @param cg_subset The subset of sites used for computing LMCs in \code{medecom.set}.
 #' @param K The K parameter, determining the number of LMCs to extract from \code{medecom.set}.
 #' @param lambda The lambda parameter, determining the regularization used for the LMCs in \code{medecom.set}.
-#' @param rnb.set An object of type \code{\link{RnBSet}} containing methylation data and metadata for the same samples for which 
+#' @param pheno.data An object of type \code{\link{RnBSet}} containing methylation data and metadata for the same samples for which 
 #'                 \code{medecom.set} was computed or a data.frame of sample annotations (ann_S)
 #' @param test.fun Test statistic used to compute p-values of differences between LMC contributions in pairwise sample comparisons.
 #'                  Defaults to \code{t.test}.
@@ -148,22 +148,22 @@ run.trait.association.single <- function(medecom.set,rnb.set,cg_subset=NULL,K=NU
 #' 
 #' @noRd
 
-link.to.traits <- function(medecom.set,cg_subset,K,lambda,rnb.set,test.fun=t.test){
-  if(!inherits(rnb.set,"RnBSet") && !is.data.frame(rnb.set)){
-    stop("Invalid value for rnb.set; needs to be RnBSet or data.frame")
+link.to.traits <- function(medecom.set,cg_subset,K,lambda,pheno.data,test.fun=t.test){
+  if(!inherits(pheno.data,"RnBSet") && !is.data.frame(pheno.data)){
+    stop("Invalid value for pheno.data; needs to be RnBSet or data.frame")
   }
-  if(inherits(rnb.set,"RnBSet")){
-    if(!(length(samples(rnb.set))==medecom.set@dataset_info$n)){
+  if(inherits(pheno.data,"RnBSet")){
+    if(!(length(samples(pheno.data))==medecom.set@dataset_info$n)){
       stop("Annotation does not match the number of samples in the MeDeComSet")
     }
   }
-  if(is.data.frame(rnb.set)){
-    if(!(nrow(rnb.set)==medecom.set@dataset_info$n)){
+  if(is.data.frame(pheno.data)){
+    if(!(nrow(pheno.data)==medecom.set@dataset_info$n)){
       stop("Annotation does not match the number of samples in the MeDeComSet")
     }
   }
   require("RnBeads")
-  sample.grps <- rnb.sample.groups(rnb.set)
+  sample.grps <- rnb.sample.groups(pheno.data)
   props <- getProportions(medecom.set,cg_subset=cg_subset,K=K,lambda=lambda)
   res <- list()
   if(!(is.null(dim(props)))){
@@ -176,10 +176,10 @@ link.to.traits <- function(medecom.set,cg_subset,K,lambda,rnb.set,test.fun=t.tes
           test.fun(x[grp[[1]]],x[grp[[2]]])$p.val
         })
       }else if(length(grp)>2){
-        if(inherits(rnb.set,"RnBSet")){
-          vec <- rep(NA,length(samples(rnb.set)))
+        if(inherits(pheno.data,"RnBSet")){
+          vec <- rep(NA,length(samples(pheno.data)))
         }else{
-          vec <- rep(NA,nrow(rnb.set))
+          vec <- rep(NA,nrow(pheno.data))
         }
         for(name in names.traits){
           vec[grp[[name]]] <- name
@@ -206,7 +206,7 @@ link.to.traits <- function(medecom.set,cg_subset,K,lambda,rnb.set,test.fun=t.tes
 #' @param cg_subset The subset of sites used for computing LMCs in \code{medecom.set}.
 #' @param K The K parameter, determining the number of LMCs to extract from \code{medecom.set}.
 #' @param lambda The lambda parameter, determining the regularization used for the LMCs in \code{medecom.set}.
-#' @param rnb.set An object of type \code{\link{RnBSet}} containing methylation data and metadata for the same samples for which 
+#' @param pheno.data An object of type \code{\link{RnBSet}} containing methylation data and metadata for the same samples for which 
 #'                 \code{medecom.set} was computed or a data.frame of sample annotations (ann_S)
 #'                  
 #' @return A list with an element for each quantitative trait present in \code{rnb.set}'s phenotypic information.
@@ -217,16 +217,16 @@ link.to.traits <- function(medecom.set,cg_subset,K,lambda,rnb.set,test.fun=t.tes
 #' 
 #' @noRd
 
-quantitative.trait.association <- function(medecom.set,cg_subset,K,lambda,rnb.set){
-  if(!inherits(rnb.set,"RnBSet") && !is.data.frame(rnb.set)){
-    stop("Invalid value for rnb.set; needs to be RnBSet or data.frame")
+quantitative.trait.association <- function(medecom.set,cg_subset,K,lambda,pheno.data){
+  if(!inherits(pheno.data,"RnBSet") && !is.data.frame(pheno.data)){
+    stop("Invalid value for pheno.data; needs to be RnBSet or data.frame")
   }
   require("RnBeads")
-  sample.grps <- names(rnb.sample.groups(rnb.set))
-  if(inherits(rnb.set,"RnBSet")){
-    ph <- pheno(rnb.set)
+  sample.grps <- names(rnb.sample.groups(pheno.data))
+  if(inherits(pheno.data,"RnBSet")){
+    ph <- pheno(pheno.data)
   }else{
-    ph <- rnb.set
+    ph <- pheno.data
   }
   quant.traits <- colnames(ph)
   quant.traits <- quant.traits[!(quant.traits%in%sample.grps)]

@@ -9,7 +9,7 @@ plotLMC.reference(medecom.set, ref.meth, ann.md,
   K = medecom.set@parameters$Ks[1],
   lambda = medecom.set@parameters$lambdas[1], ann.ref = NULL,
   type = "dendrogram", chrom.col = "Chromosome", start.col = "Start",
-  end.col = "End")
+  end.col = "End", ct.color.column = "cell_type")
 }
 \arguments{
 \item{medecom.set}{An object of type MeDeComSet}
@@ -26,13 +26,15 @@ plotLMC.reference(medecom.set, ref.meth, ann.md,
 
 \item{ann.ref}{Genomic annotation for the CpG sites in the referenc methylome. Can be omitted, if ref.meth is an RnBSet object}
 
-\item{type}{Plot type, see \code{\link{plotLMC}}}
+\item{type}{Plot type, see \code{\link{plotLMCs}}}
 
 \item{chrom.col}{The chromosome column name in ann.md and ann.ref}
 
 \item{start.col}{The start column name in ann.md and ann.ref}
 
 \item{end.col}{The end column name in ann.md and ann.ref}
+
+\item{ct.color.column}{A column name in the phenotypic information of ref.meth to be shown in the clustering}
 }
 \description{
 This routine uses a reference methylome, together with an annotation, and calls plotLMCs for the matching postions

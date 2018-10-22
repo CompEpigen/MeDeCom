@@ -4,7 +4,7 @@
 \alias{lmc.go.enrichment}
 \title{lmc.go.enrichment}
 \usage{
-lmc.go.enrichment(medecom.result, annotation.filter = NULL, rnb.set,
+lmc.go.enrichment(medecom.result, annotation.filter = NULL, anno.data,
   K = NULL, lambda = NULL, cg_subset = NULL, diff.threshold = 0.5,
   region.type = "genes", temp.dir = tempdir(), type = "hypo",
   assembly = "hg19")
@@ -16,7 +16,7 @@ such an object is stored.}
 \item{annotation.filter}{A numeric vector specifying the sites that have been removed from \code{rnb.set} in a
 preprocessing step (e.g. coverage filtering) or a path to an .RData file.}
 
-\item{rnb.set}{The original \code{\link[RnBeads]{RnBSet-class}} object containing methylation, sample meta and annotation
+\item{anno.data}{The original \code{\link[RnBeads]{RnBSet-class}} object containing methylation, sample meta and annotation
 information or a path to a directory stored by \code{\link[RnBeads]{save.rnb.set}} or a data.frame containing
 CpG annotations (ann_C)}
 

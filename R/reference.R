@@ -185,7 +185,7 @@ cluster.refbased <- function(ref.run,
 #' @param cg_subset The cg_subset of interest
 #' @param K K value
 #' @param lambda lambda value
-#' @param type Plot type, see \code{\link{plotLMC}}
+#' @param type Plot type, see \code{\link{plotLMCs}}
 #' @param chrom.col The chromosome column name in ann.md and ann.ref
 #' @param start.col The start column name in ann.md and ann.ref
 #' @param end.col The end column name in ann.md and ann.ref

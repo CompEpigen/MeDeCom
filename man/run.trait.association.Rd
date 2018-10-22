@@ -4,14 +4,14 @@
 \alias{run.trait.association}
 \title{run.trait.association}
 \usage{
-run.trait.association(medecom.set, rnb.set, test.fun = t.test,
+run.trait.association(medecom.set, pheno.data, test.fun = t.test,
   plot.path = getwd(), figure.format = "pdf")
 }
 \arguments{
 \item{medecom.set}{An object of type \code{\link{MeDeComSet}} as the result of \code{\link{runMeDeCom}} containing LMCs and their
 proportions in the samples. The Set can contain multiple runs for different values of K and lambda.}
 
-\item{rnb.set}{An object of type \code{\link[RnBeads]{RnBSet-class}} containing methylation data and metadata for the same samples for which 
+\item{pheno.data}{An object of type \code{\link[RnBeads]{RnBSet-class}} containing methylation data and metadata for the same samples for which 
 \code{medecom.set} was computed or a data.frame of sample annotations (ann_S)}
 
 \item{test.fun}{Test statistic used to compute p-values of differences between LMC contributions in pairwise sample comparisons.

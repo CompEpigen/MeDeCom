@@ -11,7 +11,7 @@
 #'                 such an object is stored.
 #' @param annotation.filter A numeric vector specifying the sites that have been removed from \code{rnb.set} in a
 #'                 preprocessing step (e.g. coverage filtering) or a path to an .RData file.
-#' @param rnb.set The original \code{\link[RnBeads]{RnBSet-class}} object containing methylation, sample meta and annotation
+#' @param anno.data The original \code{\link[RnBeads]{RnBSet-class}} object containing methylation, sample meta and annotation
 #'                 information, a path to a directory stored by \code{\link[RnBeads]{save.rnb.set}} or a data.frame containing
 #'                 CpG annotations (ann_C)
 #' @param K The number of LMCs specified for the MeDeCom run.
@@ -26,7 +26,7 @@
 #' @param type Which direction is to be tested for enrichment. Can be one of "hypo", "hyper", or "differential"
 #' @param assembly The assembly used. Needs to be one of "hg19", "hg38" or "mm10". Does not need to be specified, if rnb.set is a
 #'                 \code{\link{RnBSet-class}}
-#' @param lola.db A loaded LOLA database as loaded with \code{\link{loadRegionDB}}. If this value is NULL, the database is loaded
+#' @param lola.db A loaded LOLA database as loaded with LOLA::loadRegionDB. If this value is NULL, the database is loaded
 #'                 automatically and stored in the temporary directory.
 #' @return A list with K elements. One element is the enrichment result of the corresponding LMC-specific hypomethylated CpG sites.
 #' @export
@@ -40,7 +40,7 @@
 
 lmc.lola.enrichment <- function(medecom.result,
                                 annotation.filter=NULL,
-                                rnb.set,
+                                anno.data,
                                 K=NULL,
                                 lambda=NULL,
                                 cg_subset=NULL,
@@ -68,9 +68,9 @@ lmc.lola.enrichment <- function(medecom.result,
   }else if(!(lambda %in% medecom.result@parameters$lambdas)){
     stop("Invalid value for lambdas; not available in medecom.result")
   }
-  if(inherits(rnb.set,"RnBSet")){
+  if(inherits(anno.data,"RnBSet")){
     rnb.mode <- T
-    assembly <- assembly(rnb.set)
+    assembly <- assembly(anno.data)
   }
   if(is.character(medecom.result)){
     new.envi <- new.env()
@@ -83,19 +83,19 @@ lmc.lola.enrichment <- function(medecom.result,
     annotation.filter <- get(ls(envir = new.envi),envir = new.envi)
     
   }
-  if(is.character(rnb.set)){
+  if(is.character(anno.data)){
     options(fftempdir=temp.dir)
-    rnb.set <- load.rnb.set(rnb.set)
+    anno.data <- load.rnb.set(anno.data)
   }
   if(!region.type %in% rnb.region.types()){
     rnb.load.annotation.from.db(region.type,assembly=assembly)
   }
   agg.type <- unlist(rnb.get.annotation(region.type,assembly=assembly))
   if(rnb.mode){
-    anno <- annotation(rnb.set)
+    anno <- annotation(anno.data)
   }else{
-    anno <- rnb.set
-    rm(rnb.set)
+    anno <- anno.data
+    rm(anno.data)
   }
   if(!is.null(annotation.filter)){
     anno <- anno[annotation.filter,]
@@ -162,7 +162,7 @@ load.lola.for.medecom <- function(dir.path=tempdir()){
 #'                 such an object is stored.
 #' @param annotation.filter A numeric vector specifying the sites that have been removed from \code{rnb.set} in a
 #'                 preprocessing step (e.g. coverage filtering) or a path to an .RData file.
-#' @param rnb.set The original \code{\link[RnBeads]{RnBSet-class}} object containing methylation, sample meta and annotation
+#' @param anno.data The original \code{\link[RnBeads]{RnBSet-class}} object containing methylation, sample meta and annotation
 #'                 information, a path to a directory stored by \code{\link[RnBeads]{save.rnb.set}} or a data.frame containing
 #'                 CpG annotations (ann_C)
 #' @param K The number of LMCs specified for the MeDeCom run.
@@ -177,7 +177,7 @@ load.lola.for.medecom <- function(dir.path=tempdir()){
 #' @param type Which direction is to be tested for enrichment. Can be one of "hypo", "hyper", or "differential"
 #' @param assembly The assembly used. Needs to be one of "hg19", "hg38" or "mm10". Does not need to be specified, if rnb.set is a
 #'                 \code{\link{RnBSet-class}}
-#' @param lola.db A loaded LOLA database as loaded with \code{\link{loadRegionDB}}. If this value is NULL, the database is loaded
+#' @param lola.db A loaded LOLA database as loaded with LOLA::loadRegionDB. If this value is NULL, the database is loaded
 #'                 automatically and stored in the temporary directory.
 #' @return A list with two elements, one of them containing the plots for each LMC and the other for the corresponding LOLA
 #'         enrichment tables
@@ -188,7 +188,7 @@ load.lola.for.medecom <- function(dir.path=tempdir()){
 
 lmc.lola.plots.tables <- function(medecom.result,
                            annotation.filter=NULL,
-                           rnb.set,
+                           anno.data,
                            K=NULL,
                            lambda=NULL,
                            cg_subset=NULL,
@@ -200,7 +200,7 @@ lmc.lola.plots.tables <- function(medecom.result,
                            lola.db=NULL){
   enrichment.results <- lmc.lola.enrichment(medecom.result,
                                           annotation.filter=NULL,
-                                          rnb.set,
+                                          anno.data,
                                           K=NULL,
                                           lambda=NULL,
                                           cg_subset=NULL,
@@ -238,7 +238,7 @@ do.lola.plot <- function(enrichment.result,lola.db,pvalCut=0.01){
 #'                 such an object is stored.
 #' @param annotation.filter A numeric vector specifying the sites that have been removed from \code{rnb.set} in a
 #'                 preprocessing step (e.g. coverage filtering) or a path to an .RData file.
-#' @param rnb.set The original \code{\link[RnBeads]{RnBSet-class}} object containing methylation, sample meta and annotation
+#' @param anno.data The original \code{\link[RnBeads]{RnBSet-class}} object containing methylation, sample meta and annotation
 #'                 information or a path to a directory stored by \code{\link[RnBeads]{save.rnb.set}} or a data.frame containing
 #'                 CpG annotations (ann_C)
 #' @param K The number of LMCs specified for the MeDeCom run.
@@ -265,7 +265,7 @@ do.lola.plot <- function(enrichment.result,lola.db,pvalCut=0.01){
 
 lmc.go.enrichment <- function(medecom.result,
                                   annotation.filter=NULL,
-                                  rnb.set,
+                                  anno.data,
                                   K=NULL,
                                   lambda=NULL,
                                   cg_subset=NULL,
@@ -292,9 +292,9 @@ lmc.go.enrichment <- function(medecom.result,
   }else if(!(lambda %in% medecom.result@parameters$lambdas)){
     stop("Invalid value for lambdas; not available in medecom.result")
   }
-  if(inherits(rnb.set,"RnBSet")){
+  if(inherits(anno.data,"RnBSet")){
     rnb.mode <- T
-    assembly <- assembly(rnb.set)
+    assembly <- assembly(anno.data)
   }
   if(is.character(medecom.result)){
     new.envi <- new.env()
@@ -306,9 +306,9 @@ lmc.go.enrichment <- function(medecom.result,
     load(annotation.filter,envir = new.envi)
     annotation.filter <- get(ls(envir = new.envi),envir = new.envi)
   }
-  if(is.character(rnb.set)){
+  if(is.character(anno.data)){
     options(fftempdir=temp.dir)
-    rnb.set <- load.rnb.set(rnb.set)
+    anno.data <- load.rnb.set(anno.data)
   }
   if(!region.type %in% rnb.region.types()){
     rnb.load.annotation.from.db(region.type,assembly=assembly)
@@ -318,9 +318,9 @@ lmc.go.enrichment <- function(medecom.result,
   longer <- lengths(strsplit(entrez.id,";"))>0
   entrez.id[longer] <- unlist(lapply(strsplit(entrez.id,";"),function(x)x[1]))[longer]
   if(rnb.mode){
-    anno <- annotation(rnb.set)
+    anno <- annotation(anno.data)
   }else{
-    anno <- rnb.set
+    anno <- anno.data
   }
   if(!is.null(annotation.filter)){
     anno <- anno[annotation.filter,]

@@ -4,14 +4,14 @@
 \alias{run.trait.association.single}
 \title{run.trait.association.single}
 \usage{
-run.trait.association.single(medecom.set, rnb.set, cg_subset = NULL,
+run.trait.association.single(medecom.set, pheno.data, cg_subset = NULL,
   K = NULL, lambda = NULL, test.fun = t.test)
 }
 \arguments{
 \item{medecom.set}{An object of type \code{\link{MeDeComSet}} as the result of \code{\link{runMeDeCom}} containing LMCs and their
 proportions in the samples. The Set can contain multiple runs for different values of K and lambda.}
 
-\item{rnb.set}{An object of type \code{\link[RnBeads]{RnBSet-class}} containing methylation data and metadata for the same samples for which 
+\item{pheno.data}{An object of type \code{\link[RnBeads]{RnBSet-class}} containing methylation data and metadata for the same samples for which 
 \code{medecom.set} was computed or a data.frame of sample annotations (ann_S)}
 
 \item{cg_subset}{The cg_subset of interest}

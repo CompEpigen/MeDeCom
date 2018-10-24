@@ -1,6 +1,6 @@
 ---
 title: "MeDeCom: Methylome Decomposition via Constrained Matrix Factorization"
-author: "Pavlo Lutsik, Martin Slawski, Gilles Gasparoni, Matthias Hein and Joern Walter"
+author: "Pavlo Lutsik, Martin Slawski, Gilles Gasparoni, Nikita Vedeneev, Matthias Hein and Joern Walter"
 date: "2016-12-15"
 output:
   rmarkdown::html_document:
@@ -377,7 +377,7 @@ These settings should be stored in a `list` object:
 sge.setup<-list(
 R_bin_dir="/usr/bin",
 host_pattern="*",
-ram_limit="5G"
+mem_limit="5G"
 )
 ```
 This object should be supplied to *MeDeCom* as the argument `cluster.settings`. It is also important to specify a valid temporary 

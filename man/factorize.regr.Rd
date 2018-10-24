@@ -27,4 +27,3 @@ a \code{list} with elements:
 \description{
 Get mixing proportions from the target data matrix and a matrix of latent factors
 }
-

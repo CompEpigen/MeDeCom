@@ -22,8 +22,11 @@ plotParameters(MeDeComSet, cg_subset = 1, Ks = integer(),
 \item{minLambda}{minimal lambda value}
 
 \item{maxLambda}{maximal lambda value}
+
+\item{lambdaScale}{character indicating if native scale or logarithmic scale should be employed for plotting lambda}
+
+\item{...}{further paramters passed to \code{plot.lambda.selection} or \code{plot.K.selection}}
 }
 \description{
 Parameter selection plots
 }
-

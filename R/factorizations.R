@@ -862,6 +862,8 @@ onerun.cppTAfact<-function(
 #' 
 #' @param D 			m by n input matrix with mixture data 
 #' @param k 			number of latent components, \code{integer}
+#' @param method optimization method used. Currently supported values are
+#'                \code{"MeDeCom.quadPen"} and \code{"MeDeCom.cppTAfact"}.
 #' @param t.method 		method for updating the latent component matrix, one of 
 #' 						\code{"integer", "empirical", "Hlasso"} or \code{"quadPen"}
 #' @param Tfix			an optional matrix of a priori known fixed components
@@ -894,7 +896,7 @@ onerun.cppTAfact<-function(
 #' 
 #' @param pheno			a list with phenotypic information
 #' 
-#' @param verbose		flag specifying whether to show diagnostic
+#' @param verbosity		flag specifying whether to show diagnostic
 #' 						statements during the execution
 #' 						
 #' @details				In case \code{init} is "fixed" the starting values

@@ -20,4 +20,3 @@ Martin Slawski
 
 R port by Pavlo Lutsik
 }
-

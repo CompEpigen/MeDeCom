@@ -27,4 +27,3 @@ Matching the recovered components to the reference
 \details{
 Wrapper function for component matching methods
 }
-

@@ -20,10 +20,10 @@ Depends:
     gplots,
     parallel,
     RUnit,
-    RnBeads
+    RnBeads,
+    knitr
 Suggests:
     BiocStyle,
-    knitr,
     rmarkdown,
     LOLA,
     GOstats

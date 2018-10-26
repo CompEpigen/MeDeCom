@@ -398,7 +398,6 @@ plot.errs<-function(
 						NA
 					}
 				})
-		
 	}
 	
 	mae.A<-NULL
@@ -1104,9 +1103,15 @@ component.mds<-function(
 				labels=colnames(Tref))
 	}
 	
-	labs<-colnames(mdd)
+	if(!is.null(D) && !is.null(colnames(D))){
 		
-	text(x, y, labels = labs, cex=.7)
+		start_D<-ncol(That)+ifelse(is.null(Tref), 0, ncol(Tref))+1
+		end_D<-ncol(That)+ifelse(is.null(Tref), 0, ncol(Tref))+ncol(D)+1
+		text(x[start_D:end_D], 
+				y[start_D:end_D],
+				labels=colnames(D))
+	}
+
 }
 #######################################################################################################################
 component.dendrogram<-function(
@@ -1202,9 +1207,10 @@ plotLMCs<-function(
 		sample.characteristic=NULL,
 		scatter.matching=FALSE,
 		scatter.smooth=TRUE,
-		scatter.cg.feature=NULL
+		scatter.cg.feature=NULL,
+		locus.parameters=list()
 ){
-	plot.types<-c("dendrogram","MDS","heatmap","similarity graph", "scatterplot", "extremality", "distance to center")
+	plot.types<-c("dendrogram","MDS","heatmap","similarity graph", "scatterplot", "extremality", "distance to center", "locus plot")
 	
 	if(missing(type) || !type %in% plot.types){
 		stop(sprintf("Please specify the plot type, one of \"%s\"", paste(plot.types, collapse="\", \"")))
@@ -1354,6 +1360,13 @@ plotLMCs<-function(
 		extremality<-colMeans(That*(1-That))
 		barplot(extremality, las=2, names.arg=as.character(1:ncol(That)), xlab="r", ylab="t_r(1-t_r)")
 		
+	}else if(type=="locus plot"){
+		
+		locus.parameters[["That"]]<-That
+		locus.parameters[["cgs"]]<-MeDeComSet@parameters$cg_subset_lists[match(cg_subset, MeDeComSet@parameters$cg_subset_lists)]
+		locus.parameters[["D"]]<-D
+		
+		do.call("locus_plot", locus.parameters)
 	}
 }
 #######################################################################################################################
@@ -1410,8 +1423,8 @@ locus_plot<-function(
 		genes.locus.end<-which(ann.genes$Chromosome==locus.chr & ann.genes$End>locus.start-flank.start & ann.genes$End<locus.end+flank.end)
 		genes.locus.cover<-which(ann.genes$Chromosome==locus.chr & ann.genes$Start<locus.start-flank.start & ann.genes$End>locus.end+flank.end)
 		ann.genes.locus<-ann.genes[unique(c(genes.locus.start, genes.locus.end, genes.locus.cover)), ]
+
 	}
-	
 	
 	plot(NA,NA, 
 			type="n",lty=3,pch=15, col="white", 
@@ -1663,7 +1676,7 @@ proportion.heatmap<-function(
 	}
 }
 #######################################################################################################################
-proportion.feature.corr<-function(Ahat, lmc, data.ch){
+proportion.feature.corr<-function(Ahat, lmc, data.ch, includeRegressionLine=FALSE){
 	
 	if(is.null(rownames(Ahat))){
 		rownames(Ahat)<-sprintf("LMC%d", 1:nrow(Ahat))
@@ -1671,9 +1684,9 @@ proportion.feature.corr<-function(Ahat, lmc, data.ch){
 	yl<-paste(rownames(Ahat)[lmc], collapse=" + ")
 	if(is.numeric(data.ch)){
 		plot(data.ch, Ahat[lmc,], 
-				xlab=input$mdsDataCat, 
+				xlab="", 
 				ylab=yl, las=2)
-		if(input$includeRegressionLine){
+		if(includeRegressionLine){
 			fitData<-list()
 			fitData$feature<-data.ch
 			fitData$proportion<-Ahat[lmc,]

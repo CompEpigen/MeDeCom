@@ -1,6 +1,0 @@
-language: R
-sudo: false
-cache: packages
-r: bioc-release
-warnings_are_errors: false
-install: travis_wait 30 R CMD build

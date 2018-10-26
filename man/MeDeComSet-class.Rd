@@ -2,8 +2,8 @@
 % Please edit documentation in R/MeDeComSet-class.R
 \docType{class}
 \name{MeDeComSet-class}
-\alias{MeDeComSet-class}
 \alias{MeDeComSet}
+\alias{MeDeComSet-class}
 \alias{initialize,MeDeComSet-method}
 \title{MeDeComSet Class}
 \usage{
@@ -13,8 +13,6 @@ MeDeComSet(parameters, outputs, dataset_info = list())
 \item{parameters}{\code{list} of MeDeCom parameters with elements \code{K}, integer vector of k values, \code{lambdas}, numeric vector of lambda values.}
 
 \item{outputs}{\code{list} of MeDeCom resutls with one element per each used CpG subset.}
-
-\item{dataset_info}{\code{list} with information about the input data set.}
 }
 \value{
 an object of class MeDeComSet
@@ -44,7 +42,7 @@ Wrapper function MeDeComSet
   \item{\code{\link{plotProportions}}}{Visualize the mixing proportions.}
 }
 }
-
 \author{
 Pavlo Lutsik
 }
+

@@ -19,14 +19,14 @@ Depends:
     gtools,
     gplots,
     parallel,
-    RUnit,
-    RnBeads,
-    knitr
+    RUnit
 Suggests:
     BiocStyle,
     rmarkdown,
     LOLA,
-    GOstats
+    GOstats,
+    RnBeads,
+    knitr
 Imports:
     RcppEigen (>= 0.3)
 LinkingTo:

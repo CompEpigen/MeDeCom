@@ -54,3 +54,4 @@ Available plot types include:
 		  supplied as argument \code{D}.}
 }
 }
+

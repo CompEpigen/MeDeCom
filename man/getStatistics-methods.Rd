@@ -2,23 +2,21 @@
 % Please edit documentation in R/MeDeComSet-class.R
 \docType{methods}
 \name{getStatistics,MeDeComSet-method}
-\alias{getStatistics,MeDeComSet-method}
 \alias{getStatistics}
+\alias{getStatistics,MeDeComSet-method}
 \title{getStatistics-methods}
 \usage{
 \S4method{getStatistics}{MeDeComSet}(object, Ks = object@parameters$Ks,
   lambdas = object@parameters$lambdas, cg_subset = 1, statistic = "cve")
 }
 \arguments{
-\item{object}{object returned by \link{runMeDeCom}}
-
-\item{Ks}{numbers of LMCs}
-
-\item{lambdas}{regularlization parameters}
-
 \item{cg_subset}{used CpG subset, defaults to the full data set}
 
-\item{statistic}{\code{character} of length 1 specifying goodness of fit statistics}
+\item{K}{number of LMCs}
+
+\item{lambda}{regularlization parameter}
+
+\item{statistics}{\code{character} of length 1 specifying goodness of fit statistics}
 }
 \value{
 A numeric \code{matrix} or \code{vector} with the requested statistics
@@ -35,3 +33,4 @@ data(example.data)
 getStatistics(example_MeDeComSet, K=2, lambda=0.001)
 }
 }
+

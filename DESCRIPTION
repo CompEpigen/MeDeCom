@@ -1,6 +1,6 @@
 Package: MeDeCom
 Title: Decomposition of heterogeneous methylomes
-Description: Decomposition of heterogeneous methylomes with non-negative matrix factorization.
+Description: Decomposition of heterogeneous methylomes
 Maintainer: Pavlo Lutsik <p.lutsik@mx.uni-saarland.de>
 Authors@R: c(
    person ( "Pavlo", "Lutsik", email="p.lutsik@mx.uni-saarland.de", role = c("cre")),
@@ -10,28 +10,25 @@ Authors@R: c(
    person ( "Matthias", "Hein", email="hein@cs.uni-saarland.de", role = c("aut")),
    person ( "Joern", "Walter", email="j.walter@mx.uni-saarland.de", role = c("aut"))
  )
-Date: 2018-05-23
-Version: 0.2.1
+Date: 2016-11-02
+Version: 0.2
 Depends:
     R (>= 3.2.0),
     Rcpp,
     pracma,
     gtools,
     gplots,
-    parallel,
-    RUnit,
-    RnBeads
+    parallel
 Suggests:
     BiocStyle,
     knitr,
-    rmarkdown,
-    LOLA,
-    GOstats
-Imports:
+    rmarkdown
+Imports: 
+    Rcpp (>= 0.12), 
     RcppEigen (>= 0.3)
-LinkingTo:
+LinkingTo: 
     Rcpp, 
     RcppEigen
 VignetteBuilder: knitr
 License: GPL-3
-RoxygenNote: 6.0.1
+RoxygenNote: 5.0.1

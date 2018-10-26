@@ -2,23 +2,21 @@
 % Please edit documentation in R/MeDeComSet-class.R
 \docType{methods}
 \name{getProportions,MeDeComSet-method}
-\alias{getProportions,MeDeComSet-method}
 \alias{getProportions}
+\alias{getProportions,MeDeComSet-method}
 \title{getProportions-methods}
 \usage{
 \S4method{getProportions}{MeDeComSet}(object, K = object@parameters$Ks[1],
   lambda = object@parameters$lambdas[1], cg_subset = 1, statistic = "cve")
 }
 \arguments{
-\item{object}{object returned by \link{runMeDeCom}}
-
 \item{K}{number of LMCs}
 
 \item{lambda}{regularlization parameter}
 
 \item{cg_subset}{used CpG subset, defaults to the full data set}
 
-\item{statistic}{statistic to be used in returning}
+\item{MeDeComSet}{object returned by \link{runMeDeCom}}
 }
 \description{
 Return a matrix of LMCs
@@ -29,3 +27,4 @@ data(example.data)
 getProportions(example_MeDeComSet, K=2, lambda=0.001)
 }
 }
+

@@ -108,7 +108,7 @@ setMethod("getStatistics", signature(object="MeDeComSet"),
 				"rmse"="rmse", "RMSE"="rmse",
 				"CVE"="cve", "cve"="cve"
 		)[statistic]
-		return(object@outputs[[cg_subset]][[elt]][match(Ks, object@parameters$Ks), match(lambdas, object@parameters$lambdas)])
+		return(as.numeric(object@outputs[[cg_subset]][[elt]][match(Ks, object@parameters$Ks), match(lambdas, object@parameters$lambdas)]))
 })
 ########################################################################################################################
 if(!isGeneric("getLMCs")) setGeneric("getLMCs",

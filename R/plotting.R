@@ -983,9 +983,9 @@ component.heatmap<-function(
 		for(ri in 1:ncol(th)){
 			for(ci in 1:ncol(tr)){
 				if(method=="euclidean"){
-					data[ri,ci]<-sqrt(sum((tr[,ci]-th[,ri])^2))
+					data[ri,ci]<-sqrt(sum((tr[,ci]-th[,ri])^2,na.rm = T))
 				}else if(method=="angular"){
-					data[ri,ci]<-sum(tr[,ci]*th[,ri])/sqrt(sum(tr[,ci]^2))/sqrt(sum(th[,ri]^2))
+					data[ri,ci]<-sum(tr[,ci]*th[,ri],na.rm = T)/sqrt(sum(tr[,ci]^2,na.rm=T))/sqrt(sum(th[,ri]^2,na.rm=T))
 				}
 			}
 		}

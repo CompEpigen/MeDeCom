@@ -670,10 +670,10 @@ plot.K.selection<-function(
 	}
 	if(KvsRMSElambdaLegend){
 		plot.new()
-		legend("right", legend=as.character(all_results@parameters$lambdas), 
+		legend("right", legend=as.character(lambdas), 
 				#col=lambdaCols[1:length(all_results$lambdas)], 
-				col=1:length(all_results@parameters$lambdas),
-				lty=1:length(all_results@parameters$lambdas),
+				col=1:length(lambdas),
+				lty=1:length(lambdas),
 				pch=15,
 				xpd=TRUE,
 				title="lambda")
@@ -1313,7 +1313,7 @@ plotLMCs<-function(
 		axis(2, at = 1:nrow(recovery_matrix), labels=sprintf("%g", lls),tick=FALSE, las=2)
 		
 	}else if(type == "similarity graph"){
-		d<-get.distance.matrix(lit(That, Tref), measure=distance, centered=centered)
+		d<-get.distance.matrix(lit(That, Tref), measure=distance, centered=center)
 		if(distance=="euclidean"){
 			d <- d/max(d)				
 		}else if(distance=="correlation"){
@@ -1321,7 +1321,7 @@ plotLMCs<-function(
 		}
 		
 		require(igraph)
-		G <- graph.adjacency(d, mode="upper", weighted=TRUE,)
+		G <- graph.adjacency(d, mode="upper", weighted=TRUE)
 		G <-delete.edges(G, which(E(G)$weight <= as.numeric(input$minGraphSimilarity)))
 		#G <- remove.edges(G, V(G)[ degree(G)==0 ])
 		lo<-layout.fruchterman.reingold(G, weights=rep(1, ecount(G)))

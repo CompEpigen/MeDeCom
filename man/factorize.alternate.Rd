@@ -4,14 +4,14 @@
 \alias{factorize.alternate}
 \title{factorize.alternate}
 \usage{
-factorize.alternate(D, k, method = "MeDeCom.quadPen", t.method = "quadPen",
-  Tfix = NULL, Tpartial = NULL, Tpartial.rows = NULL, Apartial = NULL,
-  Apartial.cols = NULL, V = NULL, lambda = 0, init = "random",
-  opt = 5, emp.dim = 500, emp.resample = TRUE, emp.vsf = 1,
-  emp.borders = c(0, 1), qp.rangeT = c(0, 1), qp.Alower = NULL,
-  qp.Aupper = NULL, itermax = 100, trace = FALSE, eps = 1e-08,
-  ncores = 1, pheno = NULL, na.values = FALSE, seed = NULL,
-  verbosity = 0L)
+factorize.alternate(D, k, method = "MeDeCom.quadPen",
+  t.method = "quadPen", Tfix = NULL, Tpartial = NULL,
+  Tpartial.rows = NULL, Apartial = NULL, Apartial.cols = NULL,
+  V = NULL, lambda = 0, init = "random", opt = 5, emp.dim = 500,
+  emp.resample = TRUE, emp.vsf = 1, emp.borders = c(0, 1),
+  qp.rangeT = c(0, 1), qp.Alower = NULL, qp.Aupper = NULL,
+  itermax = 100, trace = FALSE, eps = 1e-08, ncores = 1,
+  pheno = NULL, na.values = FALSE, seed = NULL, verbosity = 0L)
 }
 \arguments{
 \item{D}{m by n input matrix with mixture data}

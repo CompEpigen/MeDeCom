@@ -4,8 +4,8 @@
 \alias{plotLMCs}
 \title{plotLMCs}
 \usage{
-plotLMCs(MeDeComSet, type, K = NA, lambda = NA, cg_subset = 1, lmc = NA,
-  Tref = NULL, distance = "correlation", center = FALSE,
+plotLMCs(MeDeComSet, type, K = NA, lambda = NA, cg_subset = 1,
+  lmc = NA, Tref = NULL, distance = "correlation", center = FALSE,
   n.most.var = NA, D = NULL, sample.characteristic = NULL,
   scatter.matching = FALSE, scatter.smooth = TRUE,
   scatter.cg.feature = NULL)

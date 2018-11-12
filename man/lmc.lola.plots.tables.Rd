@@ -4,10 +4,11 @@
 \alias{lmc.lola.plots.tables}
 \title{lmc.lola.plots.tables}
 \usage{
-lmc.lola.plots.tables(medecom.result, annotation.filter = NULL, anno.data,
-  K = NULL, lambda = NULL, cg_subset = NULL, diff.threshold = 0.5,
-  region.type = "ensembleRegBuildBPall", temp.dir = tempdir(),
-  type = "hypo", assembly = "hg19", lola.db = NULL)
+lmc.lola.plots.tables(medecom.result, annotation.filter = NULL,
+  anno.data, K = NULL, lambda = NULL, cg_subset = NULL,
+  diff.threshold = 0.5, region.type = "ensembleRegBuildBPall",
+  temp.dir = tempdir(), type = "hypo", assembly = "hg19",
+  lola.db = NULL)
 }
 \arguments{
 \item{medecom.result}{An object of type \code{\link{MeDeComSet-class}} or the location of an .RData file, where

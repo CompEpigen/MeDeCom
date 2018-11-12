@@ -7,7 +7,8 @@
 \title{getLMCs-methods}
 \usage{
 \S4method{getLMCs}{MeDeComSet}(object, K = object@parameters$Ks[1],
-  lambda = object@parameters$lambdas[1], cg_subset = 1, statistic = "cve")
+  lambda = object@parameters$lambdas[1], cg_subset = 1,
+  statistic = "cve")
 }
 \arguments{
 \item{object}{object returned by \link{runMeDeCom}}

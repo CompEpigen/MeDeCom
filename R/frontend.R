@@ -995,6 +995,10 @@ collectResults<-function(result_list, cg_subsets, Ks, lambdas, NFOLDS, result_in
 	all_results$parameters$Ks<-Ks
 	all_results$parameters$lambdas<-lambdas
 	
+	if(any(sapply(all_results$outputs,function(x)any(unlist(sapply(x,function(y)any(is.character(y)))))))){
+	  all_results$parameters$crashed <- TRUE
+	}
+	
 	####
 	# add parameters for description in shiny
 	####

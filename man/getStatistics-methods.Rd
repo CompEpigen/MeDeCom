@@ -7,7 +7,8 @@
 \title{getStatistics-methods}
 \usage{
 \S4method{getStatistics}{MeDeComSet}(object, Ks = object@parameters$Ks,
-  lambdas = object@parameters$lambdas, cg_subset = 1, statistic = "cve")
+  lambdas = object@parameters$lambdas, cg_subset = 1,
+  statistic = "cve")
 }
 \arguments{
 \item{object}{object returned by \link{runMeDeCom}}

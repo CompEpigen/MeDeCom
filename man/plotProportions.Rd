@@ -22,13 +22,7 @@ plotProportions(MeDeComSet, type, K, lambda, cg_subset = 1, lmc = NA,
 
 \item{lmc}{which LMC to use for visualization}
 
-\item{Tref}{a matrix with reference methylomes}
-
-\item{distance}{distance measure to use}
-
-\item{center}{if \code{TRUE} the LMC and reference methylome matrices will be row-centered}
-
-\item{n.most.var}{is not \code{NA} a respective number of CpGs with the highest standard deviation will be plotted}
+\item{Aref}{a matrix with reference methylomes}
 }
 \description{
 A wrapper for various plotting methods for the visualization of mixing proportions
@@ -46,4 +40,3 @@ Available plot types include:
        Lineplot of proportions recovered by MeDeCom and reference proportions.}
 }
 }
-

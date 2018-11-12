@@ -191,7 +191,7 @@ data.lineplot<-function(data, quant.trait=NULL,
 	
 	if(!legend) lp<-lp + theme(legend.position = "none")
 	
-	if(!is.null(title)) lp<-lp + ggtitle(title = title)
+	if(!is.null(title)) lp<-lp + ggtitle(title)
 	
 	if(plot)
 		print(lp) else lp
@@ -597,30 +597,30 @@ plot.K.selection<-function(
 		lambdas<-MeDeComSet@parameters$lambdas
 	}
 	
-#	if(statistic=="rmse" && !is.null(D)){
-#		meth.data<-D
-#		
-#		#if("SAMPLE_SUBSET"%in% names(getRuns()[[input$analysisrun]])){
-#		#	sample_subset<-getRuns()[[input$analysisrun]][["SAMPLE_SUBSET"]]
-#		if(is.null(sample.subset)){
-#			sample_subset<-1:ncol(meth.data)
-#		}
-#		
-#		if(is.null(cg_subsets)){
-#			cg_subsets<-list(c(1:nrow(D)))
-#		}
-#		
-##		ind<-readRDS(sprintf("%s/cg_group_%d.RDS", 
-##						getRuns()[[input$analysisrun]][["run.dir"]], 
-##						#dataset()$groups[gr]
-##						gr
-##				))										
-#		
-#		startRMSE<-sqrt(mean((meth.data[ind,sample_subset]-rowMeans(meth.data[ind,sample_subset]))^2))
-#	}else{
-#		startRMSE<-NA
-#	}
-#	
+  if(statistic=="rmse" && !is.null(D)){
+  	meth.data<-D
+  
+  	#if("SAMPLE_SUBSET"%in% names(getRuns()[[input$analysisrun]])){
+  	#	sample_subset<-getRuns()[[input$analysisrun]][["SAMPLE_SUBSET"]]
+  	if(is.null(sample.subset)){
+  		sample_subset<-1:ncol(meth.data)
+  	}
+  
+  	if(is.null(cg_subsets)){
+  		cg_subsets<-list(c(1:nrow(D)))
+  	}
+  
+  #		ind<-readRDS(sprintf("%s/cg_group_%d.RDS",
+  #						getRuns()[[input$analysisrun]][["run.dir"]],
+  #						#dataset()$groups[gr]
+  #						gr
+  #				))
+  
+  	startRMSE<-sqrt(mean((meth.data[ind,sample_subset]-rowMeans(meth.data[ind,sample_subset]))^2))
+  }else{
+  	startRMSE<-NA
+  }
+  
 	plotTitle<-""
 
 	if(addPlotTitle){
@@ -628,7 +628,7 @@ plot.K.selection<-function(
 	}
 
 	allRMSE<-getStatistics(MeDeComSet, Ks, lambdas, cg_subset, statistic=statistic)
-	if(is.null(dim(allRMSE))){
+	if(!is.null(dim(allRMSE))){
 		allRMSE<-matrix(allRMSE, nrow=length(Ks), ncol=length(lambdas))
 	}
 	if(statistic=="CVE" && normalizedCVE){
@@ -649,6 +649,11 @@ plot.K.selection<-function(
 	if(KvsRMSElambdaLegend){
 		layout(matrix(1:2, ncol=2),widths=c(0.75, 0.25))
 		par(mar=c(4,4,2,2))
+	}
+	if(all(is.na(allRMSE))){
+	  plot(c(0, 1), c(0, 1), ann = F, bty = 'n', type = 'n', xaxt = 'n', yaxt = 'n')
+	  text(x=0.5,y=0.5, paste("Statistic:", statistic,"not available for this result"))
+	  return(NULL)
 	}
 	matplot(Ks, 
 			allRMSE,
@@ -715,7 +720,7 @@ plot.lambda.selection<-function(
 	
 	for(elt in 1:length(elts)){
 		
-		vals<-getStatistics(MeDeComSet, K, lmbd, cg_subset, statistic=elts[elt])
+		vals <- as.numeric(getStatistics(MeDeComSet, K, lmbd, cg_subset, statistic=elts[elt]))
 		offs<-(max(vals[!is.na(vals)])-min(vals[!is.na(vals)]))/5
 		
 		if(!all(is.na(vals))){
@@ -792,6 +797,8 @@ plot.lambda.selection<-function(
 #' @param statistic		if multiple k values are supplied, the statistic which is plotted (defaults to cross-validation error)
 #' @param minLambda		minimal lambda value
 #' @param maxLambda		maximal lambda value
+#' @param lambdaScale character indicating if native scale or logarithmic scale should be employed for plotting lambda
+#' @param ...  further paramters passed to \code{plot.lambda.selection} or \code{plot.K.selection}
 #' 
 #' @export
 plotParameters<-function(
@@ -1697,11 +1704,8 @@ proportion.feature.corr<-function(Ahat, lmc, data.ch){
 #' @param lambda	     value of parameter lambda to use
 #' @param cg_subset	     which CpG subset to use
 #' @param lmc		     which LMC to use for visualization
-#' @param Tref		     a matrix with reference methylomes
-#' @param distance	     distance measure to use
-#' @param center  		 if \code{TRUE} the LMC and reference methylome matrices will be row-centered
-#' @param n.most.var	 is not \code{NA} a respective number of CpGs with the highest standard deviation will be plotted
-#' 
+#' @param Aref		     a matrix with reference methylomes
+#'  
 #' @details
 #' Available plot types include:
 #' \describe{

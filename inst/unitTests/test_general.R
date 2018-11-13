@@ -27,16 +27,16 @@ test.contribution.interpretation <- function(){
   checkTrue(passes)
 }
 
-test.enrichment <- function(){
-  require("RnBeads")
-  data("example.MeDeComSet")
-  anno.frame <- rnb.annotation2data.frame(rnb.get.annotation("probes450"))[sample(1:460000,10000),]
-  res <- lmc.lola.plots.tables(medecom.result,anno.data=anno.frame)
-  passes <- all(names(res) %in% c("Plots","Tables"))
-  res <- lmc.go.enrichment(medecom.result,anno.data=anno.frame)
-  passes <- passes && (class(res) == "list")
-  checkTrue(passes)
-}
+# test.enrichment <- function(){
+#   require("RnBeads")
+#   data("example.MeDeComSet")
+#   anno.frame <- rnb.annotation2data.frame(rnb.get.annotation("probes450"))[sample(1:460000,10000),]
+#   res <- lmc.lola.plots.tables(medecom.result,anno.data=anno.frame)
+#   passes <- all(names(res) %in% c("Plots","Tables"))
+#   res <- lmc.go.enrichment(medecom.result,anno.data=anno.frame)
+#   passes <- passes && (class(res) == "list")
+#   checkTrue(passes)
+# }
 
 test.routine <- function(){
   require("RUnit")
@@ -47,9 +47,9 @@ test.routine <- function(){
   cat("STARTED testing contribution interpretation \n")
   test.contribution.interpretation()
   cat("COMPLETED testing contribution interpretation \n")
-  cat("STARTED testing enrichment functions \n")
-  test.enrichment()
-  cat("COMPLETED testing enrichment functions \n")
+  # cat("STARTED testing enrichment functions \n")
+  # test.enrichment()
+  # cat("COMPLETED testing enrichment functions \n")
 }
 
 test.routine()

@@ -628,7 +628,7 @@ plot.K.selection<-function(
 	}
 
 	allRMSE<-getStatistics(MeDeComSet, Ks, lambdas, cg_subset, statistic=statistic)
-	if(!is.null(dim(allRMSE))){
+	if(!is.null(allRMSE) && is.null(dim(allRMSE))){
 		allRMSE<-matrix(allRMSE, nrow=length(Ks), ncol=length(lambdas))
 	}
 	if(statistic=="CVE" && normalizedCVE){

@@ -1357,55 +1357,50 @@ plotLMCs<-function(
 	}
 }
 #######################################################################################################################
-##
-## locus_plot
-##
-## Plot results for a selected locus
-##
-## param That a matrix of LMCs
-## param ann CpG annotation
-## param cgs indices of CpGs data for which are present in That with respect to ann
-## param locus.chr chromosome
-## param locus.start start coordinate
-## param locus.end end coordinate
-## param flank.start number of basepairs to extend the locus upstream
-## param flank.end number of basepairs to extend the locus downstream
-## param comp.cols color code for LMCs
-## param legend.pos location of the legend, in accordance with \link{legend}
-## param Tstar matrix of reference profiles
-## param D matrix of input methylation data used to produce That
-## param plot.genes if \cs{TRUE} a track with gene locations will be plotted
-## param ann.genes gene annotation necessary for the gene plotting
-##
-locus_plot<-function(
-		That,
+#'
+#' locus_plot
+#'
+#' Plot results for a selected locus
+#'
+#' @param That a matrix of LMCs
+#' @param ann CpG annotation
+#' @param cgs indices of CpGs data for which are present in That with respect to ann
+#' @param locus.chr chromosome
+#' @param locus.start start coordinate
+#' @param locus.end end coordinate
+#' @param flank.start number of basepairs to extend the locus upstream
+#' @param flank.end number of basepairs to extend the locus downstream
+#' @param comp.cols color code for LMCs
+#' @param legend.pos location of the legend, in accordance with \link{legend}
+#' @param Tstar matrix of reference profiles
+#' @param D matrix of input methylation data used to produce That
+#' @param plot.genes if \cs{TRUE} a track with gene locations will be plotted
+#' @param ann.genes gene annotation necessary for the gene plotting
+#'
+#'  @author Pavlo Lutsik, with modifications by Michael Scherer
+#'  @export  
+locus_plot<-function(That,
 		ann,
 		cgs,
-		locus.chr
-		,locus.start
-		,locus.end
-		,locus.name=sprintf("%s:%d-%d", locus.chr, locus.start,locus.end)
-		,locus.forward=FALSE
-		,flank.start=1000
-		,flank.end=1000
-		,comp.cols=rainbow(ncol(That))
-		,legend.pos="topleft"
-		,Tstar=NULL
-		,D=NULL
-		,plot.genes=FALSE
-		,ann.genes=NULL
+		locus.chr,
+		locus.start,
+		locus.end,
+		locus.name=sprintf("%s:%d-%d", locus.chr, locus.start,locus.end),
+		locus.forward=FALSE,
+		flank.start=1000,
+		flank.end=1000,
+		comp.cols=rainbow(ncol(That)),
+		legend.pos="topleft",
+		Tstar=NULL,
+		D=NULL,
+		plot.genes=FALSE,
+		ann.genes=NULL
 ){
-	
-	#require(RnBeads)
-	#ann<-rnb.annotation2data.frame(rnb.get.annotation("probes450"))
-	
 	ann.cgs<-ann[cgs,]
 	cgs.locus<-which(ann.cgs$Chromosome==locus.chr & ann.cgs$Start>locus.start-flank.start & ann.cgs$End<locus.end+flank.end)
 	ann.cgs.locus<-ann.cgs[cgs.locus, ]
 	
 	if(plot.genes && !is.null(ann.genes)){
-		#ann.genes<-rnb.annotation2data.frame(rnb.get.annotation("genes"))
-		
 		genes.locus.start<-which(ann.genes$Chromosome==locus.chr & ann.genes$Start>locus.start-flank.start & ann.genes$Start<locus.end+flank.end)
 		genes.locus.end<-which(ann.genes$Chromosome==locus.chr & ann.genes$End>locus.start-flank.start & ann.genes$End<locus.end+flank.end)
 		genes.locus.cover<-which(ann.genes$Chromosome==locus.chr & ann.genes$Start<locus.start-flank.start & ann.genes$End>locus.end+flank.end)
@@ -1445,10 +1440,8 @@ locus_plot<-function(
 	
 	if(plot.genes && nrow(ann.genes.locus)>0){
 		for(row in 1:nrow(ann.genes.locus)){
-			print(nrow(ann.genes.locus))
 			gene.forward<-ann.genes.locus[row,"Strand"]=="+"
 			line_y_pos<-(-1)*(0.25)-(((row-1) %% min(4, nrow(ann.genes.locus))))*(0.25/min(4,nrow(ann.genes.locus)))
-			print(line_y_pos)
 			arrows(if(gene.forward) ann.genes.locus[row,"Start"] else ann.genes.locus[row,"End"], 
 					line_y_pos, 
 					if(gene.forward) ann.genes.locus[row,"End"] else ann.genes.locus[row,"Start"], 

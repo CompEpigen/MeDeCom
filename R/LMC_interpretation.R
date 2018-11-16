@@ -134,6 +134,7 @@ lmc.lola.enrichment <- function(medecom.result,
     }
     comp <- paste0("LMC",i)
     lola.results[[comp]] <- lola.res
+    print(paste("LMC",i,"processed"))
   }
   return(lola.results)
 }
@@ -365,6 +366,8 @@ lmc.go.enrichment <- function(medecom.result,
         go.res <- summary(test.result.hyper)
         if(!is.null(dim(go.res)) && !is.null(go.res) && nrow(go.res)>0){
             go.res$p.val.adj.fdr <- p.adjust(go.res$Pvalue,method="fdr",n=length(test.result.hyper@pvalue.order))
+        }else{
+          NA
         }
       }else{
         go.res <- NA
@@ -372,6 +375,7 @@ lmc.go.enrichment <- function(medecom.result,
     }
     comp <- paste0("LMC",i)
     go.results[[comp]] <- go.res
+    print(paste("LMC",i,"processed"))
   }
   return(go.results)
 }

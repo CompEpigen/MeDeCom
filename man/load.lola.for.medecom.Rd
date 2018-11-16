@@ -4,10 +4,12 @@
 \alias{load.lola.for.medecom}
 \title{load.lola.for.medecom}
 \usage{
-load.lola.for.medecom(dir.path = tempdir())
+load.lola.for.medecom(dir.path = tempdir(), assembly = "hg19")
 }
 \arguments{
 \item{dir.path}{A path to a directory, where the LOLA database is to be downloaded. Defaults to the temporary directory.}
+
+\item{assembly}{The assembly to be used.}
 }
 \value{
 The loaded LOLA database

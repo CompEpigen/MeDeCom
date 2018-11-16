@@ -108,7 +108,7 @@ lmc.lola.enrichment <- function(medecom.result,
   op <- findOverlaps(anno,agg.type)
   agg.type <- agg.type[subjectHits(op)]
   if(is.null(lola.db)){
-    lola.db <- load.lola.for.medecom(temp.dir)
+    lola.db <- load.lola.for.medecom(temp.dir,assembly = assembly)
   }
   lmcs <- getLMCs(medecom.result,cg_subset=cg_subset,K=K,lambda=lambda)
   lola.results <- list()
@@ -143,13 +143,14 @@ lmc.lola.enrichment <- function(medecom.result,
 #' This functions downloads and loads the LOLA database in the specified directory. Should only be called once per session to save time.
 #' 
 #' @param dir.path A path to a directory, where the LOLA database is to be downloaded. Defaults to the temporary directory.
+#' @param assembly The assembly to be used.
 #' @return The loaded LOLA database
 #' @export
 #' @author Michael Scherer
-load.lola.for.medecom <- function(dir.path=tempdir()){
+load.lola.for.medecom <- function(dir.path=tempdir(),assembly="hg19"){
   require("LOLA")
   dir <- downloadLolaDbs(dir.path,"LOLACore")
-  lola.db <- loadRegionDB(dir$hg38)
+  lola.db <- loadRegionDB(dir[[assembly]])
   return(lola.db)
 }
 

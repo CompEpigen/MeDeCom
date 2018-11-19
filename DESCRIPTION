@@ -26,7 +26,8 @@ Suggests:
     knitr,
     rmarkdown,
     LOLA,
-    GOstats
+    GOstats,
+    qvalue
 Imports:
     RcppEigen (>= 0.3)
 LinkingTo:

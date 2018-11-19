@@ -52,6 +52,7 @@ lmc.lola.enrichment <- function(medecom.result,
                                 lola.db=NULL){
   require("RnBeads")
   require("LOLA")
+  require("qvalue")
   rnb.mode <- F
   if(is.null(cg_subset)){
     cg_subset <- medecom.result@parameters$cg_subsets[1]

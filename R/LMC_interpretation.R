@@ -363,7 +363,7 @@ lmc.go.enrichment <- function(medecom.result,
         }
       )
       if(!inherits(test.result.hyper,"error")){
-        go.res <- summary(test.result.hyper)
+        go.res <- GOstats::summary(test.result.hyper)
         if(!is.null(dim(go.res)) && !is.null(go.res) && nrow(go.res)>0){
             go.res$p.val.adj.fdr <- p.adjust(go.res$Pvalue,method="fdr",n=length(test.result.hyper@pvalue.order))
         }else{

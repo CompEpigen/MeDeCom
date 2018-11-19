@@ -1757,8 +1757,8 @@ plotProportions<-function(
 		
 	}else if(type=="scatterplot"){
 		
-		if(is.null(Aref) && is.null(Tref)){
-			stop("one of Aref or Tref should be supplied for this plot")
+		if(is.null(Aref)){
+			stop("Aref is required for this plot")
 		}else if(is.na(lmc) || is.na(ref.profile)){
 			stop("one of lmc or ref.profile should be supplied for this plot")
 		}

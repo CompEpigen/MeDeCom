@@ -151,6 +151,7 @@ lmc.lola.enrichment <- function(medecom.result,
 #' @author Michael Scherer
 load.lola.for.medecom <- function(dir.path=tempdir(),assembly="hg19"){
   require("LOLA")
+  require("simpleCache")
   dir <- downloadLolaDbs(dir.path,"LOLACore")
   lola.db <- loadRegionDB(dir[[assembly]])
   return(lola.db)

@@ -27,7 +27,8 @@ Suggests:
     rmarkdown,
     LOLA,
     GOstats,
-    qvalue
+    qvalue,
+    simpleCache
 Imports:
     RcppEigen (>= 0.3)
 LinkingTo:

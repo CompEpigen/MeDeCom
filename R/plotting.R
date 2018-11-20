@@ -631,16 +631,18 @@ plot.K.selection<-function(
 	if(!is.null(allRMSE) && is.null(dim(allRMSE))){
 		allRMSE<-matrix(allRMSE, nrow=length(Ks), ncol=length(lambdas))
 	}
-	if(statistic=="CVE" && normalizedCVE){
-		allRMSE<-sqrt(allRMSE/length(getCGsubset()))
+	if(statistic=="cve" && normalizedCVE){
+	  if("GROUP_LISTS" %in% names(MeDeComSet@parameters)){
+	    cg_length <- length(MeDeComSet@parameters$GROUP_LISTS[[cg_subset]])
+	  }else{
+	    cg_length <- MeDeComSet@dataset_info$n
+	  }
+		allRMSE<-sqrt(allRMSE/cg_length)
 	}
 	
 	if(statistic=="RMSE" && !is.na(startRMSE)){
 		ymaxv=max(na.omit(c(as.numeric(allRMSE), startRMSE)))
 		yminv=min(na.omit(c(as.numeric(allRMSE), startRMSE)))
-	}else if(statistic %in% c("cve","rmse") &&  normalizedCVE){
-		ymaxv=1.0
-		yminv=0.0
 	}else{
 		ymaxv=max(na.omit(as.numeric(allRMSE)))
 		yminv=min(na.omit(as.numeric(allRMSE)))
@@ -774,13 +776,16 @@ plot.lambda.selection<-function(
 						vals[!is.na(vals)][which(lmbd[!is.na(vals)]==0)] + 0.1*(max(vals[!is.na(vals)])-min(vals[!is.na(vals)])), 
 						expression(lambda == paste(0)), cex=1.5)
 			}
+		}else{
+		  plot(0,1)
+		  text(x=0,y=1,paste("Statistic",names(elts)[elt],"not available"),cex = 1.5)
 		}
 	}
 	mtext(
 			expression(lambda), 
 			side=1, outer=TRUE, 
 			line=4,
-			cex=1.2, 
+			cex=1.2 
 	)
 	par(mfrow=c(1,1))
 }

@@ -166,7 +166,7 @@ private:
     }
 };
 
-template <int DIM = 10, typename Scalar = Double>
+template <int DIM = 16, typename Scalar = Double>
 class QPBoxSolverSmallDims {
 public:
     using Matrix      = Eigen::Matrix<Scalar, DIM, DIM>;
@@ -727,13 +727,13 @@ RcppExport SEXP cppTAfact(SEXP mDtSEXP, SEXP mTtinitSEXP, SEXP mAinitSEXP,
     RMatrixIn mAinit(as<RMatrixIn>(mAinitSEXP));
 
     /* Dimensionality of a problem */
-    const size_t d = mAinit.rows() > 10 ? Dynamic : mAinit.rows();
+    const size_t d = mAinit.rows() > 16 ? Dynamic : mAinit.rows();
 
     RMatrixOut mTtout, mAout;
     SolverSuppOutput supp;
     solve<2, 3, 4, 5,
           6, 7, 8, 9,
-          10, Dynamic>(d, mDt, mTtinit, mAinit, lambda, itersMax,
+          16, Dynamic>(d, mDt, mTtinit, mAinit, lambda, itersMax,
                   tol, tolA, tolT,
                   mTtout, mAout, supp);
 

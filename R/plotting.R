@@ -1171,6 +1171,8 @@ component.dendrogram<-function(
 #' @param center  		 if \code{TRUE} the LMC and reference methylome matrices will be row-centered
 #' @param n.most.var	 is not \code{NA} a respective number of CpGs with the highest standard deviation will be plotted
 #' @param D				 input data matrix used to derive the LMCs
+#' @param min.similarity    minimal similarity between LMCs and (if available) reference profiles, used to select edges in \code{"similarity graph"}.
+#'                 Has only an influence if \code{type}=\code{"similarity graph"}.
 #' 
 #' @details
 #' Available plot types include:
@@ -1207,7 +1209,8 @@ plotLMCs<-function(
 		sample.characteristic=NULL,
 		scatter.matching=FALSE,
 		scatter.smooth=TRUE,
-		scatter.cg.feature=NULL
+		scatter.cg.feature=NULL,
+		min.similarity=0
 ){
 	plot.types<-c("dendrogram","MDS","heatmap","similarity graph", "scatterplot", "extremality", "distance to center")
 	
@@ -1325,22 +1328,27 @@ plotLMCs<-function(
 		axis(2, at = 1:nrow(recovery_matrix), labels=sprintf("%g", lls),tick=FALSE, las=2)
 		
 	}else if(type == "similarity graph"){
-		d<-get.distance.matrix(lit(That, Tref), measure=distance, centered=center)
+	  if(!is.null(Tref)){
+	    d<-get.distance.matrix(list(That,Tref), measure=distance, centered=center)
+	  }else{
+		  d<-get.distance.matrix(list(That), measure=distance, centered=center)
+	  }
 		if(distance=="euclidean"){
 			d <- d/max(d)				
 		}else if(distance=="correlation"){
+		  d <- as.matrix(d)
 			diag(d)<-0
 		}
 		
 		require(igraph)
 		G <- graph.adjacency(d, mode="upper", weighted=TRUE)
-		G <-delete.edges(G, which(E(G)$weight <= as.numeric(input$minGraphSimilarity)))
+		G <-delete.edges(G, which(E(G)$weight <= as.numeric(min.similarity)))
 		#G <- remove.edges(G, V(G)[ degree(G)==0 ])
 		lo<-layout.fruchterman.reingold(G, weights=rep(1, ecount(G)))
 		#lo<-layout.spring(G, repulse=TRUE)
 		plot(G, layout=lo,
 				vertex.size=3, edge.arrow.size=0.2,
-				vertex.label=colnames(mdd), rescale=FALSE,
+				rescale=FALSE,
 				xlim=range(lo[,1]), ylim=range(lo[,2]), vertex.label.dist=0.2,
 				vertex.label.color="black")
 		

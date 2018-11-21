@@ -28,7 +28,8 @@ Suggests:
     LOLA,
     GOstats,
     qvalue,
-    simpleCache
+    simpleCache,
+    igraph
 Imports:
     RcppEigen (>= 0.3)
 LinkingTo:

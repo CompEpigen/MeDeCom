@@ -8,7 +8,7 @@ plotLMCs(MeDeComSet, type, K = NA, lambda = NA, cg_subset = 1,
   lmc = NA, Tref = NULL, distance = "correlation", center = FALSE,
   n.most.var = NA, D = NULL, sample.characteristic = NULL,
   scatter.matching = FALSE, scatter.smooth = TRUE,
-  scatter.cg.feature = NULL)
+  scatter.cg.feature = NULL, min.similarity = 0)
 }
 \arguments{
 \item{MeDeComSet}{an object with MeDeCom results}
@@ -32,6 +32,9 @@ plotLMCs(MeDeComSet, type, K = NA, lambda = NA, cg_subset = 1,
 \item{n.most.var}{is not \code{NA} a respective number of CpGs with the highest standard deviation will be plotted}
 
 \item{D}{input data matrix used to derive the LMCs}
+
+\item{min.similarity}{minimal similarity between LMCs and (if available) reference profiles, used to select edges in \code{"similarity graph"}.
+Has only an influence if \code{type}=\code{"similarity graph"}.}
 }
 \description{
 A wrapper for various plotting methods for the visualization of LMCs

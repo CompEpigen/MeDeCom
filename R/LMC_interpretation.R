@@ -129,7 +129,7 @@ lmc.lola.enrichment <- function(medecom.result,
     first.sites <- anno[is.hypo]
     op <- findOverlaps(first.sites,agg.type)
     first.sites <- agg.type[subjectHits(op)]
-    lola.res <- NULL
+    lola.res <- NA
     if(length(first.sites)>0){
       lola.res <- runLOLA(userSets=unique(first.sites),userUniverse=agg.type,regionDB=lola.db)
     }
@@ -355,7 +355,7 @@ lmc.go.enrichment <- function(medecom.result,
     first.sites <- anno[is.hypo]
     op <- findOverlaps(first.sites,agg.type)
     first.ids <- entrez.id[subjectHits(op)]
-    go.res <- NULL
+    go.res <- NA
     if(length(first.ids)>0){
       params <- new("GOHyperGParams",annotation="org.Hs.eg.db",geneIds = first.ids, universeGeneIds = entrez.id, ontology = "BP",conditional = TRUE, testDirection = "over")
       test.result.hyper <- tryCatch(

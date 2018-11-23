@@ -1333,10 +1333,10 @@ plotLMCs<-function(
 	  }else{
 		  d<-get.distance.matrix(list(That), measure=distance, centered=center)
 	  }
+	  d <- as.matrix(d)
 		if(distance=="euclidean"){
 			d <- d/max(d)				
 		}else if(distance=="correlation"){
-		  d <- as.matrix(d)
 			diag(d)<-0
 		}
 		

@@ -20,6 +20,8 @@
 #' @param diff.threshold The difference cutoff between median methylation in the remaining LMCs and the LMC of interest
 #'                  used to call a CpG differentially methylated. The higher this value, the more conservative the
 #'                  selection.
+#' @param reference.computation Metric used to set the reference on the remaining LMCs to determine hyper- and hypomethylated sites.
+#'                  Can be either \code{"median"} (default) or \code{"mean"}.
 #' @param region.type Region type used to annotate CpGs to potentially regulatory regions (see \url{https://rnbeads.org/regions.html})
 #'                  for a list of available region types.
 #' @param temp.dir Path to a directory used to store temporary files.
@@ -45,6 +47,7 @@ lmc.lola.enrichment <- function(medecom.result,
                                 lambda=NULL,
                                 cg_subset=NULL,
                                 diff.threshold=0.5,
+                                reference.computation="median",
                                 region.type="ensembleRegBuildBPall",
                                 temp.dir=tempdir(),
                                 type="hypo",
@@ -82,7 +85,15 @@ lmc.lola.enrichment <- function(medecom.result,
     new.envi <- new.env()
     load(annotation.filter,envir = new.envi)
     annotation.filter <- get(ls(envir = new.envi),envir = new.envi)
-    
+  }
+  if(!reference.computation %in% c("median","mean")){
+    stop("Invalid value for reference.computation: Only mean and median are supported")
+  }else{
+    if(reference.computation %in% "median"){
+      ref.func <- rowMedians
+    }else{
+      ref.func <- rowMeans
+    }
   }
   if(is.character(anno.data)){
     options(fftempdir=temp.dir)
@@ -115,7 +126,7 @@ lmc.lola.enrichment <- function(medecom.result,
   lola.results <- list()
   for(i in 1:K){
     first.lmc <- lmcs[,i]
-    ref.lmc <- rowMedians(lmcs[,-i,drop=F])
+    ref.lmc <- ref.func(lmcs[,-i,drop=F])
     lmc.diff <- ref.lmc - first.lmc
     if(type=="hypo"){
       is.hypo <- lmc.diff > diff.threshold
@@ -251,6 +262,8 @@ do.lola.plot <- function(enrichment.result,lola.db,pvalCut=0.01){
 #' @param diff.threshold The difference cutoff between median methylation in the remaining LMCs and the LMC of interest
 #'                  used to call a CpG differentially methylated. The higher this value, the more conservative the
 #'                  selection.
+#' @param reference.computation Metric used to set the reference on the remaining LMCs to determine hyper- and hypomethylated sites.
+#'                  Can be either \code{"median"} (default) or \code{"mean"}.
 #' @param region.type Region type used to annotate CpGs to potentially regulatory regions (see \url{https://rnbeads.org/regions.html})
 #'                  for a list of available region types. Here, only "genes" "promoters" and their gencode versions
 #'                  are available.
@@ -274,6 +287,7 @@ lmc.go.enrichment <- function(medecom.result,
                                   lambda=NULL,
                                   cg_subset=NULL,
                                   diff.threshold=0.5,
+                                  reference.computation="median",
                                   region.type="genes",
                                   temp.dir=tempdir(),
                                   type="hypo",
@@ -310,6 +324,15 @@ lmc.go.enrichment <- function(medecom.result,
     load(annotation.filter,envir = new.envi)
     annotation.filter <- get(ls(envir = new.envi),envir = new.envi)
   }
+  if(!reference.computation %in% c("median","mean")){
+    stop("Invalid value for reference.computation: Only mean and median are supported")
+  }else{
+    if(reference.computation %in% "median"){
+      ref.func <- rowMedians
+    }else{
+      ref.func <- rowMeans
+    }
+  }
   if(is.character(anno.data)){
     options(fftempdir=temp.dir)
     anno.data <- load.rnb.set(anno.data)
@@ -341,7 +364,7 @@ lmc.go.enrichment <- function(medecom.result,
   go.results <- list()
   for(i in 1:K){
     first.lmc <- lmcs[,i]
-    ref.lmc <- rowMedians(lmcs[,-i,drop=F])
+    ref.lmc <- ref.func(lmcs[,-i,drop=F])
     lmc.diff <- ref.lmc - first.lmc
     if(type=="hypo"){
       is.hypo <- lmc.diff > diff.threshold

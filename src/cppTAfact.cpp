@@ -25,6 +25,11 @@ using namespace RcppEigen;
 // Enable C++11 via this plugin (Rcpp 0.10.3 or later)
 // [[Rcpp::plugins(cpp11)]]
 
+
+/* Signal handling */
+#include <signal.h>
+#include <unistd.h>
+
 /* to make Eigen thread-safe */
 #include <Eigen/Core>
 
@@ -36,6 +41,12 @@ using RMatrixOut = Eigen::MatrixXd;
 
 /* Aliases */
 using Double = double;
+
+/* Signal handing */
+bool gotSignal = false;
+void setGotSignal(int signum) {
+  gotSignal = true;
+}
 
 /* Binary operator to get projected gradient
  * while optimizing wrt T
@@ -721,6 +732,14 @@ RcppExport SEXP cppTAfact(SEXP mDtSEXP, SEXP mTtinitSEXP, SEXP mAinitSEXP,
     Eigen::initParallel();
     /* Make Eigen run in a single-thread mode */
     Eigen::setNbThreads(1);
+    
+    /*
+     * We have to set global variables after each call.
+     */
+    gotSignal = false;
+    signal(SIGINT, setGotSignal);
+    signal(SIGTERM, setGotSignal);
+    signal(SIGKILL, setGotSignal);
 
     RMatrixIn mDt(as<RMatrixIn>(mDtSEXP));
     RMatrixIn mTtinit(as<RMatrixIn>(mTtinitSEXP));

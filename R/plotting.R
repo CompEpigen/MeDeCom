@@ -1235,8 +1235,8 @@ plotLMCs<-function(
 	}
 	
 	if(!is.na(n.most.var)){
-		sds<-apply(That, 1, sd)
-		top.cgs<-sds[1:n.most.var]
+		sds <- apply(That, 1, sd)
+		top.cgs <- order(sds,decreasing = T)[1:n.most.var]
 		That<-That[top.cgs,,drop=FALSE]
 		if(!is.null(Tref)){
 			Tref<-Tref[top.cgs,,drop=FALSE]
@@ -1490,7 +1490,7 @@ proportion.lineplot<-function(
 		reorder="increasing", 
 		legend.pos="topleft", 
 		add=T, 
-		assignment.method="pearson", 
+		assignment.method="pearson",
 		...){
 	
 	ltys<-legs<-cols<-pchs<-c()
@@ -1711,6 +1711,7 @@ proportion.feature.corr<-function(Ahat, lmc, data.ch){
 #' @param cg_subset	     which CpG subset to use
 #' @param lmc		     which LMC to use for visualization
 #' @param Aref		     a matrix with reference methylomes
+#' @param ...    Extra variables based to proportion.lineplot
 #'  
 #' @details
 #' Available plot types include:
@@ -1736,10 +1737,10 @@ plotProportions<-function(
 		lmc=NA,
 		Aref=NULL,
 		ref.profile=NA, 
-		assignment.method="pearson",
 		sample.characteristic=NULL,
 		heatmap.clusterCols=FALSE,
-		heatmap.clusterRows=FALSE
+		heatmap.clusterRows=FALSE,
+		...
 ){
 	
 	Ahat<-getProportions(MeDeComSet, K, lambda, cg_subset)
@@ -1765,8 +1766,7 @@ plotProportions<-function(
 				lmc=lmc,
 				Aref=Aref,
 				ref.profile=ref.profile, 
-				reorder=TRUE, 
-				assignment.method=assignment.method)
+				...)
 		
 	}else if(type=="scatterplot"){
 		

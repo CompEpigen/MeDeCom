@@ -5,9 +5,8 @@
 \title{plotProportions}
 \usage{
 plotProportions(MeDeComSet, type, K, lambda, cg_subset = 1, lmc = NA,
-  Aref = NULL, ref.profile = NA, assignment.method = "pearson",
-  sample.characteristic = NULL, heatmap.clusterCols = FALSE,
-  heatmap.clusterRows = FALSE)
+  Aref = NULL, ref.profile = NA, sample.characteristic = NULL,
+  heatmap.clusterCols = FALSE, heatmap.clusterRows = FALSE, ...)
 }
 \arguments{
 \item{MeDeComSet}{an object with MeDeCom results}
@@ -23,6 +22,8 @@ plotProportions(MeDeComSet, type, K, lambda, cg_subset = 1, lmc = NA,
 \item{lmc}{which LMC to use for visualization}
 
 \item{Aref}{a matrix with reference methylomes}
+
+\item{...}{Extra variables based to proportion.lineplot}
 }
 \description{
 A wrapper for various plotting methods for the visualization of mixing proportions

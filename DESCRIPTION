@@ -3,7 +3,7 @@ Title: Decomposition of heterogeneous methylomes
 Description: Decomposition of heterogeneous methylomes with non-negative matrix factorization.
 Maintainer: Pavlo Lutsik <p.lutsik@mx.uni-saarland.de>
 Authors@R: c(
-   person ( "Pavlo", "Lutsik", email="p.lutsik@mx.uni-saarland.de", role = c("cre")),
+   person ( "Pavlo", "Lutsik", email="p.lutsik@dkfz.de", role = c("cre")),
    person ( "Martin", "Slawski", email="ms@cs.uni-saarland.de", role = c("aut")),
    person ( "Nik", "Vedeneev", email="nikitavedeneev@gmail.com", role = c("aut")),
    person ( "Gilles", "Gasparoni", email="gillesgasparoni@gmail.com", role = c("aut")),

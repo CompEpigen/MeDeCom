@@ -113,6 +113,9 @@ run.trait.association.single <- function(medecom.set,pheno.data,cg_subset=NULL,K
     stop("Specified value for lambda not in medecom.set")
   }
   ret.list <- list()
+  p.vals <- linear.model(medecom.set=medecom.set,cg_subset=cg_subset,K=K,lambda=lambda,pheno.data=pheno.data)
+  plot <- plot.p.val.heatmap.lm(p.vals)
+  ret.list[["linear model"]] <- plot
   p.vals <- link.to.traits(medecom.set=medecom.set,cg_subset=cg_subset,K=K,lambda=lambda,pheno.data=pheno.data,test.fun=test.fun)
   plot <- plot.p.val.heatmap(p.vals)
   ret.list[["qualitative"]] <- plot
@@ -120,6 +123,79 @@ run.trait.association.single <- function(medecom.set,pheno.data,cg_subset=NULL,K
   plot <- plot.correlation.heatmap(cors)
   ret.list[["quantitative"]] <- plot
   return(ret.list)
+}
+
+#' linear.model
+#' 
+#' This function applies a linear model to determine if the LMC proportions are linked to one of the phenotypic traits. For numeric data
+#' the standard least squares model is used, for categorical data we use logistic regression.
+#'  
+#' @param medecom.set An object of type \code{\link{MeDeComSet}} as the result of \code{\link{runMeDeCom}} containing LMCs and their
+#'                     proportions in the samples. The Set can contain multiple runs for different values of K and lambda.
+#' @param cg_subset The subset of sites used for computing LMCs in \code{medecom.set}.
+#' @param K The K parameter, determining the number of LMCs to extract from \code{medecom.set}.
+#' @param lambda The lambda parameter, determining the regularization used for the LMCs in \code{medecom.set}.
+#' @param pheno.data An object of type \code{\link{RnBSet}} containing methylation data and metadata for the same samples for which 
+#'                 \code{medecom.set} was computed or a data.frame of sample annotations (ann_S)
+#'                 
+#' @return A list with an element for each sample grouping defined by \code{\link{rnb.sample.groups}}. The first element of each element is
+#' the Akaike Information Criterion (AIC) computed for the model.
+#' 
+#' @details Each element in the returned list is of length \code{K}, displaying the p-value of the statistical assocation of the
+#'           contributions of the corresponding LMC to the output. The p-values are produced by comparing the LMC 
+#'           contributions in all sample comparisons defined by \code{\link{rnb.sample.groups}} on \code{rnb.set}. 
+#' @author Michael Scherer
+#' 
+#' @noRd
+
+linear.model <- function(medecom.set,cg_subset,K,lambda,pheno.data){
+  if(!inherits(pheno.data,"RnBSet") && !is.data.frame(pheno.data)){
+    stop("Invalid value for pheno.data; needs to be RnBSet or data.frame")
+  }
+  if(inherits(pheno.data,"RnBSet")){
+    if(!(length(samples(pheno.data))==medecom.set@dataset_info$n)){
+      stop("Annotation does not match the number of samples in the MeDeComSet")
+    }
+  }
+  if(is.data.frame(pheno.data)){
+    if(!(nrow(pheno.data)==medecom.set@dataset_info$n)){
+      stop("Annotation does not match the number of samples in the MeDeComSet")
+    }
+  }
+  require("RnBeads")
+  props <- getProportions(medecom.set,cg_subset=cg_subset,K=K,lambda=lambda)
+  res <- list()
+  if(!(is.null(dim(props)))){
+    names.grps <- colnames(pheno.data)
+    for(i in 1:length(names.grps)){
+      grp <- pheno.data[,i]
+      if(is.numeric(grp)){
+        lm.mod <- glm(grp~.,data=as.data.frame(t(props)))
+        if(!any(is.na(lm.mod$coefficients))){
+          sum.lm <- summary(lm.mod)
+          aic.model <- sum.lm$aic
+          p.vals <- c(aic.model,sum.lm$coefficients[-1,"Pr(>|z|)"])
+          names(p.vals) <- c("AIC",row.names(props))
+        }else{
+          p.vals <- NA
+        }
+      }else if(length(unique(grp))>2){
+        lm.mod <- glm(grp~.,data = as.data.frame(t(props)),family = binomial(link="logit"))
+        if(!any(is.na(lm.mod$coefficients))){
+          sum.lm <- summary(lm.mod)
+          aic.model <- sum.lm$aic
+          p.vals <- c(aic.model,sum.lm$coefficients[-1,"Pr(>|z|)"])
+          names(p.vals) <- c("AIC",row.names(props))
+        }else{
+          p.vals <- NA
+        }
+      }else{
+        p.vals <- NA
+      }
+      res[[names.grps[i]]] <- p.vals
+    }
+  }
+  return(res)
 }
 
 #' link.to.traits
@@ -269,6 +345,37 @@ plot.p.val.heatmap <- function(trait.res){
     to.plot$LMC <- row.names(to.plot)
     to.plot <- melt(to.plot)
     colnames(to.plot)[2:3] <- c("Trait","PValue")
+    to.plot$LogPValue <- log(to.plot$PValue)
+    plot <- ggplot(to.plot,aes(x=LMC,y=Trait,fill=LogPValue))+geom_tile()+theme_bw()+scale_fill_gradient(low="red",high = "white")+
+      geom_text(aes(label=ifelse(round(PValue,2)< 0.01,format(PValue,digits = 2),"")),size=5/(length(unique(to.plot$LMC))/5))+
+      theme(axis.text.x = element_text(angle=90,hjust=1))
+  }else{
+    plot <- ggplot(data.frame(x=c(0,1),y=c(0.1)))+geom_text(x=0.5,y=0.5,label="No assocation found")+theme_bw()
+  }
+  return(plot)
+}
+
+#' plot.p.val.heatmap.lm
+#' 
+#' Produces a heatmap for the p-values of the linear model and the AIC produced in \code{\link{linear.model}}.
+#' 
+#' @param trait.res A list as the result of \code{\link{linear.model}}.
+#' 
+#' @return A plot object displaying the heatmap of the input p-values and the AIC. P-values lower than 0.01 are added to the plot as numbers,
+#'          otherwise the decadic logarithm of the p-value resembles the shading of the tiles.
+#'          
+#' @author Michael Scherer
+#' @noRd
+
+plot.p.val.heatmap.lm <- function(trait.res){
+  if(length(trait.res)!=0){
+    require("ggplot2")
+    require("reshape2")
+    to.plot <- as.data.frame(trait.res)
+    to.plot$LMC <- row.names(to.plot)
+    to.plot$Type <- c("AIC",rep("LMC",nrow(to.plot)-1))
+    to.plot <- melt(to.plot,id="Type")
+    colnames(to.plot)[2:3] <- c("Type","Trait","PValue")
     to.plot$LogPValue <- log(to.plot$PValue)
     plot <- ggplot(to.plot,aes(x=LMC,y=Trait,fill=LogPValue))+geom_tile()+theme_bw()+scale_fill_gradient(low="red",high = "white")+
       geom_text(aes(label=ifelse(round(PValue,2)< 0.01,format(PValue,digits = 2),"")),size=5/(length(unique(to.plot$LMC))/5))+

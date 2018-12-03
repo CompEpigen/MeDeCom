@@ -1114,6 +1114,21 @@ component.mds<-function(
 	text(x, y, labels = labs, cex=.7)
 }
 #######################################################################################################################
+component.boxplot <- function(That,
+                              Tref=NULL){
+  to.plot <- data.frame(That)
+  if(!is.null(Tref)){
+    if(nrow(That) != nrow(Tref)){
+      stop("Invalid values for That and Tref, needs to have same number of rows (CpGs).")
+    }
+    to.plot <- data.frame(to.plot,Tref)
+  }
+  to.plot <- melt(to.plot)
+  colnames(to.plot) <- c("LMC","Methylation")
+  plot <- ggplot(to.plot,aes_string(x="LMC",y="Methylation"))+geom_violin()+
+    geom_boxplot(fill="grey80",color="black",alpha=0.25)+theme_bw()
+  return(plot)
+}
 component.dendrogram<-function(
 		That, 
 		Tref=NULL, 
@@ -1177,6 +1192,8 @@ component.dendrogram<-function(
 #' @details
 #' Available plot types include:
 #' \describe{
+#' \item{\bold{\code{boxplot}}}{
+#'        Boxplot describing the distributions of each of the LMCs and, if available, the reference methylomss.}
 #' \item{\bold{\code{dendrogram}}}{
 #'        Dendrogram visualizing a joint hierarchical clustering of LMCs and, if available, the reference methylomes.}
 #' \item{\bold{\code{heatmap}}}{
@@ -1246,11 +1263,13 @@ plotLMCs<-function(
 		}
 	}
 	
-	if(type=="dendrogram"){
+  if(type=="dendrogram"){
 		
 		component.dendrogram(That, Tref, dist.measure=distance, centered=center, label.cols=c("red", "blue"))
 	
-	}else if(type=="heatmap"){
+  } else if(type=="boxplot"){
+    component.boxplot(That,Tref)
+  }	else if(type=="heatmap"){
 					
 		if(distance=="correlation"){
 			dist_method<-"pearson"

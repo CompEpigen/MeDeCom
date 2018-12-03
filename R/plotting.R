@@ -1669,7 +1669,7 @@ proportion.heatmap<-function(
 	}
 }
 #######################################################################################################################
-proportion.feature.corr<-function(Ahat, lmc, data.ch){
+proportion.feature.corr<-function(Ahat, lmc, data.ch,...){
 	
 	if(is.null(rownames(Ahat))){
 		rownames(Ahat)<-sprintf("LMC%d", 1:nrow(Ahat))
@@ -1677,9 +1677,9 @@ proportion.feature.corr<-function(Ahat, lmc, data.ch){
 	yl<-paste(rownames(Ahat)[lmc], collapse=" + ")
 	if(is.numeric(data.ch)){
 		plot(data.ch, Ahat[lmc,], 
-				xlab=input$mdsDataCat, 
+				xlab=mdsDataCat, 
 				ylab=yl, las=2)
-		if(input$includeRegressionLine){
+		if(includeRegressionLine){
 			fitData<-list()
 			fitData$feature<-data.ch
 			fitData$proportion<-Ahat[lmc,]
@@ -1784,7 +1784,7 @@ plotProportions<-function(
 			stop("sample.characteristic should be supplied for this plot")
 		}
 		
-		proportion.feature.corr(Ahat, lmc, sample.characteristic)
+		proportion.feature.corr(Ahat, lmc, sample.characteristic, ...)
 	}
 }
 #######################################################################################################################

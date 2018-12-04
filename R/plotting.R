@@ -1689,7 +1689,7 @@ proportion.heatmap<-function(
 }
 #######################################################################################################################
 proportion.feature.corr<-function(Ahat, lmc, data.ch, includeRegressionLine=F){
-	
+
 	if(is.null(rownames(Ahat))){
 		rownames(Ahat)<-sprintf("LMC%d", 1:nrow(Ahat))
 	}

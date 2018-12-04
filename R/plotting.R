@@ -1126,7 +1126,7 @@ component.boxplot <- function(That,
   to.plot <- melt(to.plot)
   colnames(to.plot) <- c("LMC","Methylation")
   plot <- ggplot(to.plot,aes_string(x="LMC",y="Methylation"))+geom_violin()+
-    geom_boxplot(fill="grey80",color="black",alpha=0.25)+theme_bw()
+    geom_boxplot(fill="grey80",color="black",alpha=0.25)+theme_bw()+theme(axis.text.x = element_text(angle=90,hjust=1))
   return(plot)
 }
 component.dendrogram<-function(
@@ -1229,7 +1229,7 @@ plotLMCs<-function(
 		scatter.cg.feature=NULL,
 		min.similarity=0
 ){
-	plot.types<-c("dendrogram","MDS","heatmap","similarity graph", "scatterplot", "extremality", "distance to center")
+	plot.types<-c("dendrogram","boxplot","MDS","heatmap","similarity graph", "scatterplot", "extremality", "distance to center")
 	
 	if(missing(type) || !type %in% plot.types){
 		stop(sprintf("Please specify the plot type, one of \"%s\"", paste(plot.types, collapse="\", \"")))
@@ -1688,17 +1688,17 @@ proportion.heatmap<-function(
 	}
 }
 #######################################################################################################################
-proportion.feature.corr<-function(Ahat, lmc, data.ch){
+proportion.feature.corr<-function(Ahat, lmc, data.ch, includeRegressionLine=F){
 	
 	if(is.null(rownames(Ahat))){
 		rownames(Ahat)<-sprintf("LMC%d", 1:nrow(Ahat))
 	}
 	yl<-paste(rownames(Ahat)[lmc], collapse=" + ")
 	if(is.numeric(data.ch)){
-		plot(data.ch, Ahat[lmc,], 
-				xlab=input$mdsDataCat, 
-				ylab=yl, las=2)
-		if(input$includeRegressionLine){
+		plot(data.ch, Ahat[lmc,],
+		    ylab=paste("Proportion",sprintf("LMC%d",lmc)),xlab="Trait Value",
+        las=2)
+		if(includeRegressionLine){
 			fitData<-list()
 			fitData$feature<-data.ch
 			fitData$proportion<-Ahat[lmc,]
@@ -1802,8 +1802,11 @@ plotProportions<-function(
 		if(is.null(sample.characteristic)){
 			stop("sample.characteristic should be supplied for this plot")
 		}
-		
-		proportion.feature.corr(Ahat, lmc, sample.characteristic)
+		if(is.na(lmc)){
+		  stop("lmc needs to be provided for this plot")
+		}
+	  
+		proportion.feature.corr(Ahat, lmc, sample.characteristic,...)
 	}
 }
 #######################################################################################################################

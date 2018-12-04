@@ -171,24 +171,20 @@ linear.model <- function(medecom.set,cg_subset,K,lambda,pheno.data){
       grp <- pheno.data[,i]
       if(is.numeric(grp)){
         lm.mod <- glm(grp~.,data=as.data.frame(t(props)))
-        if(!any(is.na(lm.mod$coefficients))){
-          sum.lm <- summary(lm.mod)
-          aic.model <- sum.lm$aic
-          p.vals <- c(aic.model,sum.lm$coefficients[-1,"Pr(>|z|)"])
-          names(p.vals) <- c("AIC",row.names(props))
-        }else{
-          p.vals <- NA
-        }
-      }else if(length(unique(grp))>2){
+        sum.lm <- summary(lm.mod)
+        aic.model <- sum.lm$aic
+        cofi <- lm.mod$coefficients
+        p.vals <- rep(NA,length(cofi))
+        p.vals[!is.na(cofi)] <- c(aic.model,sum.lm$coefficients[-1,"Pr(>|t|)"])
+        names(p.vals) <- c("AIC",row.names(props))
+      }else if(length(unique(grp))>2 && !(length(unique(grp))==ncol(props))){
         lm.mod <- glm(grp~.,data = as.data.frame(t(props)),family = binomial(link="logit"))
-        if(!any(is.na(lm.mod$coefficients))){
-          sum.lm <- summary(lm.mod)
-          aic.model <- sum.lm$aic
-          p.vals <- c(aic.model,sum.lm$coefficients[-1,"Pr(>|z|)"])
-          names(p.vals) <- c("AIC",row.names(props))
-        }else{
-          p.vals <- NA
-        }
+        sum.lm <- summary(lm.mod)
+        aic.model <- sum.lm$aic
+        cofi <- lm.mod$coefficients
+        p.vals <- rep(NA,length(cofi))
+        p.vals[!is.na(cofi)] <- c(aic.model,sum.lm$coefficients[-1,"Pr(>|z|)"])
+        names(p.vals) <- c("AIC",row.names(props))
       }else{
         p.vals <- NA
       }
@@ -374,12 +370,17 @@ plot.p.val.heatmap.lm <- function(trait.res){
     to.plot <- as.data.frame(trait.res)
     to.plot$LMC <- row.names(to.plot)
     to.plot$Type <- c("AIC",rep("LMC",nrow(to.plot)-1))
-    to.plot <- melt(to.plot,id="Type")
-    colnames(to.plot)[2:3] <- c("Type","Trait","PValue")
+    to.plot <- melt(to.plot,id=c("Type","LMC"))
+    colnames(to.plot) <- c("Type","LMC","Trait","AIC")
+    plot.AIC <- ggplot(to.plot[to.plot$Type%in%"AIC",],aes(x="",y=Trait,fill=AIC))+geom_tile()+theme_bw()+scale_fill_gradient(low="blue",high = "white")+
+                         geom_text(aes(label=round(AIC,2)),size=5/(length(unique(to.plot$Trait))/10))+
+                         theme(axis.text.x = element_text(angle=90,hjust=1),axis.title = element_blank(),axis.ticks.x = element_blank())
+    colnames(to.plot) <- c("Type","LMC","Trait","PValue")
     to.plot$LogPValue <- log(to.plot$PValue)
-    plot <- ggplot(to.plot,aes(x=LMC,y=Trait,fill=LogPValue))+geom_tile()+theme_bw()+scale_fill_gradient(low="red",high = "white")+
-      geom_text(aes(label=ifelse(round(PValue,2)< 0.01,format(PValue,digits = 2),"")),size=5/(length(unique(to.plot$LMC))/5))+
+    plot.pval <- ggplot(to.plot[to.plot$Type%in%"LMC",],aes(x=LMC,y=Trait,fill=LogPValue))+geom_tile()+theme_bw()+scale_fill_gradient(low="red",high = "white")+
+      geom_text(aes(label=ifelse(round(PValue,2)< 0.01,format(PValue,digits = 2),"")),size=5/(length(unique(to.plot$LMC))/3))+
       theme(axis.text.x = element_text(angle=90,hjust=1))
+    plot <- grid.arrange(plot.AIC,plot.pval)
   }else{
     plot <- ggplot(data.frame(x=c(0,1),y=c(0.1)))+geom_text(x=0.5,y=0.5,label="No assocation found")+theme_bw()
   }

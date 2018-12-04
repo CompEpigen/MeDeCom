@@ -42,6 +42,8 @@ A wrapper for various plotting methods for the visualization of LMCs
 \details{
 Available plot types include:
 \describe{
+\item{\bold{\code{boxplot}}}{
+       Boxplot describing the distributions of each of the LMCs and, if available, the reference methylomss.}
 \item{\bold{\code{dendrogram}}}{
        Dendrogram visualizing a joint hierarchical clustering of LMCs and, if available, the reference methylomes.}
 \item{\bold{\code{heatmap}}}{

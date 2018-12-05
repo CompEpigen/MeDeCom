@@ -191,7 +191,7 @@ data.lineplot<-function(data, quant.trait=NULL,
 	
 	if(!legend) lp<-lp + theme(legend.position = "none")
 	
-	if(!is.null(title)) lp<-lp + ggtitle(title = title)
+	if(!is.null(title)) lp<-lp + ggtitle(title)
 	
 	if(plot)
 		print(lp) else lp
@@ -597,30 +597,30 @@ plot.K.selection<-function(
 		lambdas<-MeDeComSet@parameters$lambdas
 	}
 	
-#	if(statistic=="rmse" && !is.null(D)){
-#		meth.data<-D
-#		
-#		#if("SAMPLE_SUBSET"%in% names(getRuns()[[input$analysisrun]])){
-#		#	sample_subset<-getRuns()[[input$analysisrun]][["SAMPLE_SUBSET"]]
-#		if(is.null(sample.subset)){
-#			sample_subset<-1:ncol(meth.data)
-#		}
-#		
-#		if(is.null(cg_subsets)){
-#			cg_subsets<-list(c(1:nrow(D)))
-#		}
-#		
-##		ind<-readRDS(sprintf("%s/cg_group_%d.RDS", 
-##						getRuns()[[input$analysisrun]][["run.dir"]], 
-##						#dataset()$groups[gr]
-##						gr
-##				))										
-#		
-#		startRMSE<-sqrt(mean((meth.data[ind,sample_subset]-rowMeans(meth.data[ind,sample_subset]))^2))
-#	}else{
-#		startRMSE<-NA
-#	}
-#	
+  if(statistic=="rmse" && !is.null(D)){
+  	meth.data<-D
+  
+  	#if("SAMPLE_SUBSET"%in% names(getRuns()[[input$analysisrun]])){
+  	#	sample_subset<-getRuns()[[input$analysisrun]][["SAMPLE_SUBSET"]]
+  	if(is.null(sample.subset)){
+  		sample_subset<-1:ncol(meth.data)
+  	}
+  
+  	if(is.null(cg_subsets)){
+  		cg_subsets<-list(c(1:nrow(D)))
+  	}
+  
+  #		ind<-readRDS(sprintf("%s/cg_group_%d.RDS",
+  #						getRuns()[[input$analysisrun]][["run.dir"]],
+  #						#dataset()$groups[gr]
+  #						gr
+  #				))
+  
+  	startRMSE<-sqrt(mean((meth.data[ind,sample_subset]-rowMeans(meth.data[ind,sample_subset]))^2))
+  }else{
+  	startRMSE<-NA
+  }
+  
 	plotTitle<-""
 
 	if(addPlotTitle){
@@ -628,19 +628,21 @@ plot.K.selection<-function(
 	}
 
 	allRMSE<-getStatistics(MeDeComSet, Ks, lambdas, cg_subset, statistic=statistic)
-	if(is.null(dim(allRMSE))){
+	if(!is.null(allRMSE) && is.null(dim(allRMSE))){
 		allRMSE<-matrix(allRMSE, nrow=length(Ks), ncol=length(lambdas))
 	}
-	if(statistic=="CVE" && normalizedCVE){
-		allRMSE<-sqrt(allRMSE/length(getCGsubset()))
+	if(statistic=="cve" && normalizedCVE){
+	  if("GROUP_LISTS" %in% names(MeDeComSet@parameters)){
+	    cg_length <- length(MeDeComSet@parameters$GROUP_LISTS[[cg_subset]])
+	  }else{
+	    cg_length <- MeDeComSet@dataset_info$n
+	  }
+		allRMSE<-sqrt(allRMSE/cg_length)
 	}
 	
 	if(statistic=="RMSE" && !is.na(startRMSE)){
 		ymaxv=max(na.omit(c(as.numeric(allRMSE), startRMSE)))
 		yminv=min(na.omit(c(as.numeric(allRMSE), startRMSE)))
-	}else if(statistic %in% c("cve","rmse") &&  normalizedCVE){
-		ymaxv=1.0
-		yminv=0.0
 	}else{
 		ymaxv=max(na.omit(as.numeric(allRMSE)))
 		yminv=min(na.omit(as.numeric(allRMSE)))
@@ -649,6 +651,11 @@ plot.K.selection<-function(
 	if(KvsRMSElambdaLegend){
 		layout(matrix(1:2, ncol=2),widths=c(0.75, 0.25))
 		par(mar=c(4,4,2,2))
+	}
+	if(all(is.na(allRMSE))){
+	  plot(c(0, 1), c(0, 1), ann = F, bty = 'n', type = 'n', xaxt = 'n', yaxt = 'n')
+	  text(x=0.5,y=0.5, paste("Statistic:", statistic,"not available for this result"))
+	  return(NULL)
 	}
 	matplot(Ks, 
 			allRMSE,
@@ -670,10 +677,10 @@ plot.K.selection<-function(
 	}
 	if(KvsRMSElambdaLegend){
 		plot.new()
-		legend("right", legend=as.character(all_results@parameters$lambdas), 
+		legend("right", legend=as.character(lambdas), 
 				#col=lambdaCols[1:length(all_results$lambdas)], 
-				col=1:length(all_results@parameters$lambdas),
-				lty=1:length(all_results@parameters$lambdas),
+				col=1:length(lambdas),
+				lty=1:length(lambdas),
 				pch=15,
 				xpd=TRUE,
 				title="lambda")
@@ -715,7 +722,7 @@ plot.lambda.selection<-function(
 	
 	for(elt in 1:length(elts)){
 		
-		vals<-getStatistics(MeDeComSet, K, lmbd, cg_subset, statistic=elts[elt])
+		vals <- as.numeric(getStatistics(MeDeComSet, K, lmbd, cg_subset, statistic=elts[elt]))
 		offs<-(max(vals[!is.na(vals)])-min(vals[!is.na(vals)]))/5
 		
 		if(!all(is.na(vals))){
@@ -769,13 +776,16 @@ plot.lambda.selection<-function(
 						vals[!is.na(vals)][which(lmbd[!is.na(vals)]==0)] + 0.1*(max(vals[!is.na(vals)])-min(vals[!is.na(vals)])), 
 						expression(lambda == paste(0)), cex=1.5)
 			}
+		}else{
+		  plot(0,1)
+		  text(x=0,y=1,paste("Statistic",names(elts)[elt],"not available"),cex = 1.5)
 		}
 	}
 	mtext(
 			expression(lambda), 
 			side=1, outer=TRUE, 
 			line=4,
-			cex=1.2, 
+			cex=1.2 
 	)
 	par(mfrow=c(1,1))
 }
@@ -792,6 +802,8 @@ plot.lambda.selection<-function(
 #' @param statistic		if multiple k values are supplied, the statistic which is plotted (defaults to cross-validation error)
 #' @param minLambda		minimal lambda value
 #' @param maxLambda		maximal lambda value
+#' @param lambdaScale character indicating if native scale or logarithmic scale should be employed for plotting lambda
+#' @param ...  further paramters passed to \code{plot.lambda.selection} or \code{plot.K.selection}
 #' 
 #' @export
 plotParameters<-function(
@@ -983,9 +995,9 @@ component.heatmap<-function(
 		for(ri in 1:ncol(th)){
 			for(ci in 1:ncol(tr)){
 				if(method=="euclidean"){
-					data[ri,ci]<-sqrt(sum((tr[,ci]-th[,ri])^2))
+					data[ri,ci]<-sqrt(sum((tr[,ci]-th[,ri])^2,na.rm = T))
 				}else if(method=="angular"){
-					data[ri,ci]<-sum(tr[,ci]*th[,ri])/sqrt(sum(tr[,ci]^2))/sqrt(sum(th[,ri]^2))
+					data[ri,ci]<-sum(tr[,ci]*th[,ri],na.rm = T)/sqrt(sum(tr[,ci]^2,na.rm=T))/sqrt(sum(th[,ri]^2,na.rm=T))
 				}
 			}
 		}
@@ -1102,6 +1114,21 @@ component.mds<-function(
 	text(x, y, labels = labs, cex=.7)
 }
 #######################################################################################################################
+component.boxplot <- function(That,
+                              Tref=NULL){
+  to.plot <- data.frame(That)
+  if(!is.null(Tref)){
+    if(nrow(That) != nrow(Tref)){
+      stop("Invalid values for That and Tref, needs to have same number of rows (CpGs).")
+    }
+    to.plot <- data.frame(to.plot,Tref)
+  }
+  to.plot <- melt(to.plot)
+  colnames(to.plot) <- c("LMC","Methylation")
+  plot <- ggplot(to.plot,aes_string(x="LMC",y="Methylation"))+geom_violin()+
+    geom_boxplot(fill="grey80",color="black",alpha=0.25)+theme_bw()+theme(axis.text.x = element_text(angle=90,hjust=1))
+  return(plot)
+}
 component.dendrogram<-function(
 		That, 
 		Tref=NULL, 
@@ -1159,10 +1186,14 @@ component.dendrogram<-function(
 #' @param center  		 if \code{TRUE} the LMC and reference methylome matrices will be row-centered
 #' @param n.most.var	 is not \code{NA} a respective number of CpGs with the highest standard deviation will be plotted
 #' @param D				 input data matrix used to derive the LMCs
+#' @param min.similarity    minimal similarity between LMCs and (if available) reference profiles, used to select edges in \code{"similarity graph"}.
+#'                 Has only an influence if \code{type}=\code{"similarity graph"}.
 #' 
 #' @details
 #' Available plot types include:
 #' \describe{
+#' \item{\bold{\code{boxplot}}}{
+#'        Boxplot describing the distributions of each of the LMCs and, if available, the reference methylomss.}
 #' \item{\bold{\code{dendrogram}}}{
 #'        Dendrogram visualizing a joint hierarchical clustering of LMCs and, if available, the reference methylomes.}
 #' \item{\bold{\code{heatmap}}}{
@@ -1195,9 +1226,10 @@ plotLMCs<-function(
 		sample.characteristic=NULL,
 		scatter.matching=FALSE,
 		scatter.smooth=TRUE,
-		scatter.cg.feature=NULL
+		scatter.cg.feature=NULL,
+		min.similarity=0
 ){
-	plot.types<-c("dendrogram","MDS","heatmap","similarity graph", "scatterplot", "extremality", "distance to center")
+	plot.types<-c("dendrogram","boxplot","MDS","heatmap","similarity graph", "scatterplot", "extremality", "distance to center")
 	
 	if(missing(type) || !type %in% plot.types){
 		stop(sprintf("Please specify the plot type, one of \"%s\"", paste(plot.types, collapse="\", \"")))
@@ -1220,8 +1252,8 @@ plotLMCs<-function(
 	}
 	
 	if(!is.na(n.most.var)){
-		sds<-apply(That, 1, sd)
-		top.cgs<-sds[1:n.most.var]
+		sds <- apply(That, 1, sd)
+		top.cgs <- order(sds,decreasing = T)[1:n.most.var]
 		That<-That[top.cgs,,drop=FALSE]
 		if(!is.null(Tref)){
 			Tref<-Tref[top.cgs,,drop=FALSE]
@@ -1231,11 +1263,13 @@ plotLMCs<-function(
 		}
 	}
 	
-	if(type=="dendrogram"){
+  if(type=="dendrogram"){
 		
 		component.dendrogram(That, Tref, dist.measure=distance, centered=center, label.cols=c("red", "blue"))
 	
-	}else if(type=="heatmap"){
+  } else if(type=="boxplot"){
+    component.boxplot(That,Tref)
+  }	else if(type=="heatmap"){
 					
 		if(distance=="correlation"){
 			dist_method<-"pearson"
@@ -1313,7 +1347,12 @@ plotLMCs<-function(
 		axis(2, at = 1:nrow(recovery_matrix), labels=sprintf("%g", lls),tick=FALSE, las=2)
 		
 	}else if(type == "similarity graph"){
-		d<-get.distance.matrix(lit(That, Tref), measure=distance, centered=centered)
+	  if(!is.null(Tref)){
+	    d<-get.distance.matrix(list(That,Tref), measure=distance, centered=center)
+	  }else{
+		  d<-get.distance.matrix(list(That), measure=distance, centered=center)
+	  }
+	  d <- as.matrix(d)
 		if(distance=="euclidean"){
 			d <- d/max(d)				
 		}else if(distance=="correlation"){
@@ -1321,14 +1360,14 @@ plotLMCs<-function(
 		}
 		
 		require(igraph)
-		G <- graph.adjacency(d, mode="upper", weighted=TRUE,)
-		G <-delete.edges(G, which(E(G)$weight <= as.numeric(input$minGraphSimilarity)))
+		G <- graph.adjacency(d, mode="upper", weighted=TRUE)
+		G <-delete.edges(G, which(E(G)$weight <= as.numeric(min.similarity)))
 		#G <- remove.edges(G, V(G)[ degree(G)==0 ])
 		lo<-layout.fruchterman.reingold(G, weights=rep(1, ecount(G)))
 		#lo<-layout.spring(G, repulse=TRUE)
 		plot(G, layout=lo,
 				vertex.size=3, edge.arrow.size=0.2,
-				vertex.label=colnames(mdd), rescale=FALSE,
+				rescale=FALSE,
 				xlim=range(lo[,1]), ylim=range(lo[,2]), vertex.label.dist=0.2,
 				vertex.label.color="black")
 		
@@ -1350,55 +1389,50 @@ plotLMCs<-function(
 	}
 }
 #######################################################################################################################
-##
-## locus_plot
-##
-## Plot results for a selected locus
-##
-## param That a matrix of LMCs
-## param ann CpG annotation
-## param cgs indices of CpGs data for which are present in That with respect to ann
-## param locus.chr chromosome
-## param locus.start start coordinate
-## param locus.end end coordinate
-## param flank.start number of basepairs to extend the locus upstream
-## param flank.end number of basepairs to extend the locus downstream
-## param comp.cols color code for LMCs
-## param legend.pos location of the legend, in accordance with \link{legend}
-## param Tstar matrix of reference profiles
-## param D matrix of input methylation data used to produce That
-## param plot.genes if \cs{TRUE} a track with gene locations will be plotted
-## param ann.genes gene annotation necessary for the gene plotting
-##
-locus_plot<-function(
-		That,
+#'
+#' locus_plot
+#'
+#' Plot results for a selected locus
+#'
+#' @param That a matrix of LMCs
+#' @param ann CpG annotation
+#' @param cgs indices of CpGs data for which are present in That with respect to ann
+#' @param locus.chr chromosome
+#' @param locus.start start coordinate
+#' @param locus.end end coordinate
+#' @param flank.start number of basepairs to extend the locus upstream
+#' @param flank.end number of basepairs to extend the locus downstream
+#' @param comp.cols color code for LMCs
+#' @param legend.pos location of the legend, in accordance with \link{legend}
+#' @param Tstar matrix of reference profiles
+#' @param D matrix of input methylation data used to produce That
+#' @param plot.genes if \cs{TRUE} a track with gene locations will be plotted
+#' @param ann.genes gene annotation necessary for the gene plotting
+#'
+#'  @author Pavlo Lutsik, with modifications by Michael Scherer
+#'  @export  
+locus_plot<-function(That,
 		ann,
 		cgs,
-		locus.chr
-		,locus.start
-		,locus.end
-		,locus.name=sprintf("%s:%d-%d", locus.chr, locus.start,locus.end)
-		,locus.forward=FALSE
-		,flank.start=1000
-		,flank.end=1000
-		,comp.cols=rainbow(ncol(That))
-		,legend.pos="topleft"
-		,Tstar=NULL
-		,D=NULL
-		,plot.genes=FALSE
-		,ann.genes=NULL
+		locus.chr,
+		locus.start,
+		locus.end,
+		locus.name=sprintf("%s:%d-%d", locus.chr, locus.start,locus.end),
+		locus.forward=FALSE,
+		flank.start=1000,
+		flank.end=1000,
+		comp.cols=rainbow(ncol(That)),
+		legend.pos="topleft",
+		Tstar=NULL,
+		D=NULL,
+		plot.genes=FALSE,
+		ann.genes=NULL
 ){
-	
-	#require(RnBeads)
-	#ann<-rnb.annotation2data.frame(rnb.get.annotation("probes450"))
-	
 	ann.cgs<-ann[cgs,]
 	cgs.locus<-which(ann.cgs$Chromosome==locus.chr & ann.cgs$Start>locus.start-flank.start & ann.cgs$End<locus.end+flank.end)
 	ann.cgs.locus<-ann.cgs[cgs.locus, ]
 	
 	if(plot.genes && !is.null(ann.genes)){
-		#ann.genes<-rnb.annotation2data.frame(rnb.get.annotation("genes"))
-		
 		genes.locus.start<-which(ann.genes$Chromosome==locus.chr & ann.genes$Start>locus.start-flank.start & ann.genes$Start<locus.end+flank.end)
 		genes.locus.end<-which(ann.genes$Chromosome==locus.chr & ann.genes$End>locus.start-flank.start & ann.genes$End<locus.end+flank.end)
 		genes.locus.cover<-which(ann.genes$Chromosome==locus.chr & ann.genes$Start<locus.start-flank.start & ann.genes$End>locus.end+flank.end)
@@ -1438,10 +1472,8 @@ locus_plot<-function(
 	
 	if(plot.genes && nrow(ann.genes.locus)>0){
 		for(row in 1:nrow(ann.genes.locus)){
-			print(nrow(ann.genes.locus))
 			gene.forward<-ann.genes.locus[row,"Strand"]=="+"
 			line_y_pos<-(-1)*(0.25)-(((row-1) %% min(4, nrow(ann.genes.locus))))*(0.25/min(4,nrow(ann.genes.locus)))
-			print(line_y_pos)
 			arrows(if(gene.forward) ann.genes.locus[row,"Start"] else ann.genes.locus[row,"End"], 
 					line_y_pos, 
 					if(gene.forward) ann.genes.locus[row,"End"] else ann.genes.locus[row,"Start"], 
@@ -1477,7 +1509,7 @@ proportion.lineplot<-function(
 		reorder="increasing", 
 		legend.pos="topleft", 
 		add=T, 
-		assignment.method="pearson", 
+		assignment.method="pearson",
 		...){
 	
 	ltys<-legs<-cols<-pchs<-c()
@@ -1656,17 +1688,17 @@ proportion.heatmap<-function(
 	}
 }
 #######################################################################################################################
-proportion.feature.corr<-function(Ahat, lmc, data.ch){
-	
+proportion.feature.corr<-function(Ahat, lmc, data.ch, includeRegressionLine=F){
+
 	if(is.null(rownames(Ahat))){
 		rownames(Ahat)<-sprintf("LMC%d", 1:nrow(Ahat))
 	}
 	yl<-paste(rownames(Ahat)[lmc], collapse=" + ")
 	if(is.numeric(data.ch)){
-		plot(data.ch, Ahat[lmc,], 
-				xlab=input$mdsDataCat, 
-				ylab=yl, las=2)
-		if(input$includeRegressionLine){
+		plot(data.ch, Ahat[lmc,],
+		    ylab=paste("Proportion",sprintf("LMC%d",lmc)),xlab="Trait Value",
+        las=2)
+		if(includeRegressionLine){
 			fitData<-list()
 			fitData$feature<-data.ch
 			fitData$proportion<-Ahat[lmc,]
@@ -1697,11 +1729,9 @@ proportion.feature.corr<-function(Ahat, lmc, data.ch){
 #' @param lambda	     value of parameter lambda to use
 #' @param cg_subset	     which CpG subset to use
 #' @param lmc		     which LMC to use for visualization
-#' @param Tref		     a matrix with reference methylomes
-#' @param distance	     distance measure to use
-#' @param center  		 if \code{TRUE} the LMC and reference methylome matrices will be row-centered
-#' @param n.most.var	 is not \code{NA} a respective number of CpGs with the highest standard deviation will be plotted
-#' 
+#' @param Aref		     a matrix with reference methylomes
+#' @param ...    Extra variables based to proportion.lineplot
+#'  
 #' @details
 #' Available plot types include:
 #' \describe{
@@ -1726,10 +1756,10 @@ plotProportions<-function(
 		lmc=NA,
 		Aref=NULL,
 		ref.profile=NA, 
-		assignment.method="pearson",
 		sample.characteristic=NULL,
 		heatmap.clusterCols=FALSE,
-		heatmap.clusterRows=FALSE
+		heatmap.clusterRows=FALSE,
+		...
 ){
 	
 	Ahat<-getProportions(MeDeComSet, K, lambda, cg_subset)
@@ -1755,13 +1785,12 @@ plotProportions<-function(
 				lmc=lmc,
 				Aref=Aref,
 				ref.profile=ref.profile, 
-				reorder=TRUE, 
-				assignment.method=assignment.method)
+				...)
 		
 	}else if(type=="scatterplot"){
 		
-		if(is.null(Aref) && is.null(Tref)){
-			stop("one of Aref or Tref should be supplied for this plot")
+		if(is.null(Aref)){
+			stop("Aref is required for this plot")
 		}else if(is.na(lmc) || is.na(ref.profile)){
 			stop("one of lmc or ref.profile should be supplied for this plot")
 		}
@@ -1773,8 +1802,11 @@ plotProportions<-function(
 		if(is.null(sample.characteristic)){
 			stop("sample.characteristic should be supplied for this plot")
 		}
-		
-		proportion.feature.corr(Ahat, lmc, sample.characteristic)
+		if(is.na(lmc)){
+		  stop("lmc needs to be provided for this plot")
+		}
+	  
+		proportion.feature.corr(Ahat, lmc, sample.characteristic,...)
 	}
 }
 #######################################################################################################################

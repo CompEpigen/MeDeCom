@@ -4,18 +4,22 @@
 \alias{factorize.alternate}
 \title{factorize.alternate}
 \usage{
-factorize.alternate(D, k, t.method = "quadPen", Tfix = NULL,
-  Tpartial = NULL, Tpartial.rows = NULL, Apartial = NULL,
-  Apartial.cols = NULL, V = NULL, lambda = 0, init = "random",
-  opt = 5, emp.dim = 500, emp.resample = TRUE, emp.vsf = 1,
-  emp.borders = c(0, 1), qp.rangeT = c(0, 1), qp.Alower = NULL,
-  qp.Aupper = NULL, itermax = 100, trace = FALSE, eps = 1e-08,
-  ncores = 1, pheno = NULL, na.values = FALSE, verbosity = 0L)
+factorize.alternate(D, k, method = "MeDeCom.quadPen",
+  t.method = "quadPen", Tfix = NULL, Tpartial = NULL,
+  Tpartial.rows = NULL, Apartial = NULL, Apartial.cols = NULL,
+  V = NULL, lambda = 0, init = "random", opt = 5, emp.dim = 500,
+  emp.resample = TRUE, emp.vsf = 1, emp.borders = c(0, 1),
+  qp.rangeT = c(0, 1), qp.Alower = NULL, qp.Aupper = NULL,
+  itermax = 100, trace = FALSE, eps = 1e-08, ncores = 1,
+  pheno = NULL, na.values = FALSE, seed = NULL, verbosity = 0L)
 }
 \arguments{
 \item{D}{m by n input matrix with mixture data}
 
 \item{k}{number of latent components, \code{integer}}
+
+\item{method}{optimization method used. Currently supported values are
+\code{"MeDeCom.quadPen"} and \code{"MeDeCom.cppTAfact"}.}
 
 \item{t.method}{method for updating the latent component matrix, one of 
 \code{"integer", "empirical", "Hlasso"} or \code{"quadPen"}}
@@ -51,7 +55,7 @@ factorization results for each iteration}
 
 \item{pheno}{a list with phenotypic information}
 
-\item{verbose}{flag specifying whether to show diagnostic
+\item{verbosity}{flag specifying whether to show diagnostic
 statements during the execution}
 }
 \value{
@@ -80,4 +84,3 @@ Martin Slawski
 
 R port by Pavlo Lutsik
 }
-

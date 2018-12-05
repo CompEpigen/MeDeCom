@@ -6,27 +6,9 @@
 
 using namespace Rcpp;
 
-// cppTAfact
-RcppExport SEXP cppTAfact(SEXP mDtSEXP, SEXP mTtinitSEXP, SEXP mAinitSEXP, double lambda, int itersMax, double tol, double tolA, double tolT);
-RcppExport SEXP MeDeCom_cppTAfact(SEXP mDtSEXPSEXP, SEXP mTtinitSEXPSEXP, SEXP mAinitSEXPSEXP, SEXP lambdaSEXP, SEXP itersMaxSEXP, SEXP tolSEXP, SEXP tolASEXP, SEXP tolTSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< SEXP >::type mDtSEXP(mDtSEXPSEXP);
-    Rcpp::traits::input_parameter< SEXP >::type mTtinitSEXP(mTtinitSEXPSEXP);
-    Rcpp::traits::input_parameter< SEXP >::type mAinitSEXP(mAinitSEXPSEXP);
-    Rcpp::traits::input_parameter< double >::type lambda(lambdaSEXP);
-    Rcpp::traits::input_parameter< int >::type itersMax(itersMaxSEXP);
-    Rcpp::traits::input_parameter< double >::type tol(tolSEXP);
-    Rcpp::traits::input_parameter< double >::type tolA(tolASEXP);
-    Rcpp::traits::input_parameter< double >::type tolT(tolTSEXP);
-    rcpp_result_gen = Rcpp::wrap(cppTAfact(mDtSEXP, mTtinitSEXP, mAinitSEXP, lambda, itersMax, tol, tolA, tolT));
-    return rcpp_result_gen;
-END_RCPP
-}
 // RHLasso
 List RHLasso(NumericMatrix Ginp, NumericMatrix Winp, NumericMatrix Ainp, NumericVector l);
-RcppExport SEXP MeDeCom_RHLasso(SEXP GinpSEXP, SEXP WinpSEXP, SEXP AinpSEXP, SEXP lSEXP) {
+RcppExport SEXP _MeDeCom_RHLasso(SEXP GinpSEXP, SEXP WinpSEXP, SEXP AinpSEXP, SEXP lSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -40,7 +22,7 @@ END_RCPP
 }
 // RQuadHC
 List RQuadHC(NumericMatrix Ginp, NumericMatrix Winp, NumericMatrix Ainp, NumericVector otol, NumericVector lconstr, NumericVector uconstr);
-RcppExport SEXP MeDeCom_RQuadHC(SEXP GinpSEXP, SEXP WinpSEXP, SEXP AinpSEXP, SEXP otolSEXP, SEXP lconstrSEXP, SEXP uconstrSEXP) {
+RcppExport SEXP _MeDeCom_RQuadHC(SEXP GinpSEXP, SEXP WinpSEXP, SEXP AinpSEXP, SEXP otolSEXP, SEXP lconstrSEXP, SEXP uconstrSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -56,7 +38,7 @@ END_RCPP
 }
 // RProjSplxBox
 NumericMatrix RProjSplxBox(NumericMatrix Xinp, NumericVector linp, NumericVector uinp);
-RcppExport SEXP MeDeCom_RProjSplxBox(SEXP XinpSEXP, SEXP linpSEXP, SEXP uinpSEXP) {
+RcppExport SEXP _MeDeCom_RProjSplxBox(SEXP XinpSEXP, SEXP linpSEXP, SEXP uinpSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -69,7 +51,7 @@ END_RCPP
 }
 // RQuadSimplex
 List RQuadSimplex(NumericMatrix Ginp, NumericMatrix Winp, NumericMatrix Ainp, NumericVector ot);
-RcppExport SEXP MeDeCom_RQuadSimplex(SEXP GinpSEXP, SEXP WinpSEXP, SEXP AinpSEXP, SEXP otSEXP) {
+RcppExport SEXP _MeDeCom_RQuadSimplex(SEXP GinpSEXP, SEXP WinpSEXP, SEXP AinpSEXP, SEXP otSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -83,7 +65,7 @@ END_RCPP
 }
 // RQuadSimplexBox
 List RQuadSimplexBox(NumericMatrix Ginp, NumericMatrix Winp, NumericMatrix Ainp, NumericVector linp, NumericVector uinp, NumericVector ot);
-RcppExport SEXP MeDeCom_RQuadSimplexBox(SEXP GinpSEXP, SEXP WinpSEXP, SEXP AinpSEXP, SEXP linpSEXP, SEXP uinpSEXP, SEXP otSEXP) {
+RcppExport SEXP _MeDeCom_RQuadSimplexBox(SEXP GinpSEXP, SEXP WinpSEXP, SEXP AinpSEXP, SEXP linpSEXP, SEXP uinpSEXP, SEXP otSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -96,4 +78,37 @@ BEGIN_RCPP
     rcpp_result_gen = Rcpp::wrap(RQuadSimplexBox(Ginp, Winp, Ainp, linp, uinp, ot));
     return rcpp_result_gen;
 END_RCPP
+}
+// cppTAfact
+RcppExport SEXP cppTAfact(SEXP mDtSEXP, SEXP mTtinitSEXP, SEXP mAinitSEXP, double lambda, int itersMax, double tol, double tolA, double tolT);
+RcppExport SEXP _MeDeCom_cppTAfact(SEXP mDtSEXPSEXP, SEXP mTtinitSEXPSEXP, SEXP mAinitSEXPSEXP, SEXP lambdaSEXP, SEXP itersMaxSEXP, SEXP tolSEXP, SEXP tolASEXP, SEXP tolTSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< SEXP >::type mDtSEXP(mDtSEXPSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type mTtinitSEXP(mTtinitSEXPSEXP);
+    Rcpp::traits::input_parameter< SEXP >::type mAinitSEXP(mAinitSEXPSEXP);
+    Rcpp::traits::input_parameter< double >::type lambda(lambdaSEXP);
+    Rcpp::traits::input_parameter< int >::type itersMax(itersMaxSEXP);
+    Rcpp::traits::input_parameter< double >::type tol(tolSEXP);
+    Rcpp::traits::input_parameter< double >::type tolA(tolASEXP);
+    Rcpp::traits::input_parameter< double >::type tolT(tolTSEXP);
+    rcpp_result_gen = Rcpp::wrap(cppTAfact(mDtSEXP, mTtinitSEXP, mAinitSEXP, lambda, itersMax, tol, tolA, tolT));
+    return rcpp_result_gen;
+END_RCPP
+}
+
+static const R_CallMethodDef CallEntries[] = {
+    {"_MeDeCom_RHLasso", (DL_FUNC) &_MeDeCom_RHLasso, 4},
+    {"_MeDeCom_RQuadHC", (DL_FUNC) &_MeDeCom_RQuadHC, 6},
+    {"_MeDeCom_RProjSplxBox", (DL_FUNC) &_MeDeCom_RProjSplxBox, 3},
+    {"_MeDeCom_RQuadSimplex", (DL_FUNC) &_MeDeCom_RQuadSimplex, 4},
+    {"_MeDeCom_RQuadSimplexBox", (DL_FUNC) &_MeDeCom_RQuadSimplexBox, 6},
+    {"_MeDeCom_cppTAfact", (DL_FUNC) &_MeDeCom_cppTAfact, 8},
+    {NULL, NULL, 0}
+};
+
+RcppExport void R_init_MeDeCom(DllInfo *dll) {
+    R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
+    R_useDynamicSymbols(dll, FALSE);
 }

@@ -54,6 +54,7 @@ setClass("MeDeComSet",
 #'
 #' @param parameters       	\code{list} of MeDeCom parameters with elements \code{K}, integer vector of k values, \code{lambdas}, numeric vector of lambda values.
 #' @param outputs			\code{list} of MeDeCom resutls with one element per each used CpG subset.
+#' @param dataset_info   \code{list} with information about the input data set.
 #' 
 #' @return an object of class MeDeComSet
 #' 
@@ -80,10 +81,11 @@ if(!isGeneric("getStatistics")) setGeneric("getStatistics",
 #'
 #' Methylation sites object information for which is present in the \code{RnBSet} object.
 #'
-#' @param K			   number of LMCs
-#' @param lambda	   regularlization parameter
+#' @param object   object returned by \link{runMeDeCom}
+#' @param Ks			   numbers of LMCs
+#' @param lambdas	   regularlization parameters
 #' @param cg_subset	   used CpG subset, defaults to the full data set
-#' @param statistics   \code{character} of length 1 specifying goodness of fit statistics
+#' @param statistic   \code{character} of length 1 specifying goodness of fit statistics
 #' 
 #' @details 
 #' Currently the following values for \code{statistics} can be supplied: \code{objective}, \code{RMSE}, \code{CVE}.
@@ -106,9 +108,11 @@ setMethod("getStatistics", signature(object="MeDeComSet"),
 		elt<-c(
 				"objective"="Fval",	"Fval"="Fval", 
 				"rmse"="rmse", "RMSE"="rmse",
-				"CVE"="cve", "cve"="cve"
+				"CVE"="cve", "cve"="cve",
+				"MAEA"="maeA", "maeA"="maeA",
+				"RMSET"="rmseT","rmseT"="rmseT"
 		)[statistic]
-		return(object@outputs[[cg_subset]][[elt]][match(Ks, object@parameters$Ks), match(lambdas, object@parameters$lambdas)])
+		return(as.numeric(object@outputs[[cg_subset]][[elt]][match(Ks, object@parameters$Ks), match(lambdas, object@parameters$lambdas)]))
 })
 ########################################################################################################################
 if(!isGeneric("getLMCs")) setGeneric("getLMCs",
@@ -118,10 +122,11 @@ if(!isGeneric("getLMCs")) setGeneric("getLMCs",
 #' 
 #' Return a matrix of LMCs
 #' 
-#' @param MeDeComSet   object returned by \link{runMeDeCom}
+#' @param object   object returned by \link{runMeDeCom}
 #' @param K			   number of LMCs
 #' @param lambda	   regularlization parameter
 #' @param cg_subset	   used CpG subset, defaults to the full data set
+#' @param statistic    statistic to be used in returning
 #' 
 #' @rdname getLMCs-methods
 #' @docType methods
@@ -146,10 +151,11 @@ if(!isGeneric("getProportions")) setGeneric("getProportions",
 #' 
 #' Return a matrix of LMCs
 #' 
-#' @param MeDeComSet   object returned by \link{runMeDeCom}
+#' @param object   object returned by \link{runMeDeCom}
 #' @param K			   number of LMCs
 #' @param lambda	   regularlization parameter
 #' @param cg_subset	   used CpG subset, defaults to the full data set
+#' @param statistic    statistic to be used in returning
 #' 
 #' @rdname getProportions-methods
 #' @docType methods
@@ -165,9 +171,11 @@ setMethod("getProportions", signature(object="MeDeComSet"),
 		function(object, K=object@parameters$Ks[1], lambda=object@parameters$lambdas[1], cg_subset=1, statistic="cve"){
 	check_inputs(object, cg_subset, K, lambda)
 	Ahat<-object@outputs[[cg_subset]]$A[[match(K, object@parameters$Ks), match(lambda, object@parameters$lambdas)]]
-	rownames(Ahat)<-sprintf("LMC%d", 1:nrow(Ahat))
-	if(!is.null(object@dataset_info$sample_names)){
-		colnames(Ahat)<-object@dataset_info$sample_names
+	if(!is.null(dim(Ahat))){
+	  rownames(Ahat)<-sprintf("LMC%d", 1:nrow(Ahat))
+  	if(!is.null(object@dataset_info$sample_names)){
+	  	colnames(Ahat)<-object@dataset_info$sample_names
+  	}
 	}
 	return(Ahat)
 })

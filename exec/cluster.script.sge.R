@@ -13,7 +13,7 @@ for(params in params_list){
 	load(file.path(params$DD,"data.set.RData"))
 	D<-meth.data
 
-	if(file.exists(file.path(params$DD, "trueA.RData"))){
+	if(file.exists(file.path(params$DD, "trueT.RData"))){
 		load(file.path(params$DD,"trueT.RData"))
 		params$trueT<-trueT
 		Tstar_present<-TRUE
@@ -94,12 +94,12 @@ for(params in params_list){
 	
 	if(Tstar_present){
 		if(!is.null(params$fixed_T_cols)){
-			free_cols<-setdiff(1:ncol(trueT_ff), params$fixed_T_cols)
-			params$fixedT<-trueT_ff[,params$fixed_T_cols, drop=FALSE]
+			free_cols<-setdiff(1:ncol(trueT), params$fixed_T_cols)
+			params$fixedT<-trueT[,params$fixed_T_cols, drop=FALSE]
 			#trueT<-trueT_ff[,-fixed_T_cols, drop=FALSE]]
 		}else{
 			fixedT<-NULL
-			free_cols<-1:ncol(trueT_ff)
+			free_cols<-1:ncol(trueT)
 		}
 	}
 	

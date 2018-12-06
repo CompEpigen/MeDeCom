@@ -113,7 +113,7 @@ for(params in params_list){
 				trueT_prep<-trueT[params$cg_subset,free_cols,drop=FALSE]
 			}
 			if(Astar_present){
-				trueA_prep<-trueA_ff[,incl_samples,drop=FALSE]
+				trueA_prep<-trueA[,incl_samples,drop=FALSE]
 			}
 			perf_result<-MeDeCom:::estimatePerformance(result,
 					params$meth_matrix,

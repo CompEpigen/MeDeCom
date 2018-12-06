@@ -21,7 +21,8 @@
 #'                  used to call a CpG differentially methylated. The higher this value, the more conservative the
 #'                  selection.
 #' @param reference.computation Metric used to set the reference on the remaining LMCs to determine hyper- and hypomethylated sites.
-#'                  Can be either \code{"median"} (default) or \code{"mean"}.
+#'                  Can be either \code{"median"} (default), \code{"mean"}, or \code{"lmcs"} (\code{comp.lmcs} argument needs to be provided).
+#' @param comp.lmcs Numeric vector containing two numbers representing the LMCs that should be compared to one another.                 
 #' @param region.type Region type used to annotate CpGs to potentially regulatory regions (see \url{https://rnbeads.org/regions.html})
 #'                  for a list of available region types.
 #' @param temp.dir Path to a directory used to store temporary files.
@@ -48,6 +49,7 @@ lmc.lola.enrichment <- function(medecom.result,
                                 cg_subset=NULL,
                                 diff.threshold=0.5,
                                 reference.computation="median",
+                                comp.lmcs=NULL,
                                 region.type="ensembleRegBuildBPall",
                                 temp.dir=tempdir(),
                                 type="hypo",
@@ -86,13 +88,17 @@ lmc.lola.enrichment <- function(medecom.result,
     load(annotation.filter,envir = new.envi)
     annotation.filter <- get(ls(envir = new.envi),envir = new.envi)
   }
-  if(!reference.computation %in% c("median","mean")){
+  if(!reference.computation %in% c("median","mean","lmcs")){
     stop("Invalid value for reference.computation: Only mean and median are supported")
   }else{
     if(reference.computation %in% "median"){
       ref.func <- rowMedians
-    }else{
+    }else if(reference.computation %in% "mean"){
       ref.func <- rowMeans
+    }else{
+      if(any(comp.lmcs > K) || length(comp.lmcs) != 2){
+        stop("Invalid value for comp.lmcs: Should specify two LMC used for comparison")
+      }
     }
   }
   if(is.character(anno.data)){
@@ -125,8 +131,14 @@ lmc.lola.enrichment <- function(medecom.result,
   lmcs <- getLMCs(medecom.result,cg_subset=cg_subset,K=K,lambda=lambda)
   lola.results <- list()
   for(i in 1:K){
-    first.lmc <- lmcs[,i]
-    ref.lmc <- ref.func(lmcs[,-i,drop=F])
+    if(reference.computation %in% "lmcs"){
+      i <- comp.lmcs[1]
+      first.lmc <-  lmcs[,i]
+      ref.lmcs <- lmcs[,comp.lmcs[2]]
+    }else{
+      first.lmc <- lmcs[,i]
+      ref.lmc <- ref.func(lmcs[,-i,drop=F])
+    }
     lmc.diff <- ref.lmc - first.lmc
     if(type=="hypo"){
       is.hypo <- lmc.diff > diff.threshold
@@ -147,6 +159,9 @@ lmc.lola.enrichment <- function(medecom.result,
     comp <- paste0("LMC",i)
     lola.results[[comp]] <- lola.res
     print(paste("LMC",i,"processed"))
+    if(reference.computation %in% "lmcs"){
+      break
+    }
   }
   return(lola.results)
 }
@@ -245,6 +260,20 @@ do.lola.plot <- function(enrichment.result,lola.db,pvalCut=0.01){
   return(plot)
 }
 
+#' do.go.plot
+#' 
+#' This function creates a single GO enrichmnet plot
+#' 
+#' @param enrichment.result GO enrichment result for a single LMC
+#' @param pvalCut P-value cutoff
+#' @return An object of type ggplot, containing the enrichment plot
+#' @author Michael Scherer
+#' @noRd
+ 
+do.go.plot <- function(enrichment.result, pvalCut=0.01){
+  
+}
+
 #' lmc.go.enrichment
 #' 
 #' This routine computes GO enrichment results for LMC-specifically hypo- or hypermethylated sites. 
@@ -263,7 +292,8 @@ do.lola.plot <- function(enrichment.result,lola.db,pvalCut=0.01){
 #'                  used to call a CpG differentially methylated. The higher this value, the more conservative the
 #'                  selection.
 #' @param reference.computation Metric used to set the reference on the remaining LMCs to determine hyper- and hypomethylated sites.
-#'                  Can be either \code{"median"} (default) or \code{"mean"}.
+#'                  Can be either \code{"median"} (default), \code{"mean"}, or \code{"lmcs"} (\code{comp.lmcs} argument needs to be provided).
+#' @param comp.lmcs Numeric vector containing two numbers representing the LMCs that should be compared to one another.                 
 #' @param region.type Region type used to annotate CpGs to potentially regulatory regions (see \url{https://rnbeads.org/regions.html})
 #'                  for a list of available region types. Here, only "genes" "promoters" and their gencode versions
 #'                  are available.
@@ -324,13 +354,17 @@ lmc.go.enrichment <- function(medecom.result,
     load(annotation.filter,envir = new.envi)
     annotation.filter <- get(ls(envir = new.envi),envir = new.envi)
   }
-  if(!reference.computation %in% c("median","mean")){
+  if(!reference.computation %in% c("median","mean","lmcs")){
     stop("Invalid value for reference.computation: Only mean and median are supported")
   }else{
     if(reference.computation %in% "median"){
       ref.func <- rowMedians
-    }else{
+    }else if(reference.computation %in% "mean"){
       ref.func <- rowMeans
+    }else{
+      if(any(comp.lmcs > K) || length(comp.lmcs) != 2){
+        stop("Invalid value for comp.lmcs: Should specify two LMC used for comparison")
+      }
     }
   }
   if(is.character(anno.data)){
@@ -363,8 +397,13 @@ lmc.go.enrichment <- function(medecom.result,
   lmcs <- getLMCs(medecom.result,cg_subset=cg_subset,K=K,lambda=lambda)
   go.results <- list()
   for(i in 1:K){
-    first.lmc <- lmcs[,i]
-    ref.lmc <- ref.func(lmcs[,-i,drop=F])
+    if(reference.computation %in% "lmcs"){
+      first.lmc <-  lmcs[,comp.lmcs[1]]
+      ref.lmcs <- lmcs[,comp.lmcs[2]]
+    }else{
+      first.lmc <- lmcs[,i]
+      ref.lmc <- ref.func(lmcs[,-i,drop=F])
+    }
     lmc.diff <- ref.lmc - first.lmc
     if(type=="hypo"){
       is.hypo <- lmc.diff > diff.threshold
@@ -401,6 +440,9 @@ lmc.go.enrichment <- function(medecom.result,
     comp <- paste0("LMC",i)
     go.results[[comp]] <- go.res
     print(paste("LMC",i,"processed"))
+    if(reference.computation %in% "lmcs"){
+      break
+    }
   }
   return(go.results)
 }

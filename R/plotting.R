@@ -1806,7 +1806,7 @@ plotProportions<-function(
 		  stop("lmc needs to be provided for this plot")
 		}
 	  
-		proportion.feature.corr(Ahat, lmc, sample.characteristic,...)
+		proportion.feature.corr(Ahat, lmc, sample.characteristic, includeRegressionLine=F)
 	}
 }
 #######################################################################################################################

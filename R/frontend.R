@@ -423,7 +423,9 @@ runMeDeCom<-function(
 		save(meth.data, file=file.path(DD,"data.set.RData"))
 		#params$meth_matrix<-meth.data
 		
-		save(trueT, file=file.path(DD,"trueT.RData"))
+		if(!is.null(trueT)){
+		  save(trueT, file=file.path(DD,"trueT.RData"))
+		}
 		if(!is.null(trueA)){
 			save(trueA, file=file.path(DD, "trueA.RData"))
 		}

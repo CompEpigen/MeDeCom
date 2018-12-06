@@ -23,7 +23,7 @@ test.contribution.interpretation <- function(){
   data("example.MeDeComSet")
   anno.frame <- data.frame(Sex=sample(c("M","F"),100,replace=T),Age=sample(1:100,100,replace=T),Ethnicity=sample(c("A","B","C"),100,replace = T))
   res <- run.trait.association.single(medecom.result,pheno.data=anno.frame)
-  passes <- all(names(res) %in% c("qualitative","quantitative"))
+  passes <- all(names(res) %in% c("linear model","qualitative","quantitative"))
   checkTrue(passes)
 }
 

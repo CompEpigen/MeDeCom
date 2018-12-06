@@ -134,7 +134,7 @@ lmc.lola.enrichment <- function(medecom.result,
     if(reference.computation %in% "lmcs"){
       i <- comp.lmcs[1]
       first.lmc <-  lmcs[,i]
-      ref.lmcs <- lmcs[,comp.lmcs[2]]
+      ref.lmc <- lmcs[,comp.lmcs[2]]
     }else{
       first.lmc <- lmcs[,i]
       ref.lmc <- ref.func(lmcs[,-i,drop=F])
@@ -209,6 +209,7 @@ load.lola.for.medecom <- function(dir.path=tempdir(),assembly="hg19"){
 #'                 \code{\link{RnBSet-class}}
 #' @param lola.db A loaded LOLA database as loaded with LOLA::loadRegionDB. If this value is NULL, the database is loaded
 #'                 automatically and stored in the temporary directory.
+#' @param ... Further arguments passed to \code{lmc.lola.enrichment}
 #' @return A list with two elements, one of them containing the plots for each LMC and the other for the corresponding LOLA
 #'         enrichment tables
 #' @seealso lmc.lola.enrichment
@@ -227,7 +228,8 @@ lmc.lola.plots.tables <- function(medecom.result,
                            temp.dir=tempdir(),
                            type="hypo",
                            assembly="hg19",
-                           lola.db=NULL){
+                           lola.db=NULL,
+                           ...){
   enrichment.results <- lmc.lola.enrichment(medecom.result,
                                           annotation.filter=NULL,
                                           anno.data,
@@ -239,9 +241,52 @@ lmc.lola.plots.tables <- function(medecom.result,
                                           temp.dir=tempdir(),
                                           type="hypo",
                                           assembly="hg19",
-                                          lola.db=NULL)
+                                          lola.db=NULL,
+                                          ...)
   lola.plots <- lapply(enrichment.results,do.lola.plot,lola.db)
   return(list(Plots=lola.plots,Tables=enrichment.results))
+}
+
+#' lmc.go.plots.tables
+#' 
+#' This functions calls \link{lmc.go.enrichment} and returns plots representing those results, as well as the tables with GO
+#' enrichment results.
+#' 
+#' @param medecom.result An object of type \code{\link{MeDeComSet-class}} or the location of an .RData file, where
+#'                 such an object is stored.
+#' @param annotation.filter A numeric vector specifying the sites that have been removed from \code{rnb.set} in a
+#'                 preprocessing step (e.g. coverage filtering) or a path to an .RData file.
+#' @param anno.data The original \code{\link[RnBeads]{RnBSet-class}} object containing methylation, sample meta and annotation
+#'                 information, a path to a directory stored by \code{\link[RnBeads]{save.rnb.set}} or a data.frame containing
+#'                 CpG annotations (ann_C)
+#' @param K The number of LMCs specified for the MeDeCom run.
+#' @param lambda The lambda parameter selected.
+#' @param cg_subset The index of the selection strategy employed (e.g. most variable CpGs).
+#' @param diff.threshold The difference cutoff between median methylation in the remaining LMCs and the LMC of interest
+#'                  used to call a CpG differentially methylated. The higher this value, the more conservative the
+#'                  selection.
+#' @param region.type Region type used to annotate CpGs to potentially regulatory regions (see \url{https://rnbeads.org/regions.html})
+#'                  for a list of available region types.
+#' @param temp.dir Path to a directory used to store temporary files.
+#' @param type Which direction is to be tested for enrichment. Can be one of "hypo", "hyper", or "differential"
+#' @param assembly The assembly used. Needs to be one of "hg19", "hg38" or "mm10". Does not need to be specified, if rnb.set is a
+#'                 \code{\link{RnBSet-class}}
+#' @param ... Further arguments passed to \code{lmc.lola.enrichment}
+#' @return A list with two elements, one of them containing the plots for each LMC and the other for the corresponding GO
+#'         enrichment tables
+#' @seealso lmc.go.enrichment
+#' @author Michael Scherer                 
+#' 
+#' @export
+
+lmc.go.plots.tables <- function(medecom.result,
+                                  anno.data,
+                                  ...){
+  enrichment.results <- lmc.go.enrichment(medecom.result=medecom.result,
+                                            anno.data=anno.data,
+                                            ...)
+  go.plots <- lapply(enrichment.results,do.go.plot)
+  return(list(Plots=go.plots,Tables=enrichment.results))
 }
 
 #' do.lola.plot
@@ -271,7 +316,13 @@ do.lola.plot <- function(enrichment.result,lola.db,pvalCut=0.01){
 #' @noRd
  
 do.go.plot <- function(enrichment.result, pvalCut=0.01){
-  
+  to.plot <- enrichment.result[enrichment.result$p.val.adj.fdr<pvalCut,]
+  if(nrow(to.plot)>0){
+    plot <- ggplot(to.plot,aes(x=Term,y=OddsRatio))+geom_histogram(stat = "identity")+theme_bw()+theme(axis.text.x = element_text(angle=45,hjust = 1))
+  }else{
+    plot <- ggplot(data.frame(x=c(0,1),y=c(0.1)))+geom_text(x=0.5,y=0.5,label="No assocation found")+theme_bw()
+  }
+  return(plot)
 }
 
 #' lmc.go.enrichment
@@ -318,6 +369,7 @@ lmc.go.enrichment <- function(medecom.result,
                                   cg_subset=NULL,
                                   diff.threshold=0.5,
                                   reference.computation="median",
+                                  comp.lmcs=NULL,
                                   region.type="genes",
                                   temp.dir=tempdir(),
                                   type="hypo",
@@ -399,7 +451,7 @@ lmc.go.enrichment <- function(medecom.result,
   for(i in 1:K){
     if(reference.computation %in% "lmcs"){
       first.lmc <-  lmcs[,comp.lmcs[1]]
-      ref.lmcs <- lmcs[,comp.lmcs[2]]
+      ref.lmc <- lmcs[,comp.lmcs[2]]
     }else{
       first.lmc <- lmcs[,i]
       ref.lmc <- ref.func(lmcs[,-i,drop=F])

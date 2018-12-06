@@ -6,8 +6,9 @@
 \usage{
 lmc.go.enrichment(medecom.result, annotation.filter = NULL, anno.data,
   K = NULL, lambda = NULL, cg_subset = NULL, diff.threshold = 0.5,
-  reference.computation = "median", region.type = "genes",
-  temp.dir = tempdir(), type = "hypo", assembly = "hg19")
+  reference.computation = "median", comp.lmcs = NULL,
+  region.type = "genes", temp.dir = tempdir(), type = "hypo",
+  assembly = "hg19")
 }
 \arguments{
 \item{medecom.result}{An object of type \code{\link{MeDeComSet-class}} or the location of an .RData file, where
@@ -31,7 +32,9 @@ used to call a CpG differentially methylated. The higher this value, the more co
 selection.}
 
 \item{reference.computation}{Metric used to set the reference on the remaining LMCs to determine hyper- and hypomethylated sites.
-Can be either \code{"median"} (default) or \code{"mean"}.}
+Can be either \code{"median"} (default), \code{"mean"}, or \code{"lmcs"} (\code{comp.lmcs} argument needs to be provided).}
+
+\item{comp.lmcs}{Numeric vector containing two numbers representing the LMCs that should be compared to one another.}
 
 \item{region.type}{Region type used to annotate CpGs to potentially regulatory regions (see \url{https://rnbeads.org/regions.html})
 for a list of available region types. Here, only "genes" "promoters" and their gencode versions

@@ -11,7 +11,7 @@ Authors@R: c(
    person ( "Joern", "Walter", email="j.walter@mx.uni-saarland.de", role = c("aut"))
  )
 Date: 2018-05-23
-Version: 0.2.1
+Version: 0.3.0
 Depends:
     R (>= 3.2.0),
     Rcpp,

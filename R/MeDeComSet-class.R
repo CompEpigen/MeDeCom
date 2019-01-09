@@ -196,6 +196,76 @@ check_inputs<-function(MeDeComSet, cg_subset, K, lambda){
 		stop("wrong lambda value supplied")
 	}
 }
+#' as.MeDeComSet
+#' 
+#' Function to convert object of type RefFreeCellMix to MeDeComSet
+#' 
+#' @param object An object of class \code{RefFreeCellMix} containing cell type deconvolution information, or a list of such objects.
+#' @param cg_subsets The CpG subsets used in the analysis.
+#' @return An object of type \code{MeDeComSet}
+#' @details Since \code{RefFreeCellMix} only contains information on a single value for K, and does not contain any regularization
+#'           (lambda), the corresponding parameters in the MeDeComSet are set to single numeric values. Furthermore, no information
+#'           on goodness of fit (CVE, Fval) can be stored. If \code{cg_subsets} is not of length 1, an object containing multiple
+#'           subsets is creared. 
+#' @export
+as.MeDeComSet <- function(object,cg_subsets=1,Ks=NULL){
+  c.obj <- class(object)
+  if(c.obj=="list"){
+    c.obj <- class(object[[1]])
+    if(c.obj == "list"){
+      c.obj <- class(object[[1]][[1]])
+    }
+  }  
+  if(!c.obj=="RefFreeCellMix"){
+      stop(paste("Cannot convert object of type",c.obj,"to MeDeComSet"))
+  }
+  if(c.obj == "RefFreeCellMix"){
+    output <- list()
+    if(is.null(Ks)){
+      Ks <- "1"
+      all.Ks <- ncol(object$Omega)
+      object <- list("1"=object)
+    }else{
+      all.Ks <- Ks
+      Ks <- as.character(Ks)
+    }
+    if(length(cg_subsets)==1){
+      object <- list(object)
+    }
+    for(ssets in cg_subsets){
+      sel.sset <- object[[ssets]]
+      lambda <- 0
+      T.all <- list()
+      A.all <- list()
+      for(i in 1:length(Ks)){
+        K <- Ks[i]
+        sel.object <- sel.sset[[K]]
+        A <- sel.object$Omega
+        T <- sel.object$Mu
+        K <- ncol(A)
+        T.all[[i]] <- T
+        A.all[[i]] <- t(A)
+      }
+      T.all <- matrix(T.all,nrow=length(Ks))
+      row.names(T.all) <- paste("K",Ks,sep="_")
+      colnames(T.all) <- paste("lambda",lambda,sep = "_")
+      A.all <- matrix(A.all,nrow = length(Ks))
+      row.names(A.all) <- paste("K",Ks,sep="_")
+      colnames(A.all) <- paste("lambda",lambda,sep = "_")
+      output[[ssets]] <- list(T=T.all,A=A.all)
+    }
+    parameters <- list(cg_subsets=cg_subsets,
+                       Ks=all.Ks,
+                       lambdas=0)
+    m <- nrow(T)
+    n <- ncol(A)
+    d.info <- list(m=m,n=n,TYPE="RefFreeCellMix")
+    new.obj <- MeDeComSet(parameters = parameters,
+                          outputs = output,
+                          dataset_info = d.info)
+  }
+  return(new.obj)
+}
 ########################################################################################################################
 setMethod("show", "MeDeComSet", function(object){
 			cat("An object of class MeDeComSet\n")

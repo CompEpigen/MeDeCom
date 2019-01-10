@@ -202,6 +202,7 @@ check_inputs<-function(MeDeComSet, cg_subset, K, lambda){
 #' 
 #' @param object An object of class \code{RefFreeCellMix} containing cell type deconvolution information, or a list of such objects.
 #' @param cg_subsets The CpG subsets used in the analysis.
+#' @param Ks The values of K used in the analysis. If NULL, K is determined by the size of the matrices.
 #' @return An object of type \code{MeDeComSet}
 #' @details Since \code{RefFreeCellMix} only contains information on a single value for K, and does not contain any regularization
 #'           (lambda), the corresponding parameters in the MeDeComSet are set to single numeric values. Furthermore, no information

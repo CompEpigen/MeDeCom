@@ -203,13 +203,14 @@ check_inputs<-function(MeDeComSet, cg_subset, K, lambda){
 #' @param object An object of class \code{RefFreeCellMix} containing cell type deconvolution information, or a list of such objects.
 #' @param cg_subsets The CpG subsets used in the analysis.
 #' @param Ks The values of K used in the analysis. If NULL, K is determined by the size of the matrices.
+#' @param deviances Optional argument specifying the deviances as computed with \code{\link{RefFreeCellMixArrayDevianceBoots}}.
 #' @return An object of type \code{MeDeComSet}
 #' @details Since \code{RefFreeCellMix} only contains information on a single value for K, and does not contain any regularization
 #'           (lambda), the corresponding parameters in the MeDeComSet are set to single numeric values. Furthermore, no information
 #'           on goodness of fit (CVE, Fval) can be stored. If \code{cg_subsets} is not of length 1, an object containing multiple
 #'           subsets is creared. 
 #' @export
-as.MeDeComSet <- function(object,cg_subsets=1,Ks=NULL){
+as.MeDeComSet <- function(object,cg_subsets=1,Ks=NULL,deviances=NULL){
   c.obj <- class(object)
   if(c.obj=="list"){
     c.obj <- class(object[[1]])
@@ -226,12 +227,18 @@ as.MeDeComSet <- function(object,cg_subsets=1,Ks=NULL){
       Ks <- "1"
       all.Ks <- ncol(object$Omega)
       object <- list("1"=object)
+      if(!is.null(deviances)){
+        deviances <- list("1"=deviances)
+      }
     }else{
       all.Ks <- Ks
       Ks <- as.character(Ks)
     }
     if(length(cg_subsets)==1){
       object <- list(object)
+      if(!is.null(deviances)){
+        deviances <- list(deviances)
+      }
     }
     for(ssets in cg_subsets){
       sel.sset <- object[[ssets]]
@@ -253,7 +260,14 @@ as.MeDeComSet <- function(object,cg_subsets=1,Ks=NULL){
       A.all <- matrix(A.all,nrow = length(Ks))
       row.names(A.all) <- paste("K",Ks,sep="_")
       colnames(A.all) <- paste("lambda",lambda,sep = "_")
-      output[[ssets]] <- list(T=T.all,A=A.all)
+      if(is.null(deviances)){
+        output[[ssets]] <- list(T=T.all,A=A.all)
+      }else{
+        deviances.all <- matrix(deviances[[ssets]],nrow = length(Ks))
+        row.names(deviances.all) <- paste("K",Ks,sep="_")
+        colnames(deviances.all) <- paste("lambda",lambda,sep = "_")
+        output[[ssets]] <- list(T=T.all,A=A.all,Deviance=deviances.all)
+      }
     }
     parameters <- list(cg_subsets=cg_subsets,
                        Ks=all.Ks,

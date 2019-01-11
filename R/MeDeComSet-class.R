@@ -110,7 +110,8 @@ setMethod("getStatistics", signature(object="MeDeComSet"),
 				"rmse"="rmse", "RMSE"="rmse",
 				"CVE"="cve", "cve"="cve",
 				"MAEA"="maeA", "maeA"="maeA",
-				"RMSET"="rmseT","rmseT"="rmseT"
+				"RMSET"="rmseT","rmseT"="rmseT",
+				"deviance"="Deviance", "Deviance"="Deviance"
 		)[statistic]
 		return(as.numeric(object@outputs[[cg_subset]][[elt]][match(Ks, object@parameters$Ks), match(lambdas, object@parameters$lambdas)]))
 })

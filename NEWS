@@ -1,3 +1,8 @@
+MeDeCom 0.2.3
+=============
+
+ * Added conversion of RefFreeCellMix (https://cran.r-project.org/web/packages/RefFreeEWAS/index.html) to MeDeComSet
+ 
 MeDeCom 0.2
 =============
 

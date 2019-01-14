@@ -202,16 +202,18 @@ check_inputs<-function(MeDeComSet, cg_subset, K, lambda){
 #' Function to convert object of type RefFreeCellMix to MeDeComSet
 #' 
 #' @param object An object of class \code{RefFreeCellMix} containing cell type deconvolution information, or a list of such objects.
-#' @param cg_subsets The CpG subsets used in the analysis.
+#' @param cg_subsets The indeces of the CpG subsets used in the analysis.
 #' @param Ks The values of K used in the analysis. If NULL, K is determined by the size of the matrices.
 #' @param deviances Optional argument specifying the deviances as computed with \code{\link{RefFreeCellMixArrayDevianceBoots}}.
+#' @param m.orig The original number of rows (CpGs) in the methylation matrix.
+#' @param n.orig The original number of columns (samples) in the methylation matrix.
 #' @return An object of type \code{MeDeComSet}
 #' @details Since \code{RefFreeCellMix} only contains information on a single value for K, and does not contain any regularization
 #'           (lambda), the corresponding parameters in the MeDeComSet are set to single numeric values. Furthermore, no information
 #'           on goodness of fit (CVE, Fval) can be stored. If \code{cg_subsets} is not of length 1, an object containing multiple
 #'           subsets is creared. 
 #' @export
-as.MeDeComSet <- function(object,cg_subsets=1,Ks=NULL,deviances=NULL){
+as.MeDeComSet <- function(object,cg_subsets=1,Ks=NULL,deviances=NULL,m.orig=NULL,n.orig=NULL){
   c.obj <- class(object)
   if(c.obj=="list"){
     c.obj <- class(object[[1]])
@@ -273,8 +275,16 @@ as.MeDeComSet <- function(object,cg_subsets=1,Ks=NULL,deviances=NULL){
     parameters <- list(cg_subsets=cg_subsets,
                        Ks=all.Ks,
                        lambdas=0)
-    m <- nrow(T)
-    n <- ncol(A)
+    if(is.null(m.orig)){
+      m <- nrow(T)
+    }else{
+      m <- m.orig
+    }
+    if(is.null(n.orig)){
+      n <- ncol(A)
+    }else{
+      n <- n.orig
+    }
     d.info <- list(m=m,n=n,TYPE="RefFreeCellMix")
     new.obj <- MeDeComSet(parameters = parameters,
                           outputs = output,

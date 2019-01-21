@@ -294,7 +294,7 @@ as.MeDeComSet <- function(object,cg_subsets=1,Ks=NULL,deviances=NULL,rss=NULL,m.
     output <- list()
     if(is.null(Ks)){
       Ks <- "1"
-      all.Ks <- ncol(object$T$T.all$T.list[[1]])
+      all.Ks <- ncol(object$T[[1]][[1]])
       object <- list("1"=object)
       if(!is.null(rss)){
         rss <- list("1"=rss)
@@ -303,13 +303,7 @@ as.MeDeComSet <- function(object,cg_subsets=1,Ks=NULL,deviances=NULL,rss=NULL,m.
       all.Ks <- Ks
       Ks <- as.character(Ks)
     }
-    if(length(cg_subsets)==1){
-      object <- list(object)
-      if(!is.null(rss)){
-        rss <- list(rss)
-      }
-    }
-    for(ssets in cg_subsets){
+   for(ssets in cg_subsets){
       sel.sset <- object[[ssets]]
       lambda <- 0
       T.all <- sel.sset$T

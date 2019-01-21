@@ -4,14 +4,21 @@
 \alias{as.MeDeComSet}
 \title{as.MeDeComSet}
 \usage{
-as.MeDeComSet(object, cg_subsets = 1, Ks = NULL)
+as.MeDeComSet(object, cg_subsets = 1, Ks = NULL, deviances = NULL,
+  rss = NULL, m.orig = NULL, n.orig = NULL)
 }
 \arguments{
 \item{object}{An object of class \code{RefFreeCellMix} containing cell type deconvolution information, or a list of such objects.}
 
-\item{cg_subsets}{The CpG subsets used in the analysis.}
+\item{cg_subsets}{The indeces of the CpG subsets used in the analysis.}
 
 \item{Ks}{The values of K used in the analysis. If NULL, K is determined by the size of the matrices.}
+
+\item{deviances}{Optional argument specifying the deviances as computed with \code{\link{RefFreeCellMixArrayDevianceBoots}}.}
+
+\item{m.orig}{The original number of rows (CpGs) in the methylation matrix.}
+
+\item{n.orig}{The original number of columns (samples) in the methylation matrix.}
 }
 \value{
 An object of type \code{MeDeComSet}

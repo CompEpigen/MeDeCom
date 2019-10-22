@@ -1,3 +1,12 @@
+MeDeCom 0.3
+=============
+
+ * New functionality for gene-centric and interval-based functional annotation of LMCs as well 
+ as inference on LMC proportions (LOLA, GO-stats, association of proportions with phenotypic traits)
+ * MeDeCom now fully integrates with RnBeads, DecompPipeline and FactorViz
+ * New functions for exploring LMC distributions
+ * Multiple bugfixes
+
 MeDeCom 0.2.3
 =============
 

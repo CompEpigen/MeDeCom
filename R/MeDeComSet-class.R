@@ -205,7 +205,8 @@ check_inputs<-function(MeDeComSet, cg_subset, K, lambda){
 #' @param object An object of class \code{RefFreeCellMix} containing cell type deconvolution information, or a list of such objects.
 #' @param cg_subsets The indeces of the CpG subsets used in the analysis.
 #' @param Ks The values of K used in the analysis. If NULL, K is determined by the size of the matrices.
-#' @param deviances Optional argument specifying the deviances as computed with \code{\link{RefFreeCellMixArrayDevianceBoots}}.
+#' @param deviances Optional argument specifying the deviances as computed with \code{RefFreeCellMixArrayDevianceBoots}.
+#' @param rss Optional argument specifying the residual sum of sqaures
 #' @param m.orig The original number of rows (CpGs) in the methylation matrix.
 #' @param n.orig The original number of columns (samples) in the methylation matrix.
 #' @return An object of type \code{MeDeComSet}

@@ -162,7 +162,7 @@ linear.model <- function(medecom.set,cg_subset,K,lambda,pheno.data){
       stop("Annotation does not match the number of samples in the MeDeComSet")
     }
   }
-  require("RnBeads")
+  #require("RnBeads")
   props <- getProportions(medecom.set,cg_subset=cg_subset,K=K,lambda=lambda)
   res <- list()
   if(!(is.null(dim(props)))){
@@ -234,7 +234,7 @@ link.to.traits <- function(medecom.set,cg_subset,K,lambda,pheno.data,test.fun=t.
       stop("Annotation does not match the number of samples in the MeDeComSet")
     }
   }
-  require("RnBeads")
+  #require("RnBeads")
   sample.grps <- rnb.sample.groups(pheno.data)
   props <- getProportions(medecom.set,cg_subset=cg_subset,K=K,lambda=lambda)
   res <- list()
@@ -293,7 +293,7 @@ quantitative.trait.association <- function(medecom.set,cg_subset,K,lambda,pheno.
   if(!inherits(pheno.data,"RnBSet") && !is.data.frame(pheno.data)){
     stop("Invalid value for pheno.data; needs to be RnBSet or data.frame")
   }
-  require("RnBeads")
+  #require("RnBeads")
   sample.grps <- names(rnb.sample.groups(pheno.data))
   if(inherits(pheno.data,"RnBSet")){
     ph <- pheno(pheno.data)

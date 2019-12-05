@@ -69,7 +69,7 @@ run.refbased <- function(rnb.set,
                          ref.set=NULL,
                          id.col=NULL,
                          save.restricted.sites=FALSE){
-  require("RnBeads")
+  #require("RnBeads")
   res <- load.ref.set(ref.base,temp.dir)
   if(!is.null(res)){
     if(!is.null(ref.set)){
@@ -206,7 +206,7 @@ plotLMC.reference <- function(medecom.set,
                               start.col="Start",
                               end.col="End",
                               ct.color.column="cell_type"){
-  require("RnBeads")
+  #require("RnBeads")
   if(!inherits(medecom.set,"MeDeComSet")){
     stop("Invalid value for medecom.set")
   }
@@ -251,7 +251,7 @@ plotLMC.reference <- function(medecom.set,
 #' @noRd
 
 load.ref.set <- function(ref.base,temp.dir=NULL){
-  require("RnBeads")
+  #require("RnBeads")
   if(!ref.base %in% AVAIL.REFS){
     stop(paste("Unsupported reference data base, must be one of",AVAIL.REFS))
   }

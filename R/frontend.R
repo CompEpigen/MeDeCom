@@ -114,14 +114,6 @@ runMeDeCom<-function(
 		}
 	}
 	
-	#### marker selection
-#	if(!is.null(top.var)){
-#		if(!(is.integer(top.var) || length(top.var)!=1 || top.var<2 || top.var>nrow(D))){
-#			stop("invalid value for top.var supplied")
-#		}
-#		vars<-apply(D, var)
-#	}
-	
 	#### final data matrix
 	if(use.ff){
 		D_ff<-as.ff(D)
@@ -149,8 +141,12 @@ runMeDeCom<-function(
 #	}
 	
 	### cross-validation preparation
-	cv.partitions<-do.call("rbind", lapply(0:(NFOLDS-1), function(fld) (1:(length(sample_subset)%/%NFOLDS))+fld*(length(sample_subset)%/%NFOLDS)))
-	
+	if(NFOLDS>0){
+  	cv.partitions<-do.call("rbind", lapply(0:(NFOLDS-1), function(fld) (1:(length(sample_subset)%/%NFOLDS))+fld*(length(sample_subset)%/%NFOLDS)))
+	}else{
+	  cv.partitions <- 1:length(sample_subset)
+	}
+  	
 	#out <- cv.partitions[FOLD,];
 	#inn <- setdiff(1:length(sampl_subset), out);
 	#D_in  <- D[,inn,drop=FALSE]
@@ -480,6 +476,9 @@ runMeDeCom<-function(
 			}else{
 				fold_subset<-cv.partitions[params$FOLD,]
 				incl_samples<-params$sample_subset[-fold_subset]
+				if(NFOLDS==1){
+				  incl_samples <- params$sample_subset
+				}
 			}
 			
 			params$meth_matrix<-D_ff[params$cg_subset,incl_samples,drop=FALSE]
@@ -764,6 +763,10 @@ singleRun<-function(
 #######################################################################################################################
 summarizeCVinits<-function(result_list){
 	nfolds<-length(result_list)
+	if(nfolds==1){
+	  T.mat <- result_list[[1]]$That
+	  return(list(T=T.mat,A=NULL))
+	}
 	#Ts<-vector("list", length(result_list))
 	#As<-vector("list", length(result_list))
 	fold_errs<-vector("numeric", nfolds)
@@ -842,6 +845,10 @@ estimateFoldError<-function(Tin, D_out, NFOLDS){
 	K<-ncol(Tin)
 	
 	G <- t(Tin) %*% Tin; W <- t(Tin) %*% D_out;
+	
+	if(NFOLDS==1){
+	  return(list(cve=rep(NA,nrow(D_out))))
+	}
 	
 	mqsr <- MeDeCom:::RQuadSimplex(G, W, MeDeCom:::randsplxmat(K, ncol(D_out)), 1E-8);
 	Anew <- mqsr$A; ftemp<-mqsr$Loss

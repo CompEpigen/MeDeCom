@@ -55,7 +55,7 @@ lmc.lola.enrichment <- function(medecom.result,
                                 type="hypo",
                                 assembly="hg19",
                                 lola.db=NULL){
-  require("RnBeads")
+  #require("RnBeads")
   require("LOLA")
   require("qvalue")
   rnb.mode <- F
@@ -254,23 +254,9 @@ lmc.lola.plots.tables <- function(medecom.result,
 #' 
 #' @param medecom.result An object of type \code{\link{MeDeComSet-class}} or the location of an .RData file, where
 #'                 such an object is stored.
-#' @param annotation.filter A numeric vector specifying the sites that have been removed from \code{rnb.set} in a
-#'                 preprocessing step (e.g. coverage filtering) or a path to an .RData file.
 #' @param anno.data The original \code{\link[RnBeads]{RnBSet-class}} object containing methylation, sample meta and annotation
 #'                 information, a path to a directory stored by \code{\link[RnBeads]{save.rnb.set}} or a data.frame containing
 #'                 CpG annotations (ann_C)
-#' @param K The number of LMCs specified for the MeDeCom run.
-#' @param lambda The lambda parameter selected.
-#' @param cg_subset The index of the selection strategy employed (e.g. most variable CpGs).
-#' @param diff.threshold The difference cutoff between median methylation in the remaining LMCs and the LMC of interest
-#'                  used to call a CpG differentially methylated. The higher this value, the more conservative the
-#'                  selection.
-#' @param region.type Region type used to annotate CpGs to potentially regulatory regions (see \url{https://rnbeads.org/regions.html})
-#'                  for a list of available region types.
-#' @param temp.dir Path to a directory used to store temporary files.
-#' @param type Which direction is to be tested for enrichment. Can be one of "hypo", "hyper", or "differential"
-#' @param assembly The assembly used. Needs to be one of "hg19", "hg38" or "mm10". Does not need to be specified, if rnb.set is a
-#'                 \code{\link{RnBSet-class}}
 #' @param ... Further arguments passed to \code{lmc.lola.enrichment}
 #' @return A list with two elements, one of them containing the plots for each LMC and the other for the corresponding GO
 #'         enrichment tables
@@ -382,7 +368,7 @@ lmc.go.enrichment <- function(medecom.result,
                                   temp.dir=tempdir(),
                                   type="hypo",
                                   assembly="hg19"){
-  require("RnBeads")
+  #require("RnBeads")
   require("GOstats")
   rnb.mode <- F
   if(is.null(cg_subset)){

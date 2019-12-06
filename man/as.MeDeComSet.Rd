@@ -14,7 +14,9 @@ as.MeDeComSet(object, cg_subsets = 1, Ks = NULL, deviances = NULL,
 
 \item{Ks}{The values of K used in the analysis. If NULL, K is determined by the size of the matrices.}
 
-\item{deviances}{Optional argument specifying the deviances as computed with \code{\link{RefFreeCellMixArrayDevianceBoots}}.}
+\item{deviances}{Optional argument specifying the deviances as computed with \code{RefFreeCellMixArrayDevianceBoots}.}
+
+\item{rss}{Optional argument specifying the residual sum of sqaures}
 
 \item{m.orig}{The original number of rows (CpGs) in the methylation matrix.}
 

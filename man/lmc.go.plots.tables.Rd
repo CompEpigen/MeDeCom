@@ -15,29 +15,6 @@ information, a path to a directory stored by \code{\link[RnBeads]{save.rnb.set}}
 CpG annotations (ann_C)}
 
 \item{...}{Further arguments passed to \code{lmc.lola.enrichment}}
-
-\item{annotation.filter}{A numeric vector specifying the sites that have been removed from \code{rnb.set} in a
-preprocessing step (e.g. coverage filtering) or a path to an .RData file.}
-
-\item{K}{The number of LMCs specified for the MeDeCom run.}
-
-\item{lambda}{The lambda parameter selected.}
-
-\item{cg_subset}{The index of the selection strategy employed (e.g. most variable CpGs).}
-
-\item{diff.threshold}{The difference cutoff between median methylation in the remaining LMCs and the LMC of interest
-used to call a CpG differentially methylated. The higher this value, the more conservative the
-selection.}
-
-\item{region.type}{Region type used to annotate CpGs to potentially regulatory regions (see \url{https://rnbeads.org/regions.html})
-for a list of available region types.}
-
-\item{temp.dir}{Path to a directory used to store temporary files.}
-
-\item{type}{Which direction is to be tested for enrichment. Can be one of "hypo", "hyper", or "differential"}
-
-\item{assembly}{The assembly used. Needs to be one of "hg19", "hg38" or "mm10". Does not need to be specified, if rnb.set is a
-\code{\link{RnBSet-class}}}
 }
 \value{
 A list with two elements, one of them containing the plots for each LMC and the other for the corresponding GO

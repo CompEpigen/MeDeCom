@@ -7,11 +7,12 @@ Authors@R: c(
    person ( "Martin", "Slawski", email="ms@cs.uni-saarland.de", role = c("aut")),
    person ( "Nik", "Vedeneev", email="nikitavedeneev@gmail.com", role = c("aut")),
    person ( "Gilles", "Gasparoni", email="gillesgasparoni@gmail.com", role = c("aut")),
+   person ( "Michael", "Scherer", email="mscherer@mpi-inf.mpg.de", role = c("aut")),
    person ( "Matthias", "Hein", email="hein@cs.uni-saarland.de", role = c("aut")),
    person ( "Joern", "Walter", email="j.walter@mx.uni-saarland.de", role = c("aut"))
  )
-Date: 2018-05-23
-Version: 0.3.0
+Date: 2019-09-25
+Version: 0.3.2
 Depends:
     R (>= 3.2.0),
     Rcpp,

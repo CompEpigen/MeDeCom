@@ -178,7 +178,7 @@ linear.model <- function(medecom.set,cg_subset,K,lambda,pheno.data){
         p.vals[!is.na(cofi)] <- c(aic.model,sum.lm$coefficients[-1,"Pr(>|t|)"])
         names(p.vals) <- c("AIC",row.names(props))
       }else if(length(unique(grp))>2 && !(length(unique(grp))==ncol(props))){
-        lm.mod <- glm(grp~.,data = as.data.frame(t(props)),family = binomial(link="logit"))
+        lm.mod <- glm(as.factor(grp)~.,data = as.data.frame(t(props)),family = binomial(link="logit"))
         sum.lm <- summary(lm.mod)
         aic.model <- sum.lm$aic
         cofi <- lm.mod$coefficients

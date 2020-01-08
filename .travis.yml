@@ -3,4 +3,6 @@ sudo: false
 cache: packages
 r: bioc-release
 warnings_are_errors: false
-install: travis_wait 30 R CMD build
+#before_install: 
+#  - R -e "install.packages('knitr', 'rmarkdown'); remotes::install_deps(dependencies = TRUE)"
+#install: travis_wait 30 R CMD build

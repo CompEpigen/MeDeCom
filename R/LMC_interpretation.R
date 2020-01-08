@@ -301,7 +301,11 @@ lmc.go.plots.tables <- function(medecom.result,
 #' @noRd
 
 do.lola.plot <- function(enrichment.result,lola.db,pvalCut=0.01){
-  plot <- lolaBarPlot(lolaDb = lola.db,lolaRes=enrichment.result,pvalCut=pvalCut)+theme_bw()+theme(axis.text.x = element_text(angle=45,hjust = 1))
+  if(!is.na(enrichment.result)){
+ 	  plot <- lolaBarPlot(lolaDb = lola.db,lolaRes=enrichment.result,pvalCut=pvalCut)+theme_bw()+theme(axis.text.x = element_text(angle=45,hjust = 1))
+  }else{
+    plot <- ggplot(data.frame(x=c(0,1),y=c(0.1)))+geom_text(x=0.5,y=0.5,label="No data to be plotted")+theme_bw()
+  }
   return(plot)
 }
 
@@ -316,11 +320,15 @@ do.lola.plot <- function(enrichment.result,lola.db,pvalCut=0.01){
 #' @noRd
  
 do.go.plot <- function(enrichment.result, pvalCut=0.01){
-  to.plot <- enrichment.result[enrichment.result$p.val.adj.fdr<pvalCut,]
-  if(nrow(to.plot)>0){
-    plot <- ggplot(to.plot,aes(x=Term,y=OddsRatio))+geom_histogram(stat = "identity")+theme_bw()+theme(axis.text.x = element_text(angle=45,hjust = 1))
+  if(!is.na(enrichment.result)){
+  	to.plot <- enrichment.result[enrichment.result$p.val.adj.fdr<pvalCut,]
+  	if(nrow(to.plot)>0){
+    	plot <- ggplot(to.plot,aes(x=Term,y=OddsRatio))+geom_histogram(stat = "identity")+theme_bw()+theme(axis.text.x = element_text(angle=45,hjust = 1))
+  	}else{
+  	  plot <- ggplot(data.frame(x=c(0,1),y=c(0.1)))+geom_text(x=0.5,y=0.5,label="No significant assocation found")+theme_bw()
+	  }
   }else{
-    plot <- ggplot(data.frame(x=c(0,1),y=c(0.1)))+geom_text(x=0.5,y=0.5,label="No assocation found")+theme_bw()
+    plot <- ggplot(data.frame(x=c(0,1),y=c(0.1)))+geom_text(x=0.5,y=0.5,label="No data to be plotted")+theme_bw()
   }
   return(plot)
 }

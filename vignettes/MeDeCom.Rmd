@@ -64,7 +64,7 @@ The example data set can be loaded in a usual way:
 
 ```{r}
 ## load the package
-library(MeDeCom)
+suppressPackageStartupMessages(library(MeDeCom))
 ##  load the example data sets
 data(example.dataset, package="MeDeCom")
 ## you should get objects D, Tref and Aref
@@ -217,6 +217,28 @@ matching LMCs to reference profiles.
 ```{r}
 perm<-matchLMCs(lmcs, Tref)
 ```
+
+### LMC enrichment analysis
+
+MeDeCom provides functions to perform enrichment analysis on the sites that are particularly hypo-/hypermethylated in an LMC. These sites can then be used for GO and LOLA enrichment analysis. Importantly, genomic annotations of the LMC sites is required to be specified. We thus recommend to use the DecompPipelie [https://github.com/lutsik/DecompPipeline](https://github.com/lutsik/DecompPipeline) for processing, but the annotation can also be specified manually using a ```data.frame``` that looks as follows:
+
+```{r,CpG_annotation,eval=F}
+      Chromosome   Start     End Strand CpG GC CGI Relation SNPs
+30365       chr1 1036375 1036376      +   2 59        Shelf <NA>
+42681       chr1 1184537 1184538      +   2 58     Open Sea <NA>
+45091       chr1 1218625 1218626      +   5 66       Island <NA>
+51615       chr1 1292773 1292774      +   3 64       Island <NA>
+52001       chr1 1295504 1295505      +   9 65        Shore <NA>
+52003       chr1 1295507 1295508      +   9 65        Shore <NA>
+```
+
+The required columns are `Chromosome`, `Start`, `End`, and `Strand`. Using this ```data.frame``` (called `df` in the following), enrichment analysis can be performed using:
+
+```{r enrichment, eval=F}
+lmc.lola.enrichment(medecom.result,anno.data=df,K=5,lambda=0.001,diff.threshold = 0.5, region.type = "tiling")
+```
+
+Please note that `df` needs to have the same number of rows than the methylation matrix used as input to MeDeCom. CpGs are first aggregated over the `region.type` specified, then the regions are selected that have a difference larger than `diff.threshold`. The list of available region types is published here [https://rnbeads.org/regions.html](https://rnbeads.org/regions.htm).
 
 ## Mixing proportions
 

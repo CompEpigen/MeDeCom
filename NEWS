@@ -1,3 +1,9 @@
+MeDeCom 0.3.3
+=============
+
+ * Fixed bug in case that NFOLDS=1
+ * Further smaller bugfixes and documentation updates
+ 
 MeDeCom 0.3
 =============
 

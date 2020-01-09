@@ -56,6 +56,11 @@ lmc.lola.enrichment <- function(medecom.result,
                                 assembly="hg19",
                                 lola.db=NULL){
   #require("RnBeads")
+  if(!requireNamespace("LOLA")){
+    if(!requireNamespace("BiocManager")) install.packages("BiocManager",repos="https://cloud.r-project.org/")
+    BiocManager::install("LOLA",dependencies=T)
+    if(!requireNamespace("simpleCache")) install.packages("simpleCache",repos="https://cloud.r-project.org/")
+  }
   require("LOLA")
   require("qvalue")
   rnb.mode <- F

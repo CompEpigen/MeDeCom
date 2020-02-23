@@ -495,15 +495,15 @@ void spawn_threads(double* G, double* W, double* A, double lambda, ptrdiff_t k, 
 
     }
     // construct independet subproblems
-    omp_set_num_threads(MAX_NUM_THREADS);
-    omp_set_dynamic(DYNAMIC_THREAD);
+    //omp_set_num_threads(MAX_NUM_THREADS);
+    //omp_set_dynamic(DYNAMIC_THREAD);
     int j = 0;
     double loss = 0.0;
     //#pragma omp parallel for private(j), reduction(+: loss)
     for(j = 0; j < d; j++){
-        int id = omp_get_thread_num();
+        //int id = omp_get_thread_num();
         
-        //int id = 0;
+        int id = 0;
         HCLasso(G, W + j * k, A + j * k, lambda, k,
                 Hess + id * (k * k), beta + id * k,
                 x + id * k, x_old + id * k, g + id * k, g_old + id * k, dsct + id * k,

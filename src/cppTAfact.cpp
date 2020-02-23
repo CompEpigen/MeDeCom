@@ -739,7 +739,7 @@ RcppExport SEXP cppTAfact(SEXP mDtSEXP, SEXP mTtinitSEXP, SEXP mAinitSEXP,
     gotSignal = false;
     signal(SIGINT, setGotSignal);
     signal(SIGTERM, setGotSignal);
-    #ifndef WIN32
+    #ifndef _WIN32
         signal(SIGKILL, setGotSignal);
     #endif
     

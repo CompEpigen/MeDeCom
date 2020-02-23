@@ -1387,7 +1387,7 @@ plotLMCs<-function(
 #' @param legend.pos location of the legend, in accordance with \link{legend}
 #' @param Tstar matrix of reference profiles
 #' @param D matrix of input methylation data used to produce That
-#' @param plot.genes if \cs{TRUE} a track with gene locations will be plotted
+#' @param plot.genes if \code{TRUE} a track with gene locations will be plotted
 #' @param ann.genes gene annotation necessary for the gene plotting
 #'
 #'  @author Pavlo Lutsik, with modifications by Michael Scherer

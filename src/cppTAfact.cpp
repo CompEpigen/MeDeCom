@@ -739,8 +739,10 @@ RcppExport SEXP cppTAfact(SEXP mDtSEXP, SEXP mTtinitSEXP, SEXP mAinitSEXP,
     gotSignal = false;
     signal(SIGINT, setGotSignal);
     signal(SIGTERM, setGotSignal);
-    signal(SIGKILL, setGotSignal);
-
+    #ifndef WIN32
+        signal(SIGKILL, setGotSignal);
+    #endif
+    
     RMatrixIn mDt(as<RMatrixIn>(mDtSEXP));
     RMatrixIn mTtinit(as<RMatrixIn>(mTtinitSEXP));
     RMatrixIn mAinit(as<RMatrixIn>(mAinitSEXP));

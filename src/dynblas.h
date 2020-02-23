@@ -41,6 +41,12 @@ typedef ptrdiff_t blas_int;
 typedef long int blas_int;
 #endif*/
 
+# ifdef __cplusplus
+#  include <cstddef>
+# else
+#  include <stddef.h>
+# endif
+
 typedef ptrdiff_t blas_int;
 
 #if defined(MATLAB_MEX_FILE) && defined(_WIN32) && !defined(_MSC_VER)

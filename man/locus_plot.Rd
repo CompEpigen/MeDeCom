@@ -35,7 +35,7 @@ locus_plot(That, ann, cgs, locus.chr, locus.start, locus.end,
 
 \item{D}{matrix of input methylation data used to produce That}
 
-\item{plot.genes}{if \cs{TRUE} a track with gene locations will be plotted}
+\item{plot.genes}{if \code{TRUE} a track with gene locations will be plotted}
 
 \item{ann.genes}{gene annotation necessary for the gene plotting
 

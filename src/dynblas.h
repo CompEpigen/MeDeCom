@@ -30,7 +30,7 @@
 #define _DYNBLAS_H
 
 /* Starting from version 7.8, MATLAB BLAS expects ptrdiff_t arguments for integers */
-#if defined(MATLAB_MEX_FILE) && MATLAB_VERSION >= 0x0708
+/*#if defined(MATLAB_MEX_FILE) && MATLAB_VERSION >= 0x0708
 # ifdef __cplusplus
 #  include <cstddef>
 # else
@@ -38,8 +38,10 @@
 # endif
 typedef ptrdiff_t blas_int;
 #else
-#typedef long int blas_int;
-#endif
+typedef long int blas_int;
+#endif*/
+
+typedef ptrdiff_t blas_int;
 
 #if defined(MATLAB_MEX_FILE) && defined(_WIN32) && !defined(_MSC_VER)
 # define FORTRAN_WRAPPER(x) x

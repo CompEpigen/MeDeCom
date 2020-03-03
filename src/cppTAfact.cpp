@@ -657,7 +657,7 @@ void applySolver(const RMatrixIn& Dt, const RMatrixIn& mTtinit, const RMatrixIn&
         MatrixDX B = A * Dt - lambda * (onesrm - 2 * Ttprev);
 
         //#pragma omp parallel for schedule(runtime)
-        for (int i = 0; i < m; ++i) {
+        for (int i = 0; i < (int) m; ++i) {
             VectorDD t = Tt.col(i);
             VectorDD b = B.col(i);
             QPBoxSolverSmallDims<DIM> solver(AAt, b, tolT, innerItersMax);

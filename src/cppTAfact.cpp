@@ -28,7 +28,9 @@ using namespace RcppEigen;
 
 /* Signal handling */
 #include <signal.h>
+#ifndef _WIN32
 #include <unistd.h>
+#endif
 
 /* to make Eigen thread-safe */
 #include <Eigen/Core>
@@ -739,7 +741,9 @@ RcppExport SEXP cppTAfact(SEXP mDtSEXP, SEXP mTtinitSEXP, SEXP mAinitSEXP,
     gotSignal = false;
     signal(SIGINT, setGotSignal);
     signal(SIGTERM, setGotSignal);
+#ifndef _WIN32
     signal(SIGKILL, setGotSignal);
+#endif
 
     RMatrixIn mDt(as<RMatrixIn>(mDtSEXP));
     RMatrixIn mTtinit(as<RMatrixIn>(mTtinitSEXP));

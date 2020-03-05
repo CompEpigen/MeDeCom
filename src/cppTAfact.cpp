@@ -750,12 +750,12 @@ RcppExport SEXP cppTAfact(SEXP mDtSEXP, SEXP mTtinitSEXP, SEXP mAinitSEXP,
     RMatrixIn mAinit(as<RMatrixIn>(mAinitSEXP));
 
     /* Dimensionality of a problem */
-    const int d = mAinit.rows() > 5 ? Dynamic : mAinit.rows();
+    const int d = mAinit.rows() > 4 ? Dynamic : mAinit.rows();
 
     RMatrixOut mTtout, mAout;
     SolverSuppOutput supp;
-    solve<2, 3, 4, 5,
-          /*6, 7, 8, 9,
+    solve<2, 3, 4,/* 5,
+          6, 7, 8, 9,
           10, 11, 12,
           13, 14, 15,
           16,*/

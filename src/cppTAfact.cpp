@@ -148,18 +148,18 @@ private:
     }
 
     void colwiseProjProbSplx(Matrix& mA) {
-        size_t n = mA.cols();
-        size_t r = mA.rows();
+        int n = mA.cols();
+        int r = mA.rows();
         Matrix mAcopy = mA;
 
         //#pragma omp parallel for
-        for (size_t colN = 0; colN < n; ++colN) {
+        for (int colN = 0; colN < n; ++colN) {
             auto s = mAcopy.col(colN);
             std::sort(s.data(), s.data() + s.size(),
                     std::greater<Double>());
             bool bget = false;
             double tmpsum = 0.0, tmax;
-            for (size_t ii = 0; ii < r - 1; ++ii) {
+            for (int ii = 0; ii < r - 1; ++ii) {
                 tmpsum += s(ii);
                 tmax = (tmpsum - 1.0) / (ii + 1);
                 if (tmax >= s(ii + 1)) {
@@ -172,7 +172,7 @@ private:
                 tmax = (tmpsum + s(r - 1) - 1) / r;
             }
 
-            for (size_t jj = 0; jj < r; ++jj) {
+            for (int jj = 0; jj < r; ++jj) {
                 mA(jj, colN) = std::max(mA(jj, colN) - tmax, 0.0);
             }
         }
@@ -611,9 +611,9 @@ void applySolver(const RMatrixIn& Dt, const RMatrixIn& mTtinit, const RMatrixIn&
     using VectorDD = Eigen::Matrix<Double, DIM, 1>;
     using MatrixDX = Eigen::Matrix<Double, DIM, Dynamic>;
 
-    size_t r = mAinit.rows();
-    size_t n = Dt.rows();
-    size_t m = Dt.cols();
+    int r = mAinit.rows();
+    int n = Dt.rows();
+    int m = Dt.cols();
 
     /* Convert to Eigen's data types */
     MatrixDX Tt = mTtinit.template cast<Double>();

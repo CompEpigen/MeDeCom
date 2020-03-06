@@ -483,7 +483,7 @@ mclapply_win<-function(...){
     ##          this case it is the list to iterate over
     #size.of.list <- length(list(...)[[1]])
     print(str(list(...)))
-    ncores<-list(...)[["NCORES"]]
+    ncores<-list(...)[["mc.cores"]]
     cl <- makeCluster(min(ncores, detectCores()) )
     
     ## Find out the names of the loaded packages 
@@ -507,20 +507,20 @@ mclapply_win<-function(...){
                 ## the process with the parent environment. 
                 ##
                 this.env <- environment()
-                while( identical( this.env, globalenv() ) == FALSE ) {
+                while(!identical(this.env, globalenv())){
                     clusterExport(cl,
                             ls(all.names=TRUE, env=this.env),
                             envir=this.env)
                     this.env <- parent.env(environment())
                 }
                 ## repeat for the global environment
-                clusterExport(cl,
-                        ls(all.names=TRUE, env=globalenv()),
-                        envir=globalenv())
+                #clusterExport(cl,
+                #        ls(all.names=TRUE, env=globalenv()),
+                #       envir=globalenv())
                 
                 ## Load the libraries on all the clusters
                 ## N.B. length(cl) returns the number of clusters
-                parLapply( cl, 1:length(cl), function(xx){
+                parLapply(cl, 1:length(cl), function(xx){
                             lapply(loaded.package.names, function(yy) {
                                         ## N.B. the character.only option of 
                                         ##      require() allows you to give the 
@@ -530,7 +530,7 @@ mclapply_win<-function(...){
                 
                 ## Run the lapply in parallel 
                 print("start_executing")
-                return( parLapply( cl, ...) )
+                return(parLapply(cl, ...) )
             }, finally = {        
                 ## Stop the cluster
                 stopCluster(cl)

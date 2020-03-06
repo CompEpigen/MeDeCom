@@ -600,9 +600,15 @@ runMeDeCom<-function(
 		}
 		if(NCORES>1){#
 			
+            if(.Platform$OS.type=="windows"){
+                mclapply_fun<-mclapply_win
+            }else{
+                mclapply_fun<-mclapply
+            }
+            
 			for(concurr_indices in job_batches){
 			
-				intermed_results<-mclapply(rev(concurr_indices), function(index_group){
+				intermed_results<-mclapply_fun(rev(concurr_indices), function(index_group){
 						#int_result_list<-vector("list", index_group[2]-index_group[1])
 						#res_indices<-vector("integer", index_group[2]-index_group[1]+1)
 						#res_idx_ctr<-1

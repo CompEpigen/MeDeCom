@@ -481,8 +481,9 @@ mclapply_win<-function(...){
     ## ... N.B. list(...)[[1]] returns the first 
     ##          argument passed to the function. In
     ##          this case it is the list to iterate over
-    size.of.list <- length(list(...)[[1]])
-    cl <- makeCluster( min(size.of.list, detectCores()) )
+    #size.of.list <- length(list(...)[[1]])
+    ncores<-list(...)[["NCORES"]]
+    cl <- makeCluster(min(ncores, detectCores()) )
     
     ## Find out the names of the loaded packages 
     loaded.package.names <- c(

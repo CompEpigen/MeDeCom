@@ -470,7 +470,7 @@ lmc.go.enrichment <- function(medecom.result,
     first.ids <- entrez.id[subjectHits(op)]
     go.res <- NA
     if(length(first.ids)>0){
-      if(assembly %in% c("hg19","mm10")){
+      if(assembly %in% c("hg19","hg38")){
         params <- new("GOHyperGParams",annotation="org.Hs.eg.db",geneIds = first.ids, universeGeneIds = entrez.id, ontology = "BP",conditional = TRUE, testDirection = "over")
       }else if (assembly %in% "mm10"){
         params <- new("GOHyperGParams",annotation="org.Mm.eg.db",geneIds = first.ids, universeGeneIds = entrez.id, ontology = "BP",conditional = TRUE, testDirection = "over")

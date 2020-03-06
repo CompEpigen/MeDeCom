@@ -221,6 +221,7 @@ as.MeDeComSet <- function(object,cg_subsets=1,Ks=NULL,deviances=NULL,rss=NULL,m.
     c.obj <- class(object[[1]])
     if(c.obj == "list"){
       c.obj <- class(object[[1]][[1]])
+      #object <- object[[1]]
     }
   }  
   if(!(c.obj=="RefFreeCellMix" | c.obj=="list")){
@@ -239,12 +240,12 @@ as.MeDeComSet <- function(object,cg_subsets=1,Ks=NULL,deviances=NULL,rss=NULL,m.
       all.Ks <- Ks
       Ks <- as.character(Ks)
     }
-    if(length(cg_subsets)==1){
-      object <- list(object)
-      if(!is.null(deviances)){
-        deviances <- list(deviances)
-      }
-    }
+    # if(length(cg_subsets)==1){
+    #   object <- list(object)
+    #   if(!is.null(deviances)){
+    #     deviances <- list(deviances)
+    #   }
+    # }
     for(ssets in cg_subsets){
       sel.sset <- object[[ssets]]
       lambda <- 0
@@ -257,7 +258,11 @@ as.MeDeComSet <- function(object,cg_subsets=1,Ks=NULL,deviances=NULL,rss=NULL,m.
         T <- sel.object$Mu
         K <- ncol(A)
         T.all[[i]] <- T
-        A.all[[i]] <- t(A)
+        if(!is.null(A)){
+          A.all[[i]] <- t(A)
+        }else{
+          A.all[[i]] <- NULL
+        }  
       }
       T.all <- matrix(T.all,nrow=length(Ks))
       row.names(T.all) <- paste("K",Ks,sep="_")

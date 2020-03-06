@@ -482,6 +482,7 @@ mclapply_win<-function(...){
     ##          argument passed to the function. In
     ##          this case it is the list to iterate over
     #size.of.list <- length(list(...)[[1]])
+    print(str(list(...)))
     ncores<-list(...)[["NCORES"]]
     cl <- makeCluster(min(ncores, detectCores()) )
     
@@ -528,6 +529,7 @@ mclapply_win<-function(...){
                         })
                 
                 ## Run the lapply in parallel 
+                print("start_executing")
                 return( parLapply( cl, ...) )
             }, finally = {        
                 ## Stop the cluster

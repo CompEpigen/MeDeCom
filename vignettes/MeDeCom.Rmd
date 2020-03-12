@@ -220,7 +220,7 @@ perm<-matchLMCs(lmcs, Tref)
 
 ### LMC enrichment analysis
 
-MeDeCom provides functions to perform enrichment analysis on the sites that are particularly hypo-/hypermethylated in an LMC. These sites can then be used for GO and LOLA enrichment analysis. Importantly, genomic annotations of the LMC sites is required to be specified. We thus recommend to use the DecompPipelie [https://github.com/lutsik/DecompPipeline](https://github.com/lutsik/DecompPipeline) for processing, but the annotation can also be specified manually using a ```data.frame``` that looks as follows:
+MeDeCom provides functions to perform enrichment analysis on the sites that are particularly hypo-/hypermethylated in an LMC. These sites can then be used for GO and LOLA enrichment analysis. Importantly, genomic annotations of the LMC sites is required to be specified. We thus recommend to use the DecompPipelie [https://github.com/CompEpigen/DecompPipeline](https://github.com/CompEpigen/DecompPipeline) for processing, but the annotation can also be specified manually using a ```data.frame``` that looks as follows:
 
 ```{r,CpG_annotation,eval=F}
       Chromosome   Start     End Strand CpG GC CGI Relation SNPs

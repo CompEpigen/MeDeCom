@@ -1,7 +1,7 @@
 ---
 title: "MeDeCom: Methylome Decomposition via Constrained Matrix Factorization"
 author: "Pavlo Lutsik, Martin Slawski, Gilles Gasparoni, Nikita Vedeneev, Matthias Hein and Joern Walter"
-date: "2019-11-14"
+date: "2020-03-12"
 output:
   rmarkdown::html_document:
     mathjax: default
@@ -75,9 +75,7 @@ ls()
 ```
 
 ```
-## [1] "Aref"           "D"              "Tref"           "lmcs"          
-## [5] "medecom.result" "perm"           "prop"           "sample.group"  
-## [9] "sge.setup"
+## [1] "Aref" "D"    "Tref"
 ```
 
 Loaded numeric matrix `D` contains 100 *in silico* mixtures and serves as an example input. Columns of matrix `Tref` contains the methylomes 
@@ -288,7 +286,7 @@ perm<-matchLMCs(lmcs, Tref)
 
 ### LMC enrichment analysis
 
-MeDeCom provides functions to perform enrichment analysis on the sites that are particularly hypo-/hypermethylated in an LMC. These sites can then be used for GO and LOLA enrichment analysis. Importantly, genomic annotations of the LMC sites is required to be specified. We thus recommend to use the DecompPipelie [https://github.com/lutsik/DecompPipeline](https://github.com/lutsik/DecompPipeline) for processing, but the annotation can also be specified manually using a ```data.frame``` that looks as follows:
+MeDeCom provides functions to perform enrichment analysis on the sites that are particularly hypo-/hypermethylated in an LMC. These sites can then be used for GO and LOLA enrichment analysis. Importantly, genomic annotations of the LMC sites is required to be specified. We thus recommend to use the DecompPipelie [https://github.com/CompEpigen/DecompPipeline](https://github.com/CompEpigen/DecompPipeline) for processing, but the annotation can also be specified manually using a ```data.frame``` that looks as follows:
 
 
 ```r
@@ -429,115 +427,69 @@ cluster.settings=sge.setup)
 Here is the output of `sessionInfo()` on the system on which this document was compiled:
 
 ```
-## R version 3.6.0 (2019-04-26)
+## R version 3.6.3 (2020-02-29)
 ## Platform: x86_64-pc-linux-gnu (64-bit)
-## Running under: Debian GNU/Linux 7 (wheezy)
+## Running under: Debian GNU/Linux 10 (buster)
 ## 
 ## Matrix products: default
-## BLAS:   /TL/deep-share/archive00/software/packages/R/R-3.6.0/lib/libRblas.so
-## LAPACK: /TL/deep-share/archive00/software/packages/R/R-3.6.0/lib/libRlapack.so
+## BLAS:   /usr/lib/x86_64-linux-gnu/atlas/libblas.so.3.10.3
+## LAPACK: /usr/lib/x86_64-linux-gnu/atlas/liblapack.so.3.10.3
 ## 
 ## locale:
-##  [1] LC_CTYPE=en_US       LC_NUMERIC=C         LC_TIME=en_US       
-##  [4] LC_COLLATE=C         LC_MONETARY=en_US    LC_MESSAGES=en_US   
-##  [7] LC_PAPER=en_US       LC_NAME=C            LC_ADDRESS=C        
-## [10] LC_TELEPHONE=C       LC_MEASUREMENT=en_US LC_IDENTIFICATION=C 
+##  [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C               LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+##  [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8    LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+##  [9] LC_ADDRESS=C               LC_TELEPHONE=C             LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
 ## 
 ## attached base packages:
-##  [1] grid      stats4    parallel  stats     graphics  grDevices utils    
-##  [8] datasets  methods   base     
+##  [1] grid      stats4    parallel  stats     graphics  grDevices utils     datasets  methods   base     
 ## 
 ## other attached packages:
-##  [1] MeDeCom_0.3.0                          
-##  [2] RnBeads_2.3.2                          
-##  [3] plyr_1.8.4                             
-##  [4] methylumi_2.30.0                       
-##  [5] minfi_1.30.0                           
-##  [6] bumphunter_1.26.0                      
-##  [7] locfit_1.5-9.1                         
-##  [8] iterators_1.0.12                       
-##  [9] foreach_1.4.7                          
-## [10] Biostrings_2.52.0                      
-## [11] XVector_0.24.0                         
-## [12] SummarizedExperiment_1.14.0            
-## [13] DelayedArray_0.10.0                    
-## [14] BiocParallel_1.18.0                    
-## [15] FDb.InfiniumMethylation.hg19_2.2.0     
-## [16] org.Hs.eg.db_3.8.2                     
-## [17] TxDb.Hsapiens.UCSC.hg19.knownGene_3.2.2
-## [18] GenomicFeatures_1.36.0                 
-## [19] AnnotationDbi_1.46.0                   
-## [20] reshape2_1.4.3                         
-## [21] scales_1.0.0                           
-## [22] Biobase_2.44.0                         
-## [23] illuminaio_0.26.0                      
-## [24] matrixStats_0.54.0                     
-## [25] limma_3.40.0                           
-## [26] gridExtra_2.3                          
-## [27] ggplot2_3.1.1                          
-## [28] fields_9.7                             
-## [29] maps_3.3.0                             
-## [30] spam_2.2-2                             
-## [31] dotCall64_1.0-0                        
-## [32] ff_2.2-14                              
-## [33] bit_1.1-14                             
-## [34] cluster_2.0.8                          
-## [35] MASS_7.3-51.4                          
-## [36] GenomicRanges_1.36.0                   
-## [37] GenomeInfoDb_1.20.0                    
-## [38] IRanges_2.18.0                         
-## [39] S4Vectors_0.22.0                       
-## [40] BiocGenerics_0.30.0                    
-## [41] RUnit_0.4.32                           
-## [42] gplots_3.0.1.1                         
-## [43] gtools_3.8.1                           
-## [44] pracma_2.2.5                           
-## [45] Rcpp_1.0.3                             
-## [46] knitr_1.22                             
+##  [1] MeDeCom_1.0.0                           RnBeads_2.4.0                          
+##  [3] plyr_1.8.5                              methylumi_2.32.0                       
+##  [5] minfi_1.32.0                            bumphunter_1.28.0                      
+##  [7] locfit_1.5-9.1                          iterators_1.0.12                       
+##  [9] foreach_1.4.7                           Biostrings_2.54.0                      
+## [11] XVector_0.26.0                          SummarizedExperiment_1.16.1            
+## [13] DelayedArray_0.12.2                     BiocParallel_1.20.1                    
+## [15] FDb.InfiniumMethylation.hg19_2.2.0      org.Hs.eg.db_3.10.0                    
+## [17] TxDb.Hsapiens.UCSC.hg19.knownGene_3.2.2 GenomicFeatures_1.38.1                 
+## [19] AnnotationDbi_1.48.0                    reshape2_1.4.3                         
+## [21] scales_1.1.0                            Biobase_2.46.0                         
+## [23] illuminaio_0.28.0                       matrixStats_0.55.0                     
+## [25] limma_3.42.1                            gridExtra_2.3                          
+## [27] ggplot2_3.2.1                           fields_10.2                            
+## [29] maps_3.3.0                              spam_2.5-1                             
+## [31] dotCall64_1.0-0                         ff_2.2-14                              
+## [33] bit_1.1-15.1                            cluster_2.1.0                          
+## [35] MASS_7.3-51.5                           GenomicRanges_1.38.0                   
+## [37] GenomeInfoDb_1.22.0                     IRanges_2.20.2                         
+## [39] S4Vectors_0.24.3                        BiocGenerics_0.32.0                    
+## [41] RUnit_0.4.32                            gplots_3.0.1.1                         
+## [43] gtools_3.8.1                            pracma_2.2.9                           
+## [45] Rcpp_1.0.3                              knitr_1.27                             
 ## 
 ## loaded via a namespace (and not attached):
-##  [1] colorspace_1.4-1         siggenes_1.58.0         
-##  [3] mclust_5.4.3             base64_2.0              
-##  [5] bit64_0.9-7              xml2_1.2.0              
-##  [7] splines_3.6.0            codetools_0.2-16        
-##  [9] scrime_1.3.5             zeallot_0.1.0           
-## [11] Rsamtools_2.0.0          annotate_1.62.0         
-## [13] HDF5Array_1.12.1         readr_1.3.1             
-## [15] compiler_3.6.0           httr_1.4.0              
-## [17] backports_1.1.5          assertthat_0.2.1        
-## [19] Matrix_1.2-17            lazyeval_0.2.2          
-## [21] prettyunits_1.0.2        tools_3.6.0             
-## [23] gtable_0.3.0             glue_1.3.1              
-## [25] GenomeInfoDbData_1.2.1   dplyr_0.8.0.1           
-## [27] doRNG_1.7.1              vctrs_0.2.0             
-## [29] multtest_2.40.0          nlme_3.1-139            
-## [31] preprocessCore_1.46.0    gdata_2.18.0            
-## [33] rtracklayer_1.44.0       DelayedMatrixStats_1.6.0
-## [35] xfun_0.11                stringr_1.4.0           
-## [37] rngtools_1.3.1.1         XML_3.98-1.19           
-## [39] beanplot_1.2             zlibbioc_1.30.0         
-## [41] hms_0.4.2                GEOquery_2.52.0         
-## [43] rhdf5_2.28.0             RColorBrewer_1.1-2      
-## [45] memoise_1.1.0            pkgmaker_0.27           
-## [47] biomaRt_2.40.0           reshape_0.8.8           
-## [49] stringi_1.4.3            RSQLite_2.1.2           
-## [51] highr_0.8                genefilter_1.66.0       
-## [53] caTools_1.17.1.2         bibtex_0.4.2            
-## [55] rlang_0.4.1              pkgconfig_2.0.3         
-## [57] bitops_1.0-6             nor1mix_1.2-3           
-## [59] evaluate_0.14            lattice_0.20-38         
-## [61] purrr_0.3.2              Rhdf5lib_1.6.0          
-## [63] GenomicAlignments_1.20.0 tidyselect_0.2.5        
-## [65] magrittr_1.5             R6_2.4.0                
-## [67] DBI_1.0.0                pillar_1.3.1            
-## [69] withr_2.1.2              survival_2.44-1.1       
-## [71] RCurl_1.95-4.12          tibble_2.1.1            
-## [73] crayon_1.3.4             KernSmooth_2.23-15      
-## [75] progress_1.2.0           data.table_1.12.6       
-## [77] blob_1.2.0               digest_0.6.22           
-## [79] xtable_1.8-4             tidyr_0.8.3             
-## [81] openssl_1.3              munsell_0.5.0           
-## [83] registry_0.5-1           quadprog_1.5-7          
+##  [1] colorspace_1.4-1         siggenes_1.60.0          mclust_5.4.5             base64_2.0              
+##  [5] bit64_0.9-7              xml2_1.2.2               splines_3.6.3            codetools_0.2-16        
+##  [9] scrime_1.3.5             Rsamtools_2.2.1          annotate_1.64.0          dbplyr_1.4.2            
+## [13] HDF5Array_1.14.2         readr_1.3.1              compiler_3.6.3           httr_1.4.1              
+## [17] assertthat_0.2.1         Matrix_1.2-18            lazyeval_0.2.2           prettyunits_1.1.1       
+## [21] tools_3.6.3              gtable_0.3.0             glue_1.3.1               GenomeInfoDbData_1.2.2  
+## [25] dplyr_0.8.4              rappdirs_0.3.1           doRNG_1.8.2              vctrs_0.2.2             
+## [29] multtest_2.42.0          nlme_3.1-144             preprocessCore_1.48.0    gdata_2.18.0            
+## [33] rtracklayer_1.46.0       DelayedMatrixStats_1.8.0 xfun_0.12                stringr_1.4.0           
+## [37] lifecycle_0.1.0          rngtools_1.5             XML_3.99-0.3             beanplot_1.2            
+## [41] zlibbioc_1.32.0          hms_0.5.3                GEOquery_2.54.1          rhdf5_2.30.1            
+## [45] RColorBrewer_1.1-2       curl_4.3                 memoise_1.1.0            biomaRt_2.42.0          
+## [49] reshape_0.8.8            stringi_1.4.5            RSQLite_2.2.0            genefilter_1.68.0       
+## [53] highr_0.8                caTools_1.17.1.1         rlang_0.4.4              pkgconfig_2.0.3         
+## [57] bitops_1.0-6             nor1mix_1.3-0            evaluate_0.14            lattice_0.20-40         
+## [61] purrr_0.3.3              Rhdf5lib_1.8.0           GenomicAlignments_1.22.1 tidyselect_1.0.0        
+## [65] magrittr_1.5             R6_2.4.1                 DBI_1.1.0                pillar_1.4.3            
+## [69] withr_2.1.2              survival_3.1-8           RCurl_1.98-1.1           tibble_2.1.3            
+## [73] crayon_1.3.4             KernSmooth_2.23-16       BiocFileCache_1.10.2     progress_1.2.2          
+## [77] data.table_1.12.8        blob_1.2.1               digest_0.6.23            xtable_1.8-4            
+## [81] tidyr_1.0.2              openssl_1.4.1            munsell_0.5.0            quadprog_1.5-8          
 ## [85] askpass_1.1
 ```
 

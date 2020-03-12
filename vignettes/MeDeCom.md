@@ -75,7 +75,8 @@ ls()
 ```
 
 ```
-## [1] "Aref" "D"    "Tref"
+## [1] "Aref"           "D"              "lmcs"           "medecom.result" "perm"           "prop"           "sample.group"  
+## [8] "sge.setup"      "Tref"
 ```
 
 Loaded numeric matrix `D` contains 100 *in silico* mixtures and serves as an example input. Columns of matrix `Tref` contains the methylomes 
@@ -286,7 +287,7 @@ perm<-matchLMCs(lmcs, Tref)
 
 ### LMC enrichment analysis
 
-MeDeCom provides functions to perform enrichment analysis on the sites that are particularly hypo-/hypermethylated in an LMC. These sites can then be used for GO and LOLA enrichment analysis. Importantly, genomic annotations of the LMC sites is required to be specified. We thus recommend to use the DecompPipelie [https://github.com/CompEpigen/DecompPipeline](https://github.com/CompEpigen/DecompPipeline) for processing, but the annotation can also be specified manually using a ```data.frame``` that looks as follows:
+MeDeCom provides functions to perform enrichment analysis on the sites that are particularly hypo-/hypermethylated in an LMC. These sites can then be used for GO and LOLA enrichment analysis. Importantly, genomic annotations of the LMC sites is required to be specified. We thus recommend to use the [DecompPipeline](https://github.com/CompEpigen/DecompPipeline) package for processing, but the annotation can also be specified manually using a ```data.frame``` that looks as follows:
 
 
 ```r
@@ -469,28 +470,28 @@ Here is the output of `sessionInfo()` on the system on which this document was c
 ## [45] Rcpp_1.0.3                              knitr_1.27                             
 ## 
 ## loaded via a namespace (and not attached):
-##  [1] colorspace_1.4-1         siggenes_1.60.0          mclust_5.4.5             base64_2.0              
-##  [5] bit64_0.9-7              xml2_1.2.2               splines_3.6.3            codetools_0.2-16        
-##  [9] scrime_1.3.5             Rsamtools_2.2.1          annotate_1.64.0          dbplyr_1.4.2            
-## [13] HDF5Array_1.14.2         readr_1.3.1              compiler_3.6.3           httr_1.4.1              
-## [17] assertthat_0.2.1         Matrix_1.2-18            lazyeval_0.2.2           prettyunits_1.1.1       
-## [21] tools_3.6.3              gtable_0.3.0             glue_1.3.1               GenomeInfoDbData_1.2.2  
-## [25] dplyr_0.8.4              rappdirs_0.3.1           doRNG_1.8.2              vctrs_0.2.2             
-## [29] multtest_2.42.0          nlme_3.1-144             preprocessCore_1.48.0    gdata_2.18.0            
-## [33] rtracklayer_1.46.0       DelayedMatrixStats_1.8.0 xfun_0.12                stringr_1.4.0           
-## [37] lifecycle_0.1.0          rngtools_1.5             XML_3.99-0.3             beanplot_1.2            
-## [41] zlibbioc_1.32.0          hms_0.5.3                GEOquery_2.54.1          rhdf5_2.30.1            
-## [45] RColorBrewer_1.1-2       curl_4.3                 memoise_1.1.0            biomaRt_2.42.0          
-## [49] reshape_0.8.8            stringi_1.4.5            RSQLite_2.2.0            genefilter_1.68.0       
-## [53] highr_0.8                caTools_1.17.1.1         rlang_0.4.4              pkgconfig_2.0.3         
-## [57] bitops_1.0-6             nor1mix_1.3-0            evaluate_0.14            lattice_0.20-40         
-## [61] purrr_0.3.3              Rhdf5lib_1.8.0           GenomicAlignments_1.22.1 tidyselect_1.0.0        
-## [65] magrittr_1.5             R6_2.4.1                 DBI_1.1.0                pillar_1.4.3            
-## [69] withr_2.1.2              survival_3.1-8           RCurl_1.98-1.1           tibble_2.1.3            
-## [73] crayon_1.3.4             KernSmooth_2.23-16       BiocFileCache_1.10.2     progress_1.2.2          
-## [77] data.table_1.12.8        blob_1.2.1               digest_0.6.23            xtable_1.8-4            
-## [81] tidyr_1.0.2              openssl_1.4.1            munsell_0.5.0            quadprog_1.5-8          
-## [85] askpass_1.1
+##  [1] BiocFileCache_1.10.2     lazyeval_0.2.2           splines_3.6.3            digest_0.6.23           
+##  [5] htmltools_0.4.0          gdata_2.18.0             magrittr_1.5             memoise_1.1.0           
+##  [9] readr_1.3.1              annotate_1.64.0          askpass_1.1              siggenes_1.60.0         
+## [13] prettyunits_1.1.1        colorspace_1.4-1         blob_1.2.1               rappdirs_0.3.1          
+## [17] xfun_0.12                dplyr_0.8.4              crayon_1.3.4             RCurl_1.98-1.1          
+## [21] genefilter_1.68.0        GEOquery_2.54.1          survival_3.1-8           glue_1.3.1              
+## [25] gtable_0.3.0             zlibbioc_1.32.0          Rhdf5lib_1.8.0           HDF5Array_1.14.2        
+## [29] DBI_1.1.0                rngtools_1.5             xtable_1.8-4             progress_1.2.2          
+## [33] mclust_5.4.5             preprocessCore_1.48.0    httr_1.4.1               RColorBrewer_1.1-2      
+## [37] pkgconfig_2.0.3          reshape_0.8.8            XML_3.99-0.3             dbplyr_1.4.2            
+## [41] tidyselect_1.0.0         rlang_0.4.4              munsell_0.5.0            tools_3.6.3             
+## [45] RSQLite_2.2.0            evaluate_0.14            stringr_1.4.0            yaml_2.2.1              
+## [49] bit64_0.9-7              beanplot_1.2             caTools_1.17.1.1         scrime_1.3.5            
+## [53] purrr_0.3.3              nlme_3.1-144             doRNG_1.8.2              nor1mix_1.3-0           
+## [57] xml2_1.2.2               biomaRt_2.42.0           compiler_3.6.3           curl_4.3                
+## [61] tibble_2.1.3             stringi_1.4.5            highr_0.8                lattice_0.20-40         
+## [65] Matrix_1.2-18            multtest_2.42.0          vctrs_0.2.2              pillar_1.4.3            
+## [69] lifecycle_0.1.0          data.table_1.12.8        bitops_1.0-6             rtracklayer_1.46.0      
+## [73] R6_2.4.1                 KernSmooth_2.23-16       codetools_0.2-16         assertthat_0.2.1        
+## [77] rhdf5_2.30.1             openssl_1.4.1            withr_2.1.2              GenomicAlignments_1.22.1
+## [81] Rsamtools_2.2.1          GenomeInfoDbData_1.2.2   hms_0.5.3                quadprog_1.5-8          
+## [85] tidyr_1.0.2              base64_2.0               rmarkdown_2.1            DelayedMatrixStats_1.8.0
 ```
 
  

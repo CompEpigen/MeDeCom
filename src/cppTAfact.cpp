@@ -730,10 +730,10 @@ void solve(int d, const RMatrixIn& mDt, const RMatrixIn& mTtinit, const RMatrixI
 RcppExport SEXP cppTAfact(SEXP mDtSEXP, SEXP mTtinitSEXP, SEXP mAinitSEXP,
         double lambda = 0.0, int itersMax = 1000,
         double tol = 1e-8, double tolA = 1e-7, double tolT = 1e-7) {
-    ///* Prepare Eigen for multithreading */
-    //Eigen::initParallel();
+    /* Prepare Eigen for multithreading */
+    Eigen::initParallel();
     ///* Make Eigen run in a single-thread mode */
-    //Eigen::setNbThreads(1);
+    Eigen::setNbThreads(5);
     
     /*
      * We have to set global variables after each call.

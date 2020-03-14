@@ -733,7 +733,7 @@ RcppExport SEXP cppTAfact(SEXP mDtSEXP, SEXP mTtinitSEXP, SEXP mAinitSEXP,
     /* Prepare Eigen for multithreading */
     Eigen::initParallel();
     ///* Make Eigen run in a single-thread mode */
-    Eigen::setNbThreads(5);
+    //Eigen::setNbThreads(1);
     
     /*
      * We have to set global variables after each call.

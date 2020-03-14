@@ -731,7 +731,7 @@ RcppExport SEXP cppTAfact(SEXP mDtSEXP, SEXP mTtinitSEXP, SEXP mAinitSEXP,
         double lambda = 0.0, int itersMax = 1000,
         double tol = 1e-8, double tolA = 1e-7, double tolT = 1e-7) {
     /* Prepare Eigen for multithreading */
-    //Eigen::initParallel();
+    Eigen::initParallel();
     ///* Make Eigen run in a single-thread mode */
     auto nthreads = Eigen::nbThreads();
     std::cout << "nthreads: " << nthreads << std::endl;

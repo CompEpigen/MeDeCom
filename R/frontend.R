@@ -625,7 +625,7 @@ runMeDeCom<-function(
 						#print(str(result_list_copy))
 						report_progress("parallel",index_group)
 						return(result_list_copy)
-					}, mc.cores=NCORES, mc.preschedule=FALSE)
+					}, mc.cores=1, mc.preschedule=FALSE)
 				for(result_chunck in intermed_results){
 	#				for(result in rl){
 	#					result_list[[attr(result, "res_idx")]]<-result

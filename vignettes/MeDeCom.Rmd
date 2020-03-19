@@ -45,10 +45,19 @@ of LMCs and the strength of regularization.
 *MeDeCom* can be installed directly from github using the package `devtools`:
 
 ```{r, eval=FALSE}
-devtools:::install_github("lutsik/MeDeCom")
+devtools::install_github("lutsik/MeDeCom")
 ```
 
-Currently only *nix-like platforms with a C++11-compatible compiler are supported.
+The master branch of the GitHub repository only compiles on *nix-like* platforms with a C++11-compatible compiler are supported.
+We created a separate branch for installation of *MeDeCom* on Windows machines. However, parallel processing options are currently
+not supported for Windows due to some incompatabilites of the R/Windows connection. Thus, executing MeDeCom on a Windows machine
+takes sustantially longer. Additionally, we creared a Docker image with MeDeCom, which can be used in case of further installation
+issues [https://hub.docker.com/r/mscherer/medecom](https://hub.docker.com/r/mscherer/medecom).
+
+```{r, eval=FALSE}
+devtools::install_github("lutsik/MeDeCom",ref="windows")
+```
+
 MeDeCom uses stack model for memory to accelerate factorization for smaller ranks. 
 This requires certain preparation during compilation, therefore, please, note the extended
 compilation time (15 to 20 minutes).

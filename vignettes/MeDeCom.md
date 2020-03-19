@@ -1,7 +1,7 @@
 ---
 title: "MeDeCom: Methylome Decomposition via Constrained Matrix Factorization"
 author: "Pavlo Lutsik, Martin Slawski, Gilles Gasparoni, Nikita Vedeneev, Matthias Hein and Joern Walter"
-date: "2020-03-12"
+date: "2020-03-19"
 output:
   rmarkdown::html_document:
     mathjax: default
@@ -46,10 +46,20 @@ of LMCs and the strength of regularization.
 
 
 ```r
-devtools:::install_github("lutsik/MeDeCom")
+devtools::install_github("lutsik/MeDeCom")
 ```
 
-Currently only *nix-like platforms with a C++11-compatible compiler are supported.
+The master branch of the GitHub repository only compiles on *nix-like* platforms with a C++11-compatible compiler are supported.
+We created a separate branch for installation of *MeDeCom* on Windows machines. However, parallel processing options are currently
+not supported for Windows due to some incompatabilites of the R/Windows connection. Thus, executing MeDeCom on a Windows machine
+takes sustantially longer. Additionally, we creared a Docker image with MeDeCom, which can be used in case of further installation
+issues [https://hub.docker.com/r/mscherer/medecom](https://hub.docker.com/r/mscherer/medecom).
+
+
+```r
+devtools::install_github("lutsik/MeDeCom",ref="windows")
+```
+
 MeDeCom uses stack model for memory to accelerate factorization for smaller ranks. 
 This requires certain preparation during compilation, therefore, please, note the extended
 compilation time (15 to 20 minutes).
@@ -75,8 +85,9 @@ ls()
 ```
 
 ```
-## [1] "Aref"           "D"              "lmcs"           "medecom.result" "perm"           "prop"           "sample.group"  
-## [8] "sge.setup"      "Tref"
+## [1] "Aref"           "D"              "lmcs"           "medecom.result"
+## [5] "perm"           "prop"           "sample.group"   "sge.setup"     
+## [9] "Tref"
 ```
 
 Loaded numeric matrix `D` contains 100 *in silico* mixtures and serves as an example input. Columns of matrix `Tref` contains the methylomes 
@@ -185,7 +196,7 @@ the most feasible parameter values, or about extending the parameter value grids
 plotParameters(medecom.result)
 ```
 
-![plot of chunk unnamed-chunk-7](figure/unnamed-chunk-7-1.png)
+![plot of chunk unnamed-chunk-8](figure/unnamed-chunk-8-1.png)
 
 A lineplot helping to select parameter $\lambda$ can be produced by specifying a fixed value for $k$:
 
@@ -194,7 +205,7 @@ A lineplot helping to select parameter $\lambda$ can be produced by specifying a
 plotParameters(medecom.result, K=5, lambdaScale="log")
 ```
 
-![plot of chunk unnamed-chunk-8](figure/unnamed-chunk-8-1.png)
+![plot of chunk unnamed-chunk-9](figure/unnamed-chunk-9-1.png)
 
 Cross-validation error has a minimum at $\lambda=10^{-2}$ so this value is preferred.
 
@@ -224,7 +235,7 @@ For instance, standard hierarchical clustering can be visualized using:
 plotLMCs(medecom.result, K=5, lambda=0.01, type="dendrogram")
 ```
 
-![plot of chunk unnamed-chunk-10](figure/unnamed-chunk-10-1.png)
+![plot of chunk unnamed-chunk-11](figure/unnamed-chunk-11-1.png)
 
 A two-dimensional embedding with MDS is also obtainable:
 
@@ -233,7 +244,7 @@ A two-dimensional embedding with MDS is also obtainable:
 plotLMCs(medecom.result, K=5, lambda=0.01, type="MDS")
 ```
 
-![plot of chunk unnamed-chunk-11](figure/unnamed-chunk-11-1.png)
+![plot of chunk unnamed-chunk-12](figure/unnamed-chunk-12-1.png)
 
 Input data can be included into the MDS plot to enhance the interpretation.
 
@@ -242,7 +253,7 @@ Input data can be included into the MDS plot to enhance the interpretation.
 plotLMCs(medecom.result, K=5, lambda=0.01, type="MDS", D=D)
 ```
 
-![plot of chunk unnamed-chunk-12](figure/unnamed-chunk-12-1.png)
+![plot of chunk unnamed-chunk-13](figure/unnamed-chunk-13-1.png)
 
 ### Matching LMCs to reference profiles
 
@@ -257,7 +268,7 @@ can be included into a joint clustering analysis:
 plotLMCs(medecom.result, K=5, lambda=0.01, type="dendrogram", Tref=Tref, center=TRUE)
 ```
 
-![plot of chunk unnamed-chunk-13](figure/unnamed-chunk-13-1.png)
+![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-1.png)
 
 Furthermore, a similarity matrix of LMCs vs reference profiles can be visualized as a heatmap.
 
@@ -266,7 +277,7 @@ Furthermore, a similarity matrix of LMCs vs reference profiles can be visualized
 plotLMCs(medecom.result, K=5, lambda=0.01, type="heatmap", Tref=Tref)
 ```
 
-![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-1.png)
+![plot of chunk unnamed-chunk-15](figure/unnamed-chunk-15-1.png)
 
 Correlation coefficient values and asterisks aid the interpretation.
 The values are displayed in the cells which contain maximal values column-wise.
@@ -334,7 +345,7 @@ A complete matrix of propotions can be visualized as a stacked barplot:
 plotProportions(medecom.result, K=5, lambda=0.01, type="barplot")
 ```
 
-![plot of chunk unnamed-chunk-17](figure/unnamed-chunk-17-1.png)
+![plot of chunk unnamed-chunk-18](figure/unnamed-chunk-18-1.png)
 
 or a heatmap:
 
@@ -343,7 +354,7 @@ or a heatmap:
 plotProportions(medecom.result, K=5, lambda=0.01, type="heatmap")
 ```
 
-![plot of chunk unnamed-chunk-18](figure/unnamed-chunk-18-1.png)
+![plot of chunk unnamed-chunk-19](figure/unnamed-chunk-19-1.png)
 
 The heatmap can be enhanced by clustering the columns:
 
@@ -352,7 +363,7 @@ The heatmap can be enhanced by clustering the columns:
 plotProportions(medecom.result, K=5, lambda=0.01, type="heatmap", heatmap.clusterCols=TRUE)
 ```
 
-![plot of chunk unnamed-chunk-19](figure/unnamed-chunk-19-1.png)
+![plot of chunk unnamed-chunk-20](figure/unnamed-chunk-20-1.png)
 
 or adding color code for the samples:
 
@@ -362,7 +373,7 @@ sample.group<-c("Case", "Control")[1+sample.int(ncol(D))%%2]
 plotProportions(medecom.result, K=5, lambda=0.01, type="heatmap", sample.characteristic=sample.group)
 ```
 
-![plot of chunk unnamed-chunk-20](figure/unnamed-chunk-20-1.png)
+![plot of chunk unnamed-chunk-21](figure/unnamed-chunk-21-1.png)
 
 ### Visualization of selected LMC proportions
 
@@ -373,7 +384,7 @@ plotProportions(medecom.result, K=5, lambda=0.01, type="heatmap", sample.charact
 plotProportions(medecom.result,  K=5, lambda=0.01, type="lineplot", lmc=2, Aref=Aref, ref.profile=2)
 ```
 
-![plot of chunk unnamed-chunk-22](figure/unnamed-chunk-22-1.png)
+![plot of chunk unnamed-chunk-23](figure/unnamed-chunk-23-1.png)
 
 # Advanced usage
 
@@ -437,61 +448,95 @@ Here is the output of `sessionInfo()` on the system on which this document was c
 ## LAPACK: /usr/lib/x86_64-linux-gnu/atlas/liblapack.so.3.10.3
 ## 
 ## locale:
-##  [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C               LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
-##  [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8    LC_PAPER=en_US.UTF-8       LC_NAME=C                 
-##  [9] LC_ADDRESS=C               LC_TELEPHONE=C             LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
+##  [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+##  [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+##  [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+##  [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+##  [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+## [11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
 ## 
 ## attached base packages:
-##  [1] grid      stats4    parallel  stats     graphics  grDevices utils     datasets  methods   base     
+##  [1] grid      stats4    parallel  stats     graphics  grDevices utils    
+##  [8] datasets  methods   base     
 ## 
 ## other attached packages:
-##  [1] MeDeCom_1.0.0                           RnBeads_2.4.0                          
-##  [3] plyr_1.8.5                              methylumi_2.32.0                       
-##  [5] minfi_1.32.0                            bumphunter_1.28.0                      
-##  [7] locfit_1.5-9.1                          iterators_1.0.12                       
-##  [9] foreach_1.4.7                           Biostrings_2.54.0                      
-## [11] XVector_0.26.0                          SummarizedExperiment_1.16.1            
-## [13] DelayedArray_0.12.2                     BiocParallel_1.20.1                    
-## [15] FDb.InfiniumMethylation.hg19_2.2.0      org.Hs.eg.db_3.10.0                    
-## [17] TxDb.Hsapiens.UCSC.hg19.knownGene_3.2.2 GenomicFeatures_1.38.1                 
-## [19] AnnotationDbi_1.48.0                    reshape2_1.4.3                         
-## [21] scales_1.1.0                            Biobase_2.46.0                         
-## [23] illuminaio_0.28.0                       matrixStats_0.55.0                     
-## [25] limma_3.42.1                            gridExtra_2.3                          
-## [27] ggplot2_3.2.1                           fields_10.2                            
-## [29] maps_3.3.0                              spam_2.5-1                             
-## [31] dotCall64_1.0-0                         ff_2.2-14                              
-## [33] bit_1.1-15.1                            cluster_2.1.0                          
-## [35] MASS_7.3-51.5                           GenomicRanges_1.38.0                   
-## [37] GenomeInfoDb_1.22.0                     IRanges_2.20.2                         
-## [39] S4Vectors_0.24.3                        BiocGenerics_0.32.0                    
-## [41] RUnit_0.4.32                            gplots_3.0.1.1                         
-## [43] gtools_3.8.1                            pracma_2.2.9                           
-## [45] Rcpp_1.0.3                              knitr_1.27                             
+##  [1] MeDeCom_0.3.3                          
+##  [2] RnBeads_2.4.0                          
+##  [3] plyr_1.8.5                             
+##  [4] methylumi_2.32.0                       
+##  [5] minfi_1.32.0                           
+##  [6] bumphunter_1.28.0                      
+##  [7] locfit_1.5-9.1                         
+##  [8] iterators_1.0.12                       
+##  [9] foreach_1.4.7                          
+## [10] Biostrings_2.54.0                      
+## [11] XVector_0.26.0                         
+## [12] SummarizedExperiment_1.16.1            
+## [13] DelayedArray_0.12.2                    
+## [14] BiocParallel_1.20.1                    
+## [15] FDb.InfiniumMethylation.hg19_2.2.0     
+## [16] org.Hs.eg.db_3.10.0                    
+## [17] TxDb.Hsapiens.UCSC.hg19.knownGene_3.2.2
+## [18] GenomicFeatures_1.38.1                 
+## [19] AnnotationDbi_1.48.0                   
+## [20] reshape2_1.4.3                         
+## [21] scales_1.1.0                           
+## [22] Biobase_2.46.0                         
+## [23] illuminaio_0.28.0                      
+## [24] matrixStats_0.55.0                     
+## [25] limma_3.42.1                           
+## [26] gridExtra_2.3                          
+## [27] ggplot2_3.2.1                          
+## [28] fields_10.2                            
+## [29] maps_3.3.0                             
+## [30] spam_2.5-1                             
+## [31] dotCall64_1.0-0                        
+## [32] ff_2.2-14                              
+## [33] bit_1.1-15.1                           
+## [34] cluster_2.1.0                          
+## [35] MASS_7.3-51.5                          
+## [36] GenomicRanges_1.38.0                   
+## [37] GenomeInfoDb_1.22.0                    
+## [38] IRanges_2.20.2                         
+## [39] S4Vectors_0.24.3                       
+## [40] BiocGenerics_0.32.0                    
+## [41] RUnit_0.4.32                           
+## [42] gplots_3.0.1.1                         
+## [43] gtools_3.8.1                           
+## [44] pracma_2.2.9                           
+## [45] Rcpp_1.0.3                             
+## [46] knitr_1.27                             
 ## 
 ## loaded via a namespace (and not attached):
-##  [1] BiocFileCache_1.10.2     lazyeval_0.2.2           splines_3.6.3            digest_0.6.23           
-##  [5] htmltools_0.4.0          gdata_2.18.0             magrittr_1.5             memoise_1.1.0           
-##  [9] readr_1.3.1              annotate_1.64.0          askpass_1.1              siggenes_1.60.0         
-## [13] prettyunits_1.1.1        colorspace_1.4-1         blob_1.2.1               rappdirs_0.3.1          
-## [17] xfun_0.12                dplyr_0.8.4              crayon_1.3.4             RCurl_1.98-1.1          
-## [21] genefilter_1.68.0        GEOquery_2.54.1          survival_3.1-8           glue_1.3.1              
-## [25] gtable_0.3.0             zlibbioc_1.32.0          Rhdf5lib_1.8.0           HDF5Array_1.14.2        
-## [29] DBI_1.1.0                rngtools_1.5             xtable_1.8-4             progress_1.2.2          
-## [33] mclust_5.4.5             preprocessCore_1.48.0    httr_1.4.1               RColorBrewer_1.1-2      
-## [37] pkgconfig_2.0.3          reshape_0.8.8            XML_3.99-0.3             dbplyr_1.4.2            
-## [41] tidyselect_1.0.0         rlang_0.4.4              munsell_0.5.0            tools_3.6.3             
-## [45] RSQLite_2.2.0            evaluate_0.14            stringr_1.4.0            yaml_2.2.1              
-## [49] bit64_0.9-7              beanplot_1.2             caTools_1.17.1.1         scrime_1.3.5            
-## [53] purrr_0.3.3              nlme_3.1-144             doRNG_1.8.2              nor1mix_1.3-0           
-## [57] xml2_1.2.2               biomaRt_2.42.0           compiler_3.6.3           curl_4.3                
-## [61] tibble_2.1.3             stringi_1.4.5            highr_0.8                lattice_0.20-40         
-## [65] Matrix_1.2-18            multtest_2.42.0          vctrs_0.2.2              pillar_1.4.3            
-## [69] lifecycle_0.1.0          data.table_1.12.8        bitops_1.0-6             rtracklayer_1.46.0      
-## [73] R6_2.4.1                 KernSmooth_2.23-16       codetools_0.2-16         assertthat_0.2.1        
-## [77] rhdf5_2.30.1             openssl_1.4.1            withr_2.1.2              GenomicAlignments_1.22.1
-## [81] Rsamtools_2.2.1          GenomeInfoDbData_1.2.2   hms_0.5.3                quadprog_1.5-8          
-## [85] tidyr_1.0.2              base64_2.0               rmarkdown_2.1            DelayedMatrixStats_1.8.0
+##  [1] colorspace_1.4-1         siggenes_1.60.0          mclust_5.4.5            
+##  [4] base64_2.0               bit64_0.9-7              xml2_1.2.2              
+##  [7] splines_3.6.3            codetools_0.2-16         scrime_1.3.5            
+## [10] Rsamtools_2.2.1          annotate_1.64.0          dbplyr_1.4.2            
+## [13] HDF5Array_1.14.2         readr_1.3.1              compiler_3.6.3          
+## [16] httr_1.4.1               assertthat_0.2.1         Matrix_1.2-18           
+## [19] lazyeval_0.2.2           prettyunits_1.1.1        tools_3.6.3             
+## [22] gtable_0.3.0             glue_1.3.1               GenomeInfoDbData_1.2.2  
+## [25] dplyr_0.8.4              rappdirs_0.3.1           doRNG_1.8.2             
+## [28] vctrs_0.2.2              multtest_2.42.0          nlme_3.1-144            
+## [31] preprocessCore_1.48.0    gdata_2.18.0             rtracklayer_1.46.0      
+## [34] DelayedMatrixStats_1.8.0 xfun_0.12                stringr_1.4.0           
+## [37] lifecycle_0.1.0          rngtools_1.5             XML_3.99-0.3            
+## [40] beanplot_1.2             zlibbioc_1.32.0          hms_0.5.3               
+## [43] GEOquery_2.54.1          rhdf5_2.30.1             RColorBrewer_1.1-2      
+## [46] curl_4.3                 memoise_1.1.0            biomaRt_2.42.0          
+## [49] reshape_0.8.8            stringi_1.4.5            RSQLite_2.2.0           
+## [52] highr_0.8                genefilter_1.68.0        caTools_1.17.1.1        
+## [55] rlang_0.4.4              pkgconfig_2.0.3          bitops_1.0-6            
+## [58] nor1mix_1.3-0            evaluate_0.14            lattice_0.20-40         
+## [61] purrr_0.3.3              Rhdf5lib_1.8.0           GenomicAlignments_1.22.1
+## [64] tidyselect_1.0.0         magrittr_1.5             R6_2.4.1                
+## [67] DBI_1.1.0                pillar_1.4.3             withr_2.1.2             
+## [70] survival_3.1-8           RCurl_1.98-1.1           tibble_2.1.3            
+## [73] crayon_1.3.4             KernSmooth_2.23-16       BiocFileCache_1.10.2    
+## [76] progress_1.2.2           data.table_1.12.8        blob_1.2.1              
+## [79] digest_0.6.23            xtable_1.8-4             tidyr_1.0.2             
+## [82] openssl_1.4.1            munsell_0.5.0            quadprog_1.5-8          
+## [85] askpass_1.1
 ```
 
  

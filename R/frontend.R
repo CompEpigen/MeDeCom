@@ -600,32 +600,50 @@ runMeDeCom<-function(
 		}
 		if(NCORES>1){#
 			
+#            if(.Platform$OS.type=="windows"){
+#                mclapply_fun<-mclapply_win
+#            }else{
+#                mclapply_fun<-mclapply
+#            }
+            
+            
+            signle_run_fun<-function(index_group){
+                #int_result_list<-vector("list", index_group[2]-index_group[1])
+                #res_indices<-vector("integer", index_group[2]-index_group[1]+1)
+                #res_idx_ctr<-1
+                res_indices<-c()
+                for (ii in index_group[1]:index_group[2]){
+                    #int_result_list[[ii]]<-one_fact_run(ii)
+                    int_result<-one_fact_run(ii)
+                    #print(str(int_result))
+                    if(!is.null(int_result)){
+                        res_idx<-attr(int_result, "res_idx")
+                        #res_indices[res_idx_ctr]<-res_idx
+                        #res_idx_ctr<-res_idx_ctr+1
+                        res_indices<-c(res_indices, res_idx)
+                        result_list[[res_idx]]<<-int_result
+                    }
+                }
+                res_indices<-sort(unique(res_indices))
+                result_list_copy<-result_list[res_indices]
+                attr(result_list_copy,"res_indices")<-res_indices
+                #print(str(result_list_copy))
+                report_progress("parallel",index_group)
+                return(result_list_copy)
+            }
+            
 			for(concurr_indices in job_batches){
-			
-				intermed_results<-mclapply(rev(concurr_indices), function(index_group){
-						#int_result_list<-vector("list", index_group[2]-index_group[1])
-						#res_indices<-vector("integer", index_group[2]-index_group[1]+1)
-						#res_idx_ctr<-1
-						res_indices<-c()
-						for (ii in index_group[1]:index_group[2]){
-							#int_result_list[[ii]]<-one_fact_run(ii)
-							int_result<-one_fact_run(ii)
-							#print(str(int_result))
-							if(!is.null(int_result)){
-								res_idx<-attr(int_result, "res_idx")
-								#res_indices[res_idx_ctr]<-res_idx
-								#res_idx_ctr<-res_idx_ctr+1
-								res_indices<-c(res_indices, res_idx)
-								result_list[[res_idx]]<<-int_result
-							}
-						}
-						res_indices<-sort(unique(res_indices))
-						result_list_copy<-result_list[res_indices]
-						attr(result_list_copy,"res_indices")<-res_indices
-						#print(str(result_list_copy))
-						report_progress("parallel",index_group)
-						return(result_list_copy)
-					}, mc.cores=NCORES, mc.preschedule=FALSE)
+			    
+                if(.Platform$OS.type=="windows"){
+                    require(foreach)
+                    require(doMC)
+                    registerDoMC(NCORES)
+                    
+                    intermed_results <- foreach(index_group = rev(concurr_indices)) %do% { single_run_fun(index_group) }
+                    
+                }else{
+                    intermed_results<-mclapply(rev(concurr_indices), single_run_fun, mc.cores=NCORES, mc.preschedule=FALSE)
+                }
 				for(result_chunck in intermed_results){
 	#				for(result in rl){
 	#					result_list[[attr(result, "res_idx")]]<-result

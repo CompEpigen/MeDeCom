@@ -20,6 +20,8 @@ Depends:
     gtools,
     gplots,
     parallel,
+    foreach,
+    doParallel,
     RUnit,
     RnBeads
 Suggests:

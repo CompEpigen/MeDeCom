@@ -607,7 +607,7 @@ runMeDeCom<-function(
 #            }
             
             
-            signle_run_fun<-function(index_group){
+            single_run_fun<-function(index_group){
                 #int_result_list<-vector("list", index_group[2]-index_group[1])
                 #res_indices<-vector("integer", index_group[2]-index_group[1]+1)
                 #res_idx_ctr<-1
@@ -632,15 +632,19 @@ runMeDeCom<-function(
                 return(result_list_copy)
             }
             
+            num_omp_threads<-Sys.getenv("OMP_NUM_THREADS")
+            Sys.setenv(OMP_NUM_THREADS=1)
 			for(concurr_indices in job_batches){
-			    
+			
                 if(.Platform$OS.type=="windows"){
-                    require(foreach)
-                    require(doMC)
-                    registerDoMC(NCORES)
+                    #limit OpenMP to 1 thread
                     
-                    intermed_results <- foreach(index_group = rev(concurr_indices)) %do% { single_run_fun(index_group) }
+                    cl<-parallel::makeCluster(NCORES)
+                    doParallel::registerDoParallel(cl)
                     
+                    intermed_results <- foreach::foreach(index_group = rev(concurr_indices), .packages="MeDeCom") %dopar% { single_run_fun(index_group) }
+                    
+                    parallel::stopCluster(cl)
                 }else{
                     intermed_results<-mclapply(rev(concurr_indices), single_run_fun, mc.cores=NCORES, mc.preschedule=FALSE)
                 }
@@ -652,6 +656,7 @@ runMeDeCom<-function(
 					
 				}
 			}
+            Sys.setenv(OMP_NUM_THREADS=num_omp_threads)
 		}else{
 			for(idx in 1:length(run_param_list)){
 				result<-one_fact_run(idx)

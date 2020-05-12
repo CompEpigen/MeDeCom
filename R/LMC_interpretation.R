@@ -368,7 +368,7 @@ do.annotation.plot <- function(enrichment.result, pvalCut=0.01){
 	to.plot$annotation <- factor(to.plot$annotation,
 		levels=to.plot$annotation[order(to.plot$OddsRatio,decreasing=T)])
   	if(nrow(to.plot)>0){
-    	plot <- ggplot(to.plot,aes(x=annotation,y=OddsRatio))+geom_histogram(stat = "identity")+theme_bw()+theme(axis.text.x = element_text(angle=45,hjust = 1))
+    	plot <- ggplot(to.plot,aes(x=annotation,y=OddsRatio))+geom_histogram(stat = "identity")+theme_bw()+theme(text=element_text(size=20),axis.text.x = element_text(angle=45,hjust = 1))
   	}else{
   	  plot <- ggplot(data.frame(x=c(0,1),y=c(0.1)))+geom_text(x=0.5,y=0.5,label="No significant assocation found")+theme_bw()
 	  }
@@ -647,8 +647,8 @@ lmc.annotation.enrichment <- function(medecom.result,
     anno.data <- load.rnb.set(anno.data)
   }
   annos.all <- c("cpgislands","genes","promoters",paste0("ensembleRegBuildBP",c("ctcf","distal","dnase","proximal","tfbs","tss")))
-  if(any(!(annos.all %in% rnb.region.types()))){
-    rnb.load.annotation.from.db(annos.all[!(annos.all %in% rnb.region.types())],assembly=assembly)
+  if(any(!(annos.all %in% rnb.region.types(assembly)))){
+    rnb.load.annotation.from.db(annos.all[!(annos.all %in% rnb.region.types(assembly))],assembly=assembly)
   }
   annos.all <- c(annos.all,paste0("chr",1:22))
   if(rnb.mode){

@@ -4,8 +4,7 @@
 \alias{matchLMCs}
 \title{match.components}
 \usage{
-matchLMCs(That, Tref, method = "corrmatch", check = TRUE,
-  Ahat = NULL)
+matchLMCs(That, Tref, method = "corrmatch", check = TRUE, Ahat = NULL)
 }
 \arguments{
 \item{That}{recovered components from factorization}

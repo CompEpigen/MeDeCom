@@ -4,8 +4,10 @@
 \name{example.MeDeComSet}
 \alias{example.MeDeComSet}
 \title{Example result object (MeDeComSet)}
-\format{\code{MeDeComSet}, the result of a deconvolution experiment and input to any follow-up analysis or to retrieve latent 
-methylation components (LMCs)}
+\format{
+\code{MeDeComSet}, the result of a deconvolution experiment and input to any follow-up analysis or to retrieve latent 
+methylation components (LMCs)
+}
 \description{
 An example result of applying \pkg{MeDeCom} for a deconvolution experiment.
 }

@@ -4,8 +4,15 @@
 \alias{as.MeDeComSet}
 \title{as.MeDeComSet}
 \usage{
-as.MeDeComSet(object, cg_subsets = 1, Ks = NULL, deviances = NULL,
-  rss = NULL, m.orig = NULL, n.orig = NULL)
+as.MeDeComSet(
+  object,
+  cg_subsets = 1,
+  Ks = NULL,
+  deviances = NULL,
+  rss = NULL,
+  m.orig = NULL,
+  n.orig = NULL
+)
 }
 \arguments{
 \item{object}{An object of class \code{RefFreeCellMix} containing cell type deconvolution information, or a list of such objects.}

@@ -4,8 +4,14 @@
 \alias{run.trait.association.single}
 \title{run.trait.association.single}
 \usage{
-run.trait.association.single(medecom.set, pheno.data, cg_subset = NULL,
-  K = NULL, lambda = NULL, test.fun = t.test)
+run.trait.association.single(
+  medecom.set,
+  pheno.data,
+  cg_subset = NULL,
+  K = NULL,
+  lambda = NULL,
+  test.fun = t.test
+)
 }
 \arguments{
 \item{medecom.set}{An object of type \code{\link{MeDeComSet}} as the result of \code{\link{runMeDeCom}} containing LMCs and their

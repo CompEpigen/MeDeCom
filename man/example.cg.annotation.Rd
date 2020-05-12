@@ -4,7 +4,9 @@
 \name{example.cg.annotation}
 \alias{example.cg.annotation}
 \title{Example CG annotation}
-\format{\code{cg.ann} is a \code{data.frame} containing identifiers and postitions of CpG sites to be analyzed}
+\format{
+\code{cg.ann} is a \code{data.frame} containing identifiers and postitions of CpG sites to be analyzed
+}
 \description{
 An data frame containing CpGs with their corresponding annotation in the genome to be used for the analysis. You can provide a similar
 \code{data.frame} for your own analysis.

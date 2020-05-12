@@ -7,7 +7,9 @@
 -------------------------------------------------------------------------------------------------------------------------------------
 This scripts contains functions for assocating MeDeCom with known reference cell type profiles
 GLOBALS}
-\format{An object of class \code{character} of length 2.}
+\format{
+An object of class \code{character} of length 2.
+}
 \usage{
 AVAIL.REFS
 }

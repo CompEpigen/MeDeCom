@@ -4,8 +4,14 @@
 \alias{cluster.refbased}
 \title{cluster.refbased}
 \usage{
-cluster.refbased(ref.run, K, lambda, cg_subset = 1,
-  plot.type = "dendrogram", ...)
+cluster.refbased(
+  ref.run,
+  K,
+  lambda,
+  cg_subset = 1,
+  plot.type = "dendrogram",
+  ...
+)
 }
 \arguments{
 \item{ref.run}{A result of \code{\link{run.refbased}} with the results of \code{\link{runMeDeCom}} and the reference data matrix}

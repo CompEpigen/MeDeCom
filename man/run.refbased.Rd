@@ -5,11 +5,21 @@
 \title{FUNCTIONS
 run.refbased}
 \usage{
-run.refbased(rnb.set, Ks, lambdas, cg_subsets = NULL,
-  opt.method = "MeDeCom.cppTAfact", temp.dir = NULL,
-  ref.base = "reinius", most.var = NULL, NCORES = 1,
-  cluster.settings = NULL, ref.set = NULL, id.col = NULL,
-  save.restricted.sites = FALSE)
+run.refbased(
+  rnb.set,
+  Ks,
+  lambdas,
+  cg_subsets = NULL,
+  opt.method = "MeDeCom.cppTAfact",
+  temp.dir = NULL,
+  ref.base = "reinius",
+  most.var = NULL,
+  NCORES = 1,
+  cluster.settings = NULL,
+  ref.set = NULL,
+  id.col = NULL,
+  save.restricted.sites = FALSE
+)
 }
 \arguments{
 \item{rnb.set}{An Object of type \code{RnBSet} from the \pkg{RnBeads} package containing methylation information on which

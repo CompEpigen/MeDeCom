@@ -4,11 +4,22 @@
 \alias{lmc.lola.enrichment}
 \title{lmc.lola.enrichment}
 \usage{
-lmc.lola.enrichment(medecom.result, annotation.filter = NULL, anno.data,
-  K = NULL, lambda = NULL, cg_subset = NULL, diff.threshold = 0.5,
-  reference.computation = "median", comp.lmcs = NULL,
-  region.type = "ensembleRegBuildBPall", temp.dir = tempdir(),
-  type = "hypo", assembly = "hg19", lola.db = NULL)
+lmc.lola.enrichment(
+  medecom.result,
+  annotation.filter = NULL,
+  anno.data,
+  K = NULL,
+  lambda = NULL,
+  cg_subset = NULL,
+  diff.threshold = 0.5,
+  reference.computation = "median",
+  comp.lmcs = NULL,
+  region.type = "ensembleRegBuildBPall",
+  temp.dir = tempdir(),
+  type = "hypo",
+  assembly = "hg19",
+  lola.db = NULL
+)
 }
 \arguments{
 \item{medecom.result}{An object of type \code{\link{MeDeComSet-class}} or the location of an .RData file, where

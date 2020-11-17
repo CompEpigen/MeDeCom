@@ -726,13 +726,14 @@ submitClusterJobSLURM <- function(job_name, dependencies, params, WD, RDIR="/usr
 	sbatch_string <- paste("sbatch --export=ALL",
 				"--job-name",job_name,
 				"-o",paste0(WD,"/",job_name,".log"),
-				"--mem=",ram_limit)
+				paste0("--mem=",ram_limit))
 	if(!is.null(deps_string)){
 		sbatch_string <- paste(sbatch_string, deps_string)
 	}
 	script_string <- sprintf("%s/Rscript %s %s", RDIR, src_file, param_file)
 	
 	job_cmd <- paste(sbatch_string, paste0("--wrap='",script_string,"'"))
+	print(job_cmd)
 	res <- system(job_cmd, intern=TRUE)
 }
 

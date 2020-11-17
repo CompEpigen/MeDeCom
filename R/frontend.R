@@ -438,7 +438,7 @@ runMeDeCom<-function(
 		
 		save(sample_subset, file=file.path(DD, sprintf("sample_subset.RDdata")))
 		save(cv.partitions, file=file.path(DD, sprintf("cv_partitions.RDdata")))
-		if(is.null(cluster_run$cluster_archiceture)) cluster_run$cluster_archiceture <- "SGE"		
+		if(is.null(cluster.settings$cluster_archiceture)) cluster.settings$cluster_archiceture <- "SGE"		
 
 		for(idx in 1:length(run_param_list)){
 			id<-attr(run_param_list[[idx]], "jname")
@@ -447,7 +447,7 @@ runMeDeCom<-function(
 					RDIR=cluster.settings$R_bin_dir,
 					hosts=cluster.settings$host_pattern, 
 					ram_limit=cluster.settings$mem_limit,
-					cluster_architecture=cluster_run$cluster_archiceture)
+					cluster_architecture=cluster.settings$cluster_archiceture)
 		}
 		
 		waitForClusterJobs(analysis.name, verbose=verbosity>0L, cluster_run$cluster_archiceture)

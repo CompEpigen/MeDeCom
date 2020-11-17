@@ -728,7 +728,8 @@ submitClusterJobSLURM <- function(job_name, dependencies, params, WD, RDIR="/usr
 	sbatch_string <- paste("sbatch --export=ALL",
 				"--job-name",job_name,
 				"-o",paste0(WD,"/",job_name,".log"),
-				paste0("--mem=",ram_limit))
+				paste0("--mem=",ram_limit),
+				paste0("--cpus-per-task=",n.cpus))
 	if(!is.null(deps_string)){
 		sbatch_string <- paste(sbatch_string, deps_string)
 	}

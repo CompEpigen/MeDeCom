@@ -438,15 +438,19 @@ runMeDeCom<-function(
 		
 		save(sample_subset, file=file.path(DD, sprintf("sample_subset.RDdata")))
 		save(cv.partitions, file=file.path(DD, sprintf("cv_partitions.RDdata")))
-		
+		if(is.null(cluster_run$cluster_archiceture)) cluster_run$cluster_archiceture <- "SGE"		
+
 		for(idx in 1:length(run_param_list)){
 			id<-attr(run_param_list[[idx]], "jname")
 			deps<-attr(run_param_list[[idx]], "depends_on")
 			submitClusterJob(id, deps, run_param_list[idx], WD, 
-					RDIR=cluster.settings$R_bin_dir, hosts=cluster.settings$host_pattern, ram_limit=cluster.settings$mem_limit)
+					RDIR=cluster.settings$R_bin_dir,
+					hosts=cluster.settings$host_pattern, 
+					ram_limit=cluster.settings$mem_limit,
+					cluster_architecture=cluster_run$cluster_archiceture)
 		}
 		
-		waitForClusterJobs(analysis.name, verbose=verbosity>0L)
+		waitForClusterJobs(analysis.name, verbose=verbosity>0L, cluster_run$cluster_archiceture)
 		
 		for(idx in 1:length(result_list)){
 			if(!is.null(result_list[[idx]]) && file.exists(file.path(WD, result_list[[idx]]))){
@@ -664,8 +668,28 @@ runMeDeCom<-function(
 	MeDeComSet(result_object$parameters, result_object$outputs, dataset_info)
 }
 #######################################################################################################################
-submitClusterJob<-function(job_name, dependencies, params, WD, RDIR="/usr/bin", hosts="*", ram_limit="5G"){
-	
+submitClusterJob<-function(job_name, dependencies, params, WD, RDIR="/usr/bin", hosts="*", ram_limit="5G",cluster_architecture="SGE"){
+	if(cluster_architecture=="SGE"){
+		submitClusterJobSGE(job_name,
+			dependencies,
+			params,
+			WD,
+			RDIR,
+			hosts,
+			ram_limit)
+	}else if(cluster_architecture=="SLURM"){
+		submitClusterJobSLURM(job_name,
+			dependencies,
+			params,
+			WD,
+			RDIR,
+			hosts,
+			ram_limit)
+	}else{
+		stop("Only 'SGE' and 'SLURM' architecture currently supported")
+	}	
+}
+submitClusterJobSGE <- function(job_name, dependencies, params, WD, RDIR="/usr/bin", hosts="*", ram_limit="5G"){
 	src_file<-system.file("exec/cluster.script.sge.R", package="MeDeCom")
 	param_file<-file.path(WD, sprintf("%s_params.RDS", job_name))
 	saveRDS(params, param_file)
@@ -686,9 +710,47 @@ submitClusterJob<-function(job_name, dependencies, params, WD, RDIR="/usr/bin", 
 	job_cmd<-paste(qsub_string, script_string)
 	res<-system(job_cmd, intern=TRUE)
 }
-#######################################################################################################################
-waitForClusterJobs<-function(analysis_id, lookup_int=10, verbose=TRUE){
+submitClusterJobSLURM <- function(job_name, dependencies, params, WD, RDIR="/usr/bin", hosts="*", ram_limit="5G"){
+	src_file<-system.file("exec/cluster.script.sge.R", package="MeDeCom")
+	param_file<-file.path(WD, sprintf("%s_params.RDS", job_name))
+	saveRDS(params, param_file)
 	
+	if(!is.null(dependencies)){
+		deps<-paste(dependencies, collapse=",")
+		cmd.tok <- paste("squeue --name",dependencies,"| cut -f15 -d ' '")
+		j.ids <- system(cmd.tok,intern=TRUE)[-1]
+		deps_string <- paste0("--depend=",paste0(j.ids,collapse=","))
+	}else{
+		deps_string<-NULL
+	}
+	sbatch_string <- paste("sbatch --export=ALL",
+				"--job-name",job_name,
+				"-o",paste0(WD,"/",job_name,".log"),
+				"--mem=",ram_limit)
+	if(!is.null(deps_string)){
+		sbatch_string <- paste(sbatch_string, deps_string)
+	}
+	script_string <- sprintf("%s/Rscript %s %s", RDIR, src_file, param_file)
+	
+	job_cmd <- paste(sbatch_string, paste0("--wrap='",script_string,"'"))
+	res <- system(job_cmd, intern=TRUE)
+}
+
+#######################################################################################################################
+waitForClusterJobs<-function(analysis_id, lookup_int=10, verbose=TRUE,cluster_architecture="SGE"){
+	if(cluster_architecture=="SGE"){
+		waitForClusterJobsSGE(analysis_id,
+			lookup_int,
+			verbose)
+	}else if(cluster_architecture=="SLURM"){
+		waitForClusterJobsSLURM(analysis_id,
+			lookup_int,
+			verbose)
+	}else{
+		stop("Only 'SGE' and 'SLURM' architecture currently supported")
+	}		
+}
+waitForClusterJobsSGE <- function(analysis_id, lookup_int=10, verbose=TRUE){
 	repeat{
 		lookup_cmd<-sprintf("qstat -r | grep \"Full jobname\" | grep -e %s", analysis_id)
 		suppressWarnings({
@@ -696,6 +758,20 @@ waitForClusterJobs<-function(analysis_id, lookup_int=10, verbose=TRUE){
 		})
 		if(length(running_jobs)>0){
 			cat(sprintf("[SGE jobs:] %d remaining\n", length(running_jobs)))
+			Sys.sleep(lookup_int)
+		}else{
+			break;
+		}
+	}
+}
+waitForClusterJobsSLURM <- function(analysis_id, lookup_int=10, verbose=TRUE){
+	repeat{
+		lookup_cmd <- paste0("squeue --format='%j' | grep -e ", analysis_id)
+		suppressWarnings({
+			running_jobs <- system(lookup_cmd, intern=TRUE)
+		})
+		if(length(running_jobs)>0){
+			cat(sprintf("[SLURM jobs:] %d remaining\n", length(running_jobs)))
 			Sys.sleep(lookup_int)
 		}else{
 			break;

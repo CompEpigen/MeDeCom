@@ -450,7 +450,7 @@ runMeDeCom<-function(
 					cluster_architecture=cluster.settings$cluster_architecture)
 		}
 		
-		waitForClusterJobs(analysis.name, verbose=verbosity>0L, cluster_run$cluster_architecture)
+		waitForClusterJobs(analysis.name, verbose=verbosity>0L,cluster_architecture= cluster_run$cluster_architecture)
 		
 		for(idx in 1:length(result_list)){
 			if(!is.null(result_list[[idx]]) && file.exists(file.path(WD, result_list[[idx]]))){
@@ -733,7 +733,6 @@ submitClusterJobSLURM <- function(job_name, dependencies, params, WD, RDIR="/usr
 	script_string <- sprintf("%s/Rscript %s %s", RDIR, src_file, param_file)
 	
 	job_cmd <- paste(sbatch_string, paste0("--wrap='",script_string,"'"))
-	print(job_cmd)
 	res <- system(job_cmd, intern=TRUE)
 }
 

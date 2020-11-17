@@ -447,10 +447,11 @@ runMeDeCom<-function(
 					RDIR=cluster.settings$R_bin_dir,
 					hosts=cluster.settings$host_pattern, 
 					ram_limit=cluster.settings$mem_limit,
-					cluster_architecture=cluster.settings$cluster_architecture)
+					cluster_architecture=cluster.settings$cluster_architecture,
+					n.cpus=cluster.settings$n_cpus)
 		}
 		
-		waitForClusterJobs(analysis.name, verbose=verbosity>0L,cluster_architecture= cluster_run$cluster_architecture)
+		waitForClusterJobs(analysis.name, verbose=verbosity>0L,cluster_architecture= cluster.settings$cluster_architecture)
 		
 		for(idx in 1:length(result_list)){
 			if(!is.null(result_list[[idx]]) && file.exists(file.path(WD, result_list[[idx]]))){
@@ -668,7 +669,7 @@ runMeDeCom<-function(
 	MeDeComSet(result_object$parameters, result_object$outputs, dataset_info)
 }
 #######################################################################################################################
-submitClusterJob<-function(job_name, dependencies, params, WD, RDIR="/usr/bin", hosts="*", ram_limit="5G",cluster_architecture="SGE"){
+submitClusterJob<-function(job_name, dependencies, params, WD, RDIR="/usr/bin", hosts="*", ram_limit="5G",n.cpus=NULL,cluster_architecture="SGE"){
 	if(cluster_architecture=="SGE"){
 		submitClusterJobSGE(job_name,
 			dependencies,
@@ -678,13 +679,14 @@ submitClusterJob<-function(job_name, dependencies, params, WD, RDIR="/usr/bin", 
 			hosts,
 			ram_limit)
 	}else if(cluster_architecture=="SLURM"){
+		if(is.null(n.cpus)) n.cpus <- 1
 		submitClusterJobSLURM(job_name,
 			dependencies,
 			params,
 			WD,
 			RDIR,
-			hosts,
-			ram_limit)
+			ram_limit,
+			n.cpus)
 	}else{
 		stop("Only 'SGE' and 'SLURM' architecture currently supported")
 	}	
@@ -710,7 +712,7 @@ submitClusterJobSGE <- function(job_name, dependencies, params, WD, RDIR="/usr/b
 	job_cmd<-paste(qsub_string, script_string)
 	res<-system(job_cmd, intern=TRUE)
 }
-submitClusterJobSLURM <- function(job_name, dependencies, params, WD, RDIR="/usr/bin", hosts="*", ram_limit="5G"){
+submitClusterJobSLURM <- function(job_name, dependencies, params, WD, RDIR="/usr/bin",  ram_limit="5G",n.cpus=1){
 	src_file<-system.file("exec/cluster.script.sge.R", package="MeDeCom")
 	param_file<-file.path(WD, sprintf("%s_params.RDS", job_name))
 	saveRDS(params, param_file)

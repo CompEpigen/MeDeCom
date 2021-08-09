@@ -536,8 +536,8 @@ LMCs <em>MeDeCom</em> uses a special for of regularization controlled by the par
 <h1>Installation</h1>
 <p><em>MeDeCom</em> can be installed directly from github using the package <code>devtools</code>:</p>
 <pre class="r"><code class="hljs">devtools::install_github(<span class="hljs-string">"lutsik/MeDeCom"</span>)</code></pre>
-<p>The master branch of the GitHub repository only compiles on <em>nix-like</em> platforms with a C++11-compatible compiler are supported. We created a separate branch for installation of <em>MeDeCom</em>
- on Windows machines. However, parallel processing options are currently
+<p>The master branch of the GitHub repository only compiles on <em>nix-like</em> platforms with a C++11-compatible compiler are supported. Users on Mac OS might run into compilation errors as OpenMP, which is required for compilation, is disabled by default. To enable OpenMP, the following tutorial can be followed <a href="https://mac.r-project.org/openmp/">https://mac.r-project.org/openmp/</a>. We created a separate branch for installation of <em>MeDeCom</em>
+on Windows machines. However, parallel processing options are currently
  not supported for Windows due to some incompatabilites of the R/Windows
  connection. Thus, executing MeDeCom on a Windows machine takes 
 sustantially longer. Additionally, we creared a Docker image with 

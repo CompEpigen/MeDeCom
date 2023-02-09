@@ -49,6 +49,7 @@ devtools::install_github("lutsik/MeDeCom")
 ```
 
 The master branch of the GitHub repository only compiles on *nix-like* platforms with a C++11-compatible compiler are supported.
+Users on Mac OS might run into compilation errors as OpenMP, which is required for compilation, is disabled by default. To enable OpenMP, the following tutorial can be followed [https://mac.r-project.org/openmp/](https://mac.r-project.org/openmp/)
 We created a separate branch for installation of *MeDeCom* on Windows machines. However, parallel processing options are currently
 not supported for Windows due to some incompatabilites of the R/Windows connection. Thus, executing MeDeCom on a Windows machine
 takes sustantially longer. Additionally, we creared a Docker image with MeDeCom, which can be used in case of further installation

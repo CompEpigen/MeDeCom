@@ -320,7 +320,7 @@ lmc.annotation.plots.tables <- function(medecom.result,
 #' @noRd
 
 do.lola.plot <- function(enrichment.result,lola.db,pvalCut=0.01){
-  if(!any(is.na(enrichment.result))){
+  if(!is.null(enrichment.result)){
  	  plot <- lolaBarPlot(lolaDb = lola.db,lolaRes=enrichment.result,pvalCut=pvalCut)+theme_bw()+theme(axis.text.x = element_text(angle=45,hjust = 1))
   }else{
     plot <- ggplot(data.frame(x=c(0,1),y=c(0.1)))+geom_text(x=0.5,y=0.5,label="No data to be plotted")+theme_bw()

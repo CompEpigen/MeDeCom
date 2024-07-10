@@ -262,7 +262,7 @@ lmc.lola.plots.tables <- function(medecom.result,
 #' @param anno.data The original \code{\link[RnBeads]{RnBSet-class}} object containing methylation, sample meta and annotation
 #'                 information, a path to a directory stored by \code{\link[RnBeads]{save.rnb.set}} or a data.frame containing
 #'                 CpG annotations (ann_C)
-#' @param ... Further arguments passed to \code{lmc.lola.enrichment}
+#' @param ... Further arguments passed to \code{lmc.go.enrichment}
 #' @return A list with two elements, one of them containing the plots for each LMC and the other for the corresponding GO
 #'         enrichment tables
 #' @seealso lmc.go.enrichment
@@ -280,6 +280,34 @@ lmc.go.plots.tables <- function(medecom.result,
   return(list(Plots=go.plots,Tables=enrichment.results))
 }
 
+#' lmc.annotation.plots.tables
+#' 
+#' This functions calls \link{lmc.annotation.enrichment} and returns plots representing those results, as well as the tables with annotation
+#' enrichment results.
+#' 
+#' @param medecom.result An object of type \code{\link{MeDeComSet-class}} or the location of an .RData file, where
+#'                 such an object is stored.
+#' @param anno.data The original \code{\link[RnBeads]{RnBSet-class}} object containing methylation, sample meta and annotation
+#'                 information, a path to a directory stored by \code{\link[RnBeads]{save.rnb.set}} or a data.frame containing
+#'                 CpG annotations (ann_C)
+#' @param ... Further arguments passed to \code{lmc.annotation.enrichment}
+#' @return A list with two elements, one of them containing the plots for each LMC and the other for the corresponding annotation
+#'         enrichment tables
+#' @seealso lmc.annotation.enrichment
+#' @author Michael Scherer                 
+#' 
+#' @export
+
+lmc.annotation.plots.tables <- function(medecom.result,
+                                  anno.data,
+                                  ...){
+  enrichment.results <- lmc.annotation.enrichment(medecom.result=medecom.result,
+                                            anno.data=anno.data,
+                                            ...)
+  annotation.plots <- lapply(enrichment.results,do.annotation.plot)
+  return(list(Plots=annotation.plots,Tables=enrichment.results))
+}
+
 #' do.lola.plot
 #' 
 #' This functions creates a single LOLA enrichment plot
@@ -292,7 +320,7 @@ lmc.go.plots.tables <- function(medecom.result,
 #' @noRd
 
 do.lola.plot <- function(enrichment.result,lola.db,pvalCut=0.01){
-  if(!is.na(enrichment.result)){
+  if(!is.null(enrichment.result)){
  	  plot <- lolaBarPlot(lolaDb = lola.db,lolaRes=enrichment.result,pvalCut=pvalCut)+theme_bw()+theme(axis.text.x = element_text(angle=45,hjust = 1))
   }else{
     plot <- ggplot(data.frame(x=c(0,1),y=c(0.1)))+geom_text(x=0.5,y=0.5,label="No data to be plotted")+theme_bw()
@@ -315,6 +343,32 @@ do.go.plot <- function(enrichment.result, pvalCut=0.01){
   	to.plot <- enrichment.result[enrichment.result$p.val.adj.fdr<pvalCut,]
   	if(nrow(to.plot)>0){
     	plot <- ggplot(to.plot,aes(x=Term,y=OddsRatio))+geom_histogram(stat = "identity")+theme_bw()+theme(axis.text.x = element_text(angle=45,hjust = 1))
+  	}else{
+  	  plot <- ggplot(data.frame(x=c(0,1),y=c(0.1)))+geom_text(x=0.5,y=0.5,label="No significant assocation found")+theme_bw()
+	  }
+  }else{
+    plot <- ggplot(data.frame(x=c(0,1),y=c(0.1)))+geom_text(x=0.5,y=0.5,label="No data to be plotted")+theme_bw()
+  }
+  return(plot)
+}
+
+#' do.annotation.plot
+#' 
+#' This function creates a single annotation enrichmnet plot
+#' 
+#' @param enrichment.result Annotation enrichment result for a single LMC
+#' @param pvalCut P-value cutoff
+#' @return An object of type ggplot, containing the enrichment plot
+#' @author Michael Scherer
+#' @noRd
+
+do.annotation.plot <- function(enrichment.result, pvalCut=0.01){
+  if(!is.na(enrichment.result)){
+  	to.plot <- enrichment.result[enrichment.result$p.value<pvalCut,]
+	to.plot$annotation <- factor(to.plot$annotation,
+		levels=to.plot$annotation[order(to.plot$OddsRatio,decreasing=T)])
+  	if(nrow(to.plot)>0){
+    	plot <- ggplot(to.plot,aes(x=annotation,y=OddsRatio))+geom_histogram(stat = "identity")+theme_bw()+theme(text=element_text(size=20),axis.text.x = element_text(angle=45,hjust = 1))
   	}else{
   	  plot <- ggplot(data.frame(x=c(0,1),y=c(0.1)))+geom_text(x=0.5,y=0.5,label="No significant assocation found")+theme_bw()
 	  }
@@ -501,3 +555,169 @@ lmc.go.enrichment <- function(medecom.result,
   }
   return(go.results)
 }
+
+#' lmc.annotation.enrichment
+#' 
+#' This function performs enrichment analysis for various genomic locations including chromosomes,
+#' and different function categories defined by the Ensembl regulatory build
+#'
+#' @param medecom.result An object of type \code{\link{MeDeComSet-class}} or the location of an .RData file, where
+#'                 such an object is stored.
+#' @param annotation.filter A numeric vector specifying the sites that have been removed from \code{rnb.set} in a
+#'                 preprocessing step (e.g. coverage filtering) or a path to an .RData file.
+#' @param anno.data The original \code{\link[RnBeads]{RnBSet-class}} object containing methylation, sample meta and annotation
+#'                 information or a path to a directory stored by \code{\link[RnBeads]{save.rnb.set}} or a data.frame containing
+#'                 CpG annotations (ann_C)
+#' @param K The number of LMCs specified for the MeDeCom run.
+#' @param lambda The lambda parameter selected.
+#' @param cg_subset The index of the selection strategy employed (e.g. most variable CpGs).
+#' @param diff.threshold The difference cutoff between median methylation in the remaining LMCs and the LMC of interest
+#'                  used to call a CpG differentially methylated. The higher this value, the more conservative the
+#'                  selection.
+#' @param reference.computation Metric used to set the reference on the remaining LMCs to determine hyper- and hypomethylated sites.
+#'                  Can be either \code{"median"} (default), \code{"mean"}, or \code{"lmcs"} (\code{comp.lmcs} argument needs to be provided).
+#' @param comp.lmcs Numeric vector containing two numbers representing the LMCs that should be compared to one another.                 
+#' @param type Which direction is to be tested for enrichment. Can be one of "hypo", "hyper", or "differential"
+#' @param assembly The assembly used. Needs to be one of "hg19", "hg38" or "mm10". Does not need to be specified, if rnb.set is a
+#'                 \code{\link{RnBSet-class}}
+#' @return A data frame with four columns: \describe{
+#'  \item{LMC}{The LMC analyzed}
+#'  \item{annotation}{The annotation used. Can either be \code{chrXY} for enrichments on different chromosmes or different functional categories in the Ensembl regulatory build}
+#'  \item{p.value}{The p-value computing using Fisher's exact test for enrichment}
+#'  \item{OR}{The odds ratio for enrichment}
+#' }
+#' @export
+#' @author Michael Scherer
+lmc.annotation.enrichment <- function(medecom.result,
+                                annotation.filter=NULL,
+                                anno.data,
+                                K=NULL,
+                                lambda=NULL,
+                                cg_subset=NULL,
+                                diff.threshold=0.5,
+                                reference.computation="median",
+                                comp.lmcs=NULL,
+                                type="hypo",
+                                assembly="hg19"){
+  rnb.mode <- F
+  if(is.null(cg_subset)){
+    cg_subset <- medecom.result@parameters$cg_subsets[1]
+  }else if(!(cg_subset %in% medecom.result@parameters$cg_subsets)){
+    stop("Invalid value for cg_subset; not available in medecom.result")
+  }
+  if(is.null(K)){
+    K <- medecom.result@parameters$Ks[1]
+  }else if(!(K %in% medecom.result@parameters$Ks)){
+    stop("Invalid value for K; not available in medecom.result")
+  }
+  if(is.null(lambda)){
+    lambda <- medecom.result@parameters$lambdas[1]
+  }else if(!(lambda %in% medecom.result@parameters$lambdas)){
+    stop("Invalid value for lambdas; not available in medecom.result")
+  }
+  if(inherits(anno.data,"RnBSet")){
+    rnb.mode <- T
+    assembly <- assembly(anno.data)
+  }
+  if(is.character(medecom.result)){
+    new.envi <- new.env()
+    load(medecom.result,envir = new.envi)
+    medecom.result <- get(ls(envir = new.envi),envir = new.envi)
+  }
+  if(is.character(annotation.filter)){
+    new.envi <- new.env()
+    load(annotation.filter,envir = new.envi)
+    annotation.filter <- get(ls(envir = new.envi),envir = new.envi)
+  }
+  if(!reference.computation %in% c("median","mean","lmcs")){
+    stop("Invalid value for reference.computation: Only mean and median are supported")
+  }else{
+    if(reference.computation %in% "median"){
+      ref.func <- rowMedians
+    }else if(reference.computation %in% "mean"){
+      ref.func <- rowMeans
+    }else{
+      if(any(comp.lmcs > K) || length(comp.lmcs) != 2){
+        stop("Invalid value for comp.lmcs: Should specify two LMC used for comparison")
+      }
+    }
+  }
+  if(is.character(anno.data)){
+    options(fftempdir=temp.dir)
+    anno.data <- load.rnb.set(anno.data)
+  }
+  annos.all <- c("cpgislands","genes","promoters",paste0("ensembleRegBuildBP",c("ctcf","distal","dnase","proximal","tfbs","tss")))
+  if(any(!(annos.all %in% rnb.region.types(assembly)))){
+    rnb.load.annotation.from.db(annos.all[!(annos.all %in% rnb.region.types(assembly))],assembly=assembly)
+  }
+  annos.all <- c(annos.all,paste0("chr",1:22))
+  if(rnb.mode){
+    anno <- annotation(anno.data)
+  }else{
+    anno <- anno.data
+    rm(anno.data)
+  }
+  if(!is.null(annotation.filter)){
+    anno <- anno[annotation.filter,]
+  }
+  if(!is.null(medecom.result@parameters$GROUP_LISTS)){
+    sset <- medecom.result@parameters$GROUP_LIST[[cg_subset]]
+    anno <- anno[sset,]
+  }
+  anno <- GRanges(Rle(anno$Chromosome),IRanges(start=anno$Start,end=anno$End))
+  lmcs <- getLMCs(medecom.result,cg_subset=cg_subset,K=K,lambda=lambda)
+  enr.results <- c()
+  for(i in 1:K){
+    if(reference.computation %in% "lmcs"){
+      i <- comp.lmcs[1]
+      first.lmc <-  lmcs[,i]
+      ref.lmc <- lmcs[,comp.lmcs[2]]
+    }else{
+      first.lmc <- lmcs[,i]
+      ref.lmc <- ref.func(lmcs[,-i,drop=F])
+    }
+    lmc.diff <- ref.lmc - first.lmc
+    if(type=="hypo"){
+      is.hypo <- lmc.diff > diff.threshold
+    }else if (type=="hyper"){
+      is.hypo <- lmc.diff < -diff.threshold
+    }else if (type=="differential"){
+      is.hypo <- (lmc.diff < -diff.threshold) | (lmc.diff > diff.threshold)
+    }else{
+      stop("Invalid value for type, needs to be one of 'hypo', 'hyper' or 'differential'")
+    }
+    first.sites <- anno[is.hypo]
+    backgr.sites <- anno[!is.hypo]
+    res.all.annos <- c()
+    for(agg.type.name in annos.all){
+	  if(grepl("chr",agg.type.name)){
+	          if(length(first.sites)>0){
+		  	tps <- sum(as.character(seqnames(first.sites))%in%agg.type.name)
+		  	fps <- length(first.sites)-tps
+		  }else{
+			tps <- fps <- 0
+		  }
+		  fns <- sum(as.character(seqnames(backgr.sites))%in%agg.type.name)
+		  tns <- length(backgr.sites)-fns
+	  }else{
+		  agg.type <- rnb.get.annotation(agg.type.name,assembly=assembly)
+		  tps <- length(findOverlaps(first.sites,agg.type))
+		  fps <- length(first.sites)-tps
+		  fns <- length(findOverlaps(backgr.sites,agg.type))
+		  tns <- length(backgr.sites)-fns
+	  }
+	  agg.type.name <- gsub("ensembleRegBuildBP","",agg.type.name)
+	  gr <- fisher.test(matrix(c(tps,fns,fps,tns),2,2),alternative="greater")$p.value
+	  or <- (tps/fps)/(fns/tns)
+          res.all.annos <- rbind(res.all.annos,c(agg.type.name,gr,or))
+     }
+    comp <- paste0("LMC",i)
+    res.all.annos <- data.frame(annotation=res.all.annos[,1],
+		p.value=as.numeric(res.all.annos[,2]),
+		OddsRatio=as.numeric(res.all.annos[,3]))
+    enr.results[[comp]] <- as.data.frame(res.all.annos)
+    print(paste(comp,"processed"))
+  }
+  return(enr.results)
+}
+

@@ -4,9 +4,20 @@
 \alias{plotProportions}
 \title{plotProportions}
 \usage{
-plotProportions(MeDeComSet, type, K, lambda, cg_subset = 1, lmc = NA,
-  Aref = NULL, ref.profile = NA, sample.characteristic = NULL,
-  heatmap.clusterCols = FALSE, heatmap.clusterRows = FALSE, ...)
+plotProportions(
+  MeDeComSet,
+  type,
+  K,
+  lambda,
+  cg_subset = 1,
+  lmc = NA,
+  Aref = NULL,
+  ref.profile = NA,
+  sample.characteristic = NULL,
+  heatmap.clusterCols = FALSE,
+  heatmap.clusterRows = FALSE,
+  ...
+)
 }
 \arguments{
 \item{MeDeComSet}{an object with MeDeCom results}

@@ -4,8 +4,13 @@
 \alias{run.trait.association}
 \title{run.trait.association}
 \usage{
-run.trait.association(medecom.set, pheno.data, test.fun = t.test,
-  plot.path = getwd(), figure.format = "pdf")
+run.trait.association(
+  medecom.set,
+  pheno.data,
+  test.fun = t.test,
+  plot.path = getwd(),
+  figure.format = "pdf"
+)
 }
 \arguments{
 \item{medecom.set}{An object of type \code{\link{MeDeComSet}} as the result of \code{\link{runMeDeCom}} containing LMCs and their

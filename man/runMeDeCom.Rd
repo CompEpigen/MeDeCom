@@ -4,14 +4,33 @@
 \alias{runMeDeCom}
 \title{runMeDeCom}
 \usage{
-runMeDeCom(data, Ks, lambdas, opt.method = "MeDeCom.cppTAfact",
-  cg_subsets = NULL, sample_subset = NULL, startT = NULL,
-  startA = NULL, trueT = NULL, trueA = NULL, fixed_T_cols = NULL,
-  NINIT = 100, ITERMAX = 1000, NFOLDS = 10, N_COMP_LAMBDA = 4,
-  NCORES = 1, random.seed = NULL, num.tol = 1e-08,
-  analysis.name = NULL, use.ff = FALSE, cluster.settings = NULL,
-  temp.dir = NULL, cleanup = TRUE, verbosity = 1L,
-  time.stamps = FALSE)
+runMeDeCom(
+  data,
+  Ks,
+  lambdas,
+  opt.method = "MeDeCom.cppTAfact",
+  cg_subsets = NULL,
+  sample_subset = NULL,
+  startT = NULL,
+  startA = NULL,
+  trueT = NULL,
+  trueA = NULL,
+  fixed_T_cols = NULL,
+  NINIT = 100,
+  ITERMAX = 1000,
+  NFOLDS = 10,
+  N_COMP_LAMBDA = 4,
+  NCORES = 1,
+  random.seed = NULL,
+  num.tol = 1e-08,
+  analysis.name = NULL,
+  use.ff = FALSE,
+  cluster.settings = NULL,
+  temp.dir = NULL,
+  cleanup = TRUE,
+  verbosity = 1L,
+  time.stamps = FALSE
+)
 }
 \arguments{
 \item{data}{DNA methylation dataset as a \code{numeric} matrix (methylation sites vs samples) or an ojbect of class \code{RnBeadSet}}

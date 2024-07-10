@@ -4,11 +4,24 @@
 \alias{locus_plot}
 \title{locus_plot}
 \usage{
-locus_plot(That, ann, cgs, locus.chr, locus.start, locus.end,
+locus_plot(
+  That,
+  ann,
+  cgs,
+  locus.chr,
+  locus.start,
+  locus.end,
   locus.name = sprintf("\%s:\%d-\%d", locus.chr, locus.start, locus.end),
-  locus.forward = FALSE, flank.start = 1000, flank.end = 1000,
-  comp.cols = rainbow(ncol(That)), legend.pos = "topleft",
-  Tstar = NULL, D = NULL, plot.genes = FALSE, ann.genes = NULL)
+  locus.forward = FALSE,
+  flank.start = 1000,
+  flank.end = 1000,
+  comp.cols = rainbow(ncol(That)),
+  legend.pos = "topleft",
+  Tstar = NULL,
+  D = NULL,
+  plot.genes = FALSE,
+  ann.genes = NULL
+)
 }
 \arguments{
 \item{That}{a matrix of LMCs}

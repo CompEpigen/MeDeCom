@@ -4,9 +4,17 @@
 \alias{plotParameters}
 \title{plotParameters}
 \usage{
-plotParameters(MeDeComSet, cg_subset = 1, Ks = integer(),
-  lambdas = integer(), statistic = "cve", minLambda = 0,
-  maxLambda = Inf, lambdaScale = "native", ...)
+plotParameters(
+  MeDeComSet,
+  cg_subset = 1,
+  Ks = integer(),
+  lambdas = integer(),
+  statistic = "cve",
+  minLambda = 0,
+  maxLambda = Inf,
+  lambdaScale = "native",
+  ...
+)
 }
 \arguments{
 \item{MeDeComSet}{MeDeCom object}

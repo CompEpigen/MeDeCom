@@ -4,12 +4,20 @@
 \alias{plotLMC.reference}
 \title{plotLMC.reference}
 \usage{
-plotLMC.reference(medecom.set, ref.meth, ann.md,
+plotLMC.reference(
+  medecom.set,
+  ref.meth,
+  ann.md,
   cg_subset = medecom.set@parameters$cg_subsets[1],
   K = medecom.set@parameters$Ks[1],
-  lambda = medecom.set@parameters$lambdas[1], ann.ref = NULL,
-  type = "dendrogram", chrom.col = "Chromosome", start.col = "Start",
-  end.col = "End", ct.color.column = "cell_type")
+  lambda = medecom.set@parameters$lambdas[1],
+  ann.ref = NULL,
+  type = "dendrogram",
+  chrom.col = "Chromosome",
+  start.col = "Start",
+  end.col = "End",
+  ct.color.column = "cell_type"
+)
 }
 \arguments{
 \item{medecom.set}{An object of type MeDeComSet}

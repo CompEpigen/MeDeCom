@@ -7,3 +7,7 @@ See MeDeCom [vignette](vignettes/MeDeCom.md) for a more detailed description and
 # Publications
 
 MeDeCom has originially been published in [Genome Biology](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-017-1182-6). Together with its accompanying packages [DecompPipeline](https://github.com/CompEpigen/DecompPipeline) and [FactorViz](https://github.com/CompEpigen/FactorViz), MeDeCom is part of a published [protocol](https://www.nature.com/articles/s41596-020-0369-6) for reference-free deconvolution of complex DNA methylation data (see also [http://epigenomics.dkfz.de/DecompProtocol/](http://epigenomics.dkfz.de/DecompProtocol/)).
+
+# de.NBI service
+
+MeDeCom is an approved [de.NBI service](https://www.denbi.de/services-according-to-service-centers/915-medecom-decomposition-of-heterogeneous-dna-methylomes). Please help us improve by taking our short [user survey](https://www.surveymonkey.de/r/denbi-service?sc=hd-hub&tool=medecom).
